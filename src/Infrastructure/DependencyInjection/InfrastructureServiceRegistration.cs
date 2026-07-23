@@ -14,8 +14,11 @@ public static class InfrastructureServiceRegistration
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("Default")
-            ?? Environment.GetEnvironmentVariable("CONNECTIONSTRINGS__DEFAULT")
-            ?? "Host=localhost;Database=proyecto_avengers;Username=postgres;Password=postgres";
+            ?? Environment.GetEnvironmentVariable("CONNECTIONSTRINGS__DEFAULT");
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException(
+                "Connection string 'Default' no está configurada. Define 'ConnectionStrings:Default' en appsettings o la variable de entorno 'CONNECTIONSTRINGS__DEFAULT'.");
 
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));

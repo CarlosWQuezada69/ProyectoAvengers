@@ -21,6 +21,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
+    [ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "search", "categoryId", "minPrice", "maxPrice", "onlyAvailable", "sort", "page", "pageSize" })]
     public async Task<ActionResult<PaginatedResponse<ProductListDto>>> GetProducts(
         [FromQuery] string? search,
         [FromQuery] Guid? categoryId,
@@ -35,15 +36,17 @@ public class ProductsController : ControllerBase
 
         var query = _context.Products
             .Include(p => p.Category)
-            .Include(p => p.ProductImages)
-            .Where(p => p.DeletedAt == null && p.IsActive)
+            .Where(p => p.IsActive)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
+        {
+            var searchTerm = search.ToLowerInvariant();
             query = query.Where(p =>
-                p.Name.Contains(search) ||
-                p.Sku.Contains(search) ||
-                p.Description!.Contains(search));
+                p.Name.ToLower().Contains(searchTerm) ||
+                p.Sku.ToLower().Contains(searchTerm) ||
+                p.Description!.ToLower().Contains(searchTerm));
+        }
 
         if (categoryId.HasValue)
             query = query.Where(p => p.CategoryId == categoryId);
@@ -72,28 +75,30 @@ public class ProductsController : ControllerBase
         var items = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .Select(p => new ProductListDto
+            {
+                Id = p.Id,
+                Sku = p.Sku,
+                Name = p.Name,
+                Slug = p.Slug,
+                Price = p.Price,
+                CompareAtPrice = p.CompareAtPrice,
+                Stock = p.Stock,
+                CategoryName = p.Category != null ? p.Category.Name : null,
+                IsActive = p.IsActive,
+                IsFeatured = p.IsFeatured,
+                PrimaryImageUrl = p.ProductImages
+                    .OrderByDescending(i => i.IsPrimary)
+                    .ThenBy(i => i.DisplayOrder)
+                    .Select(i => i.Url)
+                    .FirstOrDefault(),
+                CreatedAt = p.CreatedAt
+            })
             .ToListAsync();
-
-        var dtos = items.Select(p => new ProductListDto
-        {
-            Id = p.Id,
-            Sku = p.Sku,
-            Name = p.Name,
-            Slug = p.Slug,
-            Price = p.Price,
-            CompareAtPrice = p.CompareAtPrice,
-            Stock = p.Stock,
-            CategoryName = p.Category?.Name,
-            IsActive = p.IsActive,
-            IsFeatured = p.IsFeatured,
-            PrimaryImageUrl = p.ProductImages.FirstOrDefault(i => i.IsPrimary)?.Url
-                ?? p.ProductImages.FirstOrDefault()?.Url,
-            CreatedAt = p.CreatedAt
-        }).ToList();
 
         return Ok(new PaginatedResponse<ProductListDto>
         {
-            Data = dtos,
+            Data = items,
             Page = page,
             PageSize = pageSize,
             TotalCount = totalCount
@@ -101,31 +106,34 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("featured")]
+    [ResponseCache(Duration = 120)]
     public async Task<ActionResult<List<ProductListDto>>> GetFeatured()
     {
         var items = await _context.Products
-            .Include(p => p.Category)
-            .Include(p => p.ProductImages)
-            .Where(p => p.DeletedAt == null && p.IsActive && p.IsFeatured)
+            .Where(p => p.IsActive && p.IsFeatured)
             .OrderByDescending(p => p.CreatedAt)
             .Take(10)
+            .Select(p => new ProductListDto
+            {
+                Id = p.Id,
+                Sku = p.Sku,
+                Name = p.Name,
+                Slug = p.Slug,
+                Price = p.Price,
+                CompareAtPrice = p.CompareAtPrice,
+                Stock = p.Stock,
+                CategoryName = p.Category != null ? p.Category.Name : null,
+                IsFeatured = p.IsFeatured,
+                PrimaryImageUrl = p.ProductImages
+                    .OrderByDescending(i => i.IsPrimary)
+                    .ThenBy(i => i.DisplayOrder)
+                    .Select(i => i.Url)
+                    .FirstOrDefault(),
+                CreatedAt = p.CreatedAt
+            })
             .ToListAsync();
 
-        return Ok(items.Select(p => new ProductListDto
-        {
-            Id = p.Id,
-            Sku = p.Sku,
-            Name = p.Name,
-            Slug = p.Slug,
-            Price = p.Price,
-            CompareAtPrice = p.CompareAtPrice,
-            Stock = p.Stock,
-            CategoryName = p.Category?.Name,
-            IsFeatured = p.IsFeatured,
-            PrimaryImageUrl = p.ProductImages.FirstOrDefault(i => i.IsPrimary)?.Url
-                ?? p.ProductImages.FirstOrDefault()?.Url,
-            CreatedAt = p.CreatedAt
-        }).ToList());
+        return Ok(items);
     }
 
     [HttpGet("{slug}")]
@@ -135,7 +143,7 @@ public class ProductsController : ControllerBase
             .Include(p => p.Category)
             .Include(p => p.ProductImages.OrderBy(pi => pi.DisplayOrder))
             .Include(p => p.ProductRestrictions.Where(r => r.IsActive))
-            .FirstOrDefaultAsync(p => p.Slug == slug && p.DeletedAt == null && p.IsActive);
+            .FirstOrDefaultAsync(p => p.Slug == slug && p.IsActive);
 
         if (product == null)
             return NotFound();
@@ -146,10 +154,10 @@ public class ProductsController : ControllerBase
     [HttpPost("{id:guid}/track-view")]
     public async Task<ActionResult> TrackView(Guid id)
     {
-        var product = await _context.Products
-            .AnyAsync(p => p.Id == id && p.DeletedAt == null && p.IsActive);
+        var productExists = await _context.Products
+            .AnyAsync(p => p.Id == id && p.IsActive);
 
-        if (!product)
+        if (!productExists)
             return NotFound();
 
         _viewTracker.TrackView(id);

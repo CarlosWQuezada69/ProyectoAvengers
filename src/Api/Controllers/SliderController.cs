@@ -17,6 +17,7 @@ public class SliderController : ControllerBase
     }
 
     [HttpGet]
+    [ResponseCache(Duration = 120)]
     public async Task<ActionResult<List<SliderItemDto>>> GetSlider()
     {
         var now = DateTime.UtcNow;

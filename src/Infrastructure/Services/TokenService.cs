@@ -11,28 +11,33 @@ namespace ProyectoAvengers.Infrastructure.Services;
 
 public class TokenService : ITokenService
 {
-    private readonly IConfiguration _configuration;
+    private readonly SigningCredentials _signingCredentials;
+    private readonly string _issuer;
+    private readonly string _audience;
+    private readonly int _expiryMinutes;
+    private readonly JwtSecurityTokenHandler _tokenHandler = new();
 
     public TokenService(IConfiguration configuration)
     {
-        _configuration = configuration;
+        var jwtSettings = configuration.GetSection("Jwt");
+        var secretKey = jwtSettings["Secret"]
+            ?? Environment.GetEnvironmentVariable("JWT_SECRET");
+
+        if (string.IsNullOrWhiteSpace(secretKey) || secretKey.Length < 32)
+            throw new InvalidOperationException(
+                "JWT:Secret no está configurado. Define 'Jwt:Secret' en appsettings o la variable de entorno 'JWT_SECRET' (mínimo 32 caracteres).");
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        _signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        _issuer = jwtSettings["Issuer"] ?? "ProyectoAvengers";
+        _audience = jwtSettings["Audience"] ?? "ProyectoAvengers";
+        _expiryMinutes = int.Parse(jwtSettings["ExpiryMinutes"]
+            ?? Environment.GetEnvironmentVariable("JWT_EXPIRY_MINUTES")
+            ?? "15");
     }
 
     public (string token, int expiresIn) GenerateAccessToken(User user, List<string> roles, List<string> permissions)
     {
-        var jwtSettings = _configuration.GetSection("Jwt");
-        var secretKey = jwtSettings["Secret"]
-            ?? Environment.GetEnvironmentVariable("JWT_SECRET")
-            ?? "SuperSecretKey_Dev_ChangeInProduction_MinLength32Chars!";
-        var issuer = jwtSettings["Issuer"] ?? "ProyectoAvengers";
-        var audience = jwtSettings["Audience"] ?? "ProyectoAvengers";
-        var expiryMinutes = int.Parse(jwtSettings["ExpiryMinutes"]
-            ?? Environment.GetEnvironmentVariable("JWT_EXPIRY_MINUTES")
-            ?? "15");
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -47,14 +52,14 @@ public class TokenService : ITokenService
             claims.Add(new Claim("permission", permission));
 
         var token = new JwtSecurityToken(
-            issuer: issuer,
-            audience: audience,
+            issuer: _issuer,
+            audience: _audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(expiryMinutes),
-            signingCredentials: credentials
+            expires: DateTime.UtcNow.AddMinutes(_expiryMinutes),
+            signingCredentials: _signingCredentials
         );
 
-        return (new JwtSecurityTokenHandler().WriteToken(token), expiryMinutes * 60);
+        return (_tokenHandler.WriteToken(token), _expiryMinutes * 60);
     }
 
     public string GenerateRefreshToken()
@@ -69,25 +74,19 @@ public class TokenService : ITokenService
     {
         try
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtSettings = _configuration.GetSection("Jwt");
-            var secretKey = jwtSettings["Secret"]
-                ?? Environment.GetEnvironmentVariable("JWT_SECRET")
-                ?? "SuperSecretKey_Dev_ChangeInProduction_MinLength32Chars!";
-            var key = Encoding.UTF8.GetBytes(secretKey);
-
-            var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+            var validationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
+                IssuerSigningKey = _signingCredentials.Key,
                 ValidateIssuer = true,
-                ValidIssuer = jwtSettings["Issuer"] ?? "ProyectoAvengers",
+                ValidIssuer = _issuer,
                 ValidateAudience = true,
-                ValidAudience = jwtSettings["Audience"] ?? "ProyectoAvengers",
+                ValidAudience = _audience,
                 ValidateLifetime = false,
                 ClockSkew = TimeSpan.Zero
-            }, out _);
+            };
 
+            var principal = _tokenHandler.ValidateToken(token, validationParameters, out _);
             return principal;
         }
         catch

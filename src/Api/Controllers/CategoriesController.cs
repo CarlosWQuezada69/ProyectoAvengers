@@ -17,6 +17,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
+    [ResponseCache(Duration = 120, VaryByQueryKeys = new[] { "tree" })]
     public async Task<ActionResult> GetCategories([FromQuery] bool tree = false)
     {
         var categories = await _context.Categories
@@ -49,6 +50,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet("{slug}")]
+    [ResponseCache(Duration = 120)]
     public async Task<ActionResult<CategoryDto>> GetCategory(string slug)
     {
         var category = await _context.Categories

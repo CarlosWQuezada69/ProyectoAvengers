@@ -23,6 +23,7 @@ public class SettingsController : ControllerBase
     }
 
     [HttpGet("public")]
+    [ResponseCache(Duration = 300)]
     public async Task<ActionResult<Dictionary<string, string?>>> GetPublicSettings()
     {
         var settings = await _context.SiteSettings

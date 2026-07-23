@@ -23,16 +23,18 @@ services:
     container_name: avengers-api
     environment:
       CONNECTIONSTRINGS__DEFAULT: "Host=postgres;Database=proyecto_avengers;Username=postgres;Password=postgres"
-      JWT__SECRET: "SuperSecretKey_Dev_ChangeInProduction_MinLength32Chars!"
+      JWT__SECRET: "${JWT_SECRET:-SuperSecretKey_Dev_ChangeInProduction_MinLength32Chars!}"
       JWT__ISSUER: "ProyectoAvengers"
       JWT__AUDIENCE: "ProyectoAvengers"
-      ADMIN_EMAIL: "admin@avengers.com"
-      ADMIN_PASSWORD: "Admin123!"
-      ASPNETCORE_ENVIRONMENT: "Development"
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@avengers.com}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-Admin123!}"
+      ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT:-Development}"
+      ASPNETCORE_URLS: "http://+:8080"
       FILESTORAGE__PATH: "/app/uploads"
       FILESTORAGE__URL: "/uploads"
+      CORS__ALLOWEDORIGINS__0: "${CORS_ORIGIN:-http://localhost:4200}"
     ports:
-      - "5000:8080"
+      - "${API_PORT:-5000}:8080"
     volumes:
       - uploads:/app/uploads
     depends_on:

@@ -29,7 +29,6 @@ public class InMemoryViewTracker : IViewTracker
             return;
 
         var snapshot = new Dictionary<string, int>(_views);
-        _views.Clear();
 
         using var scope = _scopeFactory.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -62,5 +61,16 @@ public class InMemoryViewTracker : IViewTracker
         }
 
         await context.SaveChangesAsync(ct);
+
+        foreach (var key in snapshot.Keys)
+        {
+            _views.TryUpdate(key, _views[key] - snapshot[key], _views[key]);
+        }
+
+        foreach (var key in snapshot.Keys)
+        {
+            if (_views.TryGetValue(key, out var remaining) && remaining <= 0)
+                _views.TryRemove(key, out _);
+        }
     }
 }

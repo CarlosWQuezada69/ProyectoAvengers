@@ -1,11 +1,36 @@
+# Node.js
 node_modules/
 dist/
 build/
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.sln.docstates
+*.userprefs
+packages/
+*.nupkg
+*.vs/
+.nuget/
+
+# Environment
 .env
 .env.local
+
+# Logs
 *.log
+
+# OS
 .DS_Store
 Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+
+# Coverage
 coverage/
 .next/
 .cache/

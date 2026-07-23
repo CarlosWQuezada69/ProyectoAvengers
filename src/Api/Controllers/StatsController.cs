@@ -22,14 +22,14 @@ public class StatsController : AdminBaseController
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         var totalProducts = await _context.Products.CountAsync();
-        var activeProducts = await _context.Products.CountAsync(p => p.DeletedAt == null && p.IsActive);
+        var activeProducts = await _context.Products.CountAsync(p => p.IsActive);
         var totalCategories = await _context.Categories.CountAsync();
-        var totalUsers = await _context.Users.CountAsync(u => u.DeletedAt == null);
+        var totalUsers = await _context.Users.CountAsync();
         var todayViews = await _context.ProductStatsDailies
             .Where(s => s.Date == today)
             .SumAsync(s => s.Views);
         var lowStockCount = await _context.Products
-            .CountAsync(p => p.DeletedAt == null && p.Stock > 0 && p.Stock <= 5);
+            .CountAsync(p => p.Stock > 0 && p.Stock <= 5);
 
         return Ok(new OverviewStats
         {
@@ -55,12 +55,12 @@ public class StatsController : AdminBaseController
 
         var stats = await _context.ProductStatsDailies
             .Where(s => s.Date >= fromDate && s.Date <= toDate)
-            .GroupBy(s => new { s.ProductId, s.Product.Name, s.Product.ProductImages.FirstOrDefault(i => i.IsPrimary).Url })
+            .GroupBy(s => new { s.ProductId, s.Product.Name, ImageUrl = s.Product.ProductImages.OrderByDescending(i => i.IsPrimary).ThenBy(i => i.DisplayOrder).Select(i => i.Url).FirstOrDefault() })
             .Select(g => new TopProductStat
             {
                 ProductId = g.Key.ProductId,
                 ProductName = g.Key.Name,
-                ImageUrl = g.Key.Url,
+                ImageUrl = g.Key.ImageUrl,
                 Count = g.Sum(s => s.Views)
             })
             .OrderByDescending(s => s.Count)
@@ -83,12 +83,12 @@ public class StatsController : AdminBaseController
 
         var stats = await _context.ProductStatsDailies
             .Where(s => s.Date >= fromDate && s.Date <= toDate)
-            .GroupBy(s => new { s.ProductId, s.Product.Name, s.Product.ProductImages.FirstOrDefault(i => i.IsPrimary).Url })
+            .GroupBy(s => new { s.ProductId, s.Product.Name, ImageUrl = s.Product.ProductImages.OrderByDescending(i => i.IsPrimary).ThenBy(i => i.DisplayOrder).Select(i => i.Url).FirstOrDefault() })
             .Select(g => new TopProductStat
             {
                 ProductId = g.Key.ProductId,
                 ProductName = g.Key.Name,
-                ImageUrl = g.Key.Url,
+                ImageUrl = g.Key.ImageUrl,
                 Count = g.Sum(s => s.Purchases)
             })
             .OrderByDescending(s => s.Count)
@@ -103,18 +103,22 @@ public class StatsController : AdminBaseController
     public async Task<ActionResult<List<TopProductStat>>> GetLowStock([FromQuery] int threshold = 5)
     {
         var products = await _context.Products
-            .Include(p => p.ProductImages)
-            .Where(p => p.DeletedAt == null && p.Stock > 0 && p.Stock <= threshold)
+            .Where(p => p.Stock > 0 && p.Stock <= threshold)
             .OrderBy(p => p.Stock)
             .Take(50)
+            .Select(p => new TopProductStat
+            {
+                ProductId = p.Id,
+                ProductName = p.Name,
+                ImageUrl = p.ProductImages
+                    .OrderByDescending(i => i.IsPrimary)
+                    .ThenBy(i => i.DisplayOrder)
+                    .Select(i => i.Url)
+                    .FirstOrDefault(),
+                Count = p.Stock
+            })
             .ToListAsync();
 
-        return Ok(products.Select(p => new TopProductStat
-        {
-            ProductId = p.Id,
-            ProductName = p.Name,
-            ImageUrl = p.ProductImages.FirstOrDefault(i => i.IsPrimary)?.Url,
-            Count = p.Stock
-        }).ToList());
+        return Ok(products);
     }
 }

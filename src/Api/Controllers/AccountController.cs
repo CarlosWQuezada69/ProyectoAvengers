@@ -1,5 +1,7 @@
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Application.Interfaces;
 using ProyectoAvengers.Infrastructure.Persistence;
@@ -27,13 +29,14 @@ public class AccountController : ControllerBase
 
     [HttpPost("change-email/request")]
     [Authorize]
+    [EnableRateLimiting("Auth")]
     public async Task<ActionResult> ChangeEmailRequest([FromBody] ChangeEmailRequest request)
     {
         var userId = _currentUser.GetUserId();
         if (userId == null)
             return Unauthorized();
 
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId && u.DeletedAt == null);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         if (user == null)
             return NotFound();
 
@@ -45,7 +48,10 @@ public class AccountController : ControllerBase
                 Detail = "El correo electrónico ya está registrado por otro usuario."
             });
 
-        var token = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
+        var tokenBytes = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(tokenBytes);
+        var token = Convert.ToHexString(tokenBytes).ToLowerInvariant();
 
         _context.EmailChangeRequests.Add(new Domain.Entities.EmailChangeRequest
         {

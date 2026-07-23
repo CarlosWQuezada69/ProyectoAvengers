@@ -38,13 +38,14 @@ public class AdminProductsController : AdminBaseController
 
         var query = _context.Products
             .Include(p => p.Category)
-            .Include(p => p.ProductImages)
-            .Where(p => p.DeletedAt == null)
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
+        {
+            var searchTerm = search.ToLowerInvariant();
             query = query.Where(p =>
-                p.Name.Contains(search) || p.Sku.Contains(search));
+                p.Name.ToLower().Contains(searchTerm) || p.Sku.ToLower().Contains(searchTerm));
+        }
 
         if (categoryId.HasValue)
             query = query.Where(p => p.CategoryId == categoryId);
@@ -58,28 +59,30 @@ public class AdminProductsController : AdminBaseController
             .OrderByDescending(p => p.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .Select(p => new ProductListDto
+            {
+                Id = p.Id,
+                Sku = p.Sku,
+                Name = p.Name,
+                Slug = p.Slug,
+                Price = p.Price,
+                CompareAtPrice = p.CompareAtPrice,
+                Stock = p.Stock,
+                CategoryName = p.Category != null ? p.Category.Name : null,
+                IsActive = p.IsActive,
+                IsFeatured = p.IsFeatured,
+                PrimaryImageUrl = p.ProductImages
+                    .OrderByDescending(i => i.IsPrimary)
+                    .ThenBy(i => i.DisplayOrder)
+                    .Select(i => i.Url)
+                    .FirstOrDefault(),
+                CreatedAt = p.CreatedAt
+            })
             .ToListAsync();
-
-        var dtos = items.Select(p => new ProductListDto
-        {
-            Id = p.Id,
-            Sku = p.Sku,
-            Name = p.Name,
-            Slug = p.Slug,
-            Price = p.Price,
-            CompareAtPrice = p.CompareAtPrice,
-            Stock = p.Stock,
-            CategoryName = p.Category?.Name,
-            IsActive = p.IsActive,
-            IsFeatured = p.IsFeatured,
-            PrimaryImageUrl = p.ProductImages.FirstOrDefault(i => i.IsPrimary)?.Url
-                ?? p.ProductImages.FirstOrDefault()?.Url,
-            CreatedAt = p.CreatedAt
-        }).ToList();
 
         return Ok(new PaginatedResponse<ProductListDto>
         {
-            Data = dtos,
+            Data = items,
             Page = page,
             PageSize = pageSize,
             TotalCount = totalCount
@@ -94,7 +97,7 @@ public class AdminProductsController : AdminBaseController
             .Include(p => p.Category)
             .Include(p => p.ProductImages.OrderBy(pi => pi.DisplayOrder))
             .Include(p => p.ProductRestrictions)
-            .FirstOrDefaultAsync(p => p.Id == id && p.DeletedAt == null);
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null)
             return NotFound();
@@ -153,7 +156,7 @@ public class AdminProductsController : AdminBaseController
     public async Task<ActionResult<ProductDto>> UpdateProduct(Guid id, [FromBody] UpdateProductRequest request)
     {
         var product = await _context.Products
-            .FirstOrDefaultAsync(p => p.Id == id && p.DeletedAt == null);
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null)
             return NotFound();
@@ -211,7 +214,7 @@ public class AdminProductsController : AdminBaseController
     public async Task<ActionResult> DeleteProduct(Guid id)
     {
         var product = await _context.Products
-            .FirstOrDefaultAsync(p => p.Id == id && p.DeletedAt == null);
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null)
             return NotFound();
@@ -229,7 +232,7 @@ public class AdminProductsController : AdminBaseController
     {
         var product = await _context.Products
             .Include(p => p.ProductImages)
-            .FirstOrDefaultAsync(p => p.Id == id && p.DeletedAt == null);
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null)
             return NotFound();
@@ -294,7 +297,7 @@ public class AdminProductsController : AdminBaseController
     {
         var product = await _context.Products
             .Include(p => p.ProductImages)
-            .FirstOrDefaultAsync(p => p.Id == id && p.DeletedAt == null);
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null)
             return NotFound();
@@ -314,10 +317,10 @@ public class AdminProductsController : AdminBaseController
     [RequirePermission("products.manage-restrictions")]
     public async Task<ActionResult<ProductRestrictionDto>> CreateRestriction(Guid id, [FromBody] CreateRestrictionRequest request)
     {
-        var product = await _context.Products
-            .AnyAsync(p => p.Id == id && p.DeletedAt == null);
+        var productExists = await _context.Products
+            .AnyAsync(p => p.Id == id);
 
-        if (!product)
+        if (!productExists)
             return NotFound();
 
         var restriction = new ProductRestriction

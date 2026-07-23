@@ -38,7 +38,6 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
-        // Check constraint for product_restrictions.restriction_type
         modelBuilder.Entity<ProductRestriction>(entity =>
         {
             entity.ToTable(t => t.HasCheckConstraint(
@@ -46,6 +45,9 @@ public class AppDbContext : DbContext
                 "restriction_type IN ('AGE_MIN', 'PURCHASE_LIMIT_USER', 'PURCHASE_LIMIT_ORDER', 'AVAILABILITY_WINDOW', 'GEOGRAPHIC', 'LIMITED_STOCK')"
             ));
         });
+
+        modelBuilder.Entity<Product>().HasQueryFilter(p => p.DeletedAt == null);
+        modelBuilder.Entity<User>().HasQueryFilter(u => u.DeletedAt == null);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -53,7 +55,6 @@ public class AppDbContext : DbContext
         var userId = _currentUserService.GetUserId();
         var ipAddress = _currentUserService.GetIpAddress();
         var now = DateTime.UtcNow;
-        var auditEntries = new List<(EntityEntry Entry, AuditLog Audit)>();
 
         foreach (var entry in ChangeTracker.Entries())
         {
@@ -61,72 +62,72 @@ public class AppDbContext : DbContext
                 continue;
 
             var entity = entry.Entity;
-            var entityType = entity.GetType();
 
             switch (entry.State)
             {
                 case EntityState.Added:
                     SetProperty(entity, "CreatedAt", now);
                     SetProperty(entity, "CreatedByUserId", userId);
-                    auditEntries.Add((entry, new AuditLog
-                    {
-                        UserId = userId,
-                        Action = "CREATE",
-                        EntityName = entityType.Name,
-                        EntityId = GetPrimaryKey(entry),
-                        Changes = SerializeChanges(entry),
-                        IpAddress = ipAddress,
-                        CreatedAt = now
-                    }));
                     break;
 
                 case EntityState.Modified:
                     SetProperty(entity, "UpdatedAt", now);
                     SetProperty(entity, "UpdatedByUserId", userId);
-                    auditEntries.Add((entry, new AuditLog
-                    {
-                        UserId = userId,
-                        Action = "UPDATE",
-                        EntityName = entityType.Name,
-                        EntityId = GetPrimaryKey(entry),
-                        Changes = SerializeChanges(entry),
-                        IpAddress = ipAddress,
-                        CreatedAt = now
-                    }));
                     break;
 
                 case EntityState.Deleted:
-                    var hasSoftDelete = HasProperty(entity, "DeletedAt");
-                    if (hasSoftDelete)
+                    if (HasProperty(entity, "DeletedAt"))
                     {
                         entry.State = EntityState.Modified;
                         SetProperty(entity, "DeletedAt", now);
                         SetProperty(entity, "DeletedByUserId", userId);
                     }
-                    auditEntries.Add((entry, new AuditLog
-                    {
-                        UserId = userId,
-                        Action = "DELETE",
-                        EntityName = entityType.Name,
-                        EntityId = GetPrimaryKey(entry),
-                        Changes = SerializeChanges(entry),
-                        IpAddress = ipAddress,
-                        CreatedAt = now
-                    }));
                     break;
             }
         }
 
-        var result = await base.SaveChangesAsync(cancellationToken);
+        var auditLogs = GenerateAuditLogs(userId, ipAddress, now);
+        if (auditLogs.Count > 0)
+            AuditLogs.AddRange(auditLogs);
 
-        foreach (var (entry, audit) in auditEntries)
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    private List<AuditLog> GenerateAuditLogs(Guid? userId, string? ipAddress, DateTime now)
+    {
+        var logs = new List<AuditLog>();
+
+        foreach (var entry in ChangeTracker.Entries())
         {
-            AuditLogs.Add(audit);
+            if (entry.Entity is AuditLog)
+                continue;
+
+            if (entry.State is not (EntityState.Added or EntityState.Modified or EntityState.Deleted))
+                continue;
+
+            var action = entry.State switch
+            {
+                EntityState.Added => "CREATE",
+                EntityState.Modified => "UPDATE",
+                EntityState.Deleted => "DELETE",
+                _ => null
+            };
+
+            if (action == null) continue;
+
+            logs.Add(new AuditLog
+            {
+                UserId = userId,
+                Action = action,
+                EntityName = entry.Entity.GetType().Name,
+                EntityId = GetPrimaryKey(entry),
+                Changes = entry.State != EntityState.Added ? SerializeChanges(entry) : null,
+                IpAddress = ipAddress,
+                CreatedAt = now
+            });
         }
 
-        await base.SaveChangesAsync(cancellationToken);
-
-        return result;
+        return logs;
     }
 
     private static void SetProperty(object entity, string propertyName, object? value)
@@ -159,10 +160,19 @@ public class AppDbContext : DbContext
 
         foreach (var prop in entry.Properties)
         {
-            if (prop.IsModified || entry.State == EntityState.Added)
+            if (!prop.IsModified)
+                continue;
+
+            if (prop.Metadata.Name is "RowVersion" or "ConcurrencyStamp" or "UpdatedAt" or "UpdatedByUserId")
+                continue;
+
+            if (prop.Metadata.GetColumnType() is "text" or "bytea")
             {
-                changes[prop.Metadata.Name] = prop.CurrentValue;
+                changes[prop.Metadata.Name] = "[truncated]";
+                continue;
             }
+
+            changes[prop.Metadata.Name] = prop.CurrentValue;
         }
 
         return changes.Count > 0 ? JsonSerializer.Serialize(changes) : null;

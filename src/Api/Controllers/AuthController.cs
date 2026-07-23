@@ -1,5 +1,8 @@
+using System.Collections.Concurrent;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Application.Interfaces;
 using ProyectoAvengers.Domain.Entities;
@@ -13,6 +16,8 @@ namespace ProyectoAvengers.Api.Controllers;
 [Route("api/v1/auth")]
 public class AuthController : ControllerBase
 {
+    private static readonly ConcurrentDictionary<string, FailedLoginInfo> _failedLogins = new();
+
     private readonly AppDbContext _context;
     private readonly ITokenService _tokenService;
     private readonly ICurrentUserService _currentUser;
@@ -31,22 +36,38 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting("Auth")]
     public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
     {
+        var normalizedEmail = request.Email.ToLowerInvariant().Trim();
+
+        if (IsAccountLocked(normalizedEmail))
+            return Unauthorized(new ProblemDetails
+            {
+                Title = "Cuenta bloqueada",
+                Status = 401,
+                Detail = "Demasiados intentos fallidos. Intenta de nuevo en 15 minutos."
+            });
+
         var user = await _context.Users
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
                     .ThenInclude(r => r.RolePermissions)
                         .ThenInclude(rp => rp.Permission)
-            .FirstOrDefaultAsync(u => u.Email == request.Email && u.DeletedAt == null);
+            .FirstOrDefaultAsync(u => u.Email == normalizedEmail && u.DeletedAt == null);
 
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        {
+            RecordFailedAttempt(normalizedEmail);
             return Unauthorized(new ProblemDetails
             {
                 Title = "Credenciales inválidas",
                 Status = 401,
                 Detail = "El correo o la contraseña no son correctos."
             });
+        }
+
+        _failedLogins.TryRemove(normalizedEmail, out _);
 
         if (!user.IsActive)
             return Unauthorized(new ProblemDetails
@@ -93,6 +114,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh-token")]
+    [EnableRateLimiting("Auth")]
     public async Task<ActionResult<RefreshTokenResponse>> RefreshToken([FromBody] RefreshTokenRequest request)
     {
         var storedToken = await _context.RefreshTokens
@@ -103,12 +125,40 @@ public class AuthController : ControllerBase
                             .ThenInclude(rp => rp.Permission)
             .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken);
 
-        if (storedToken == null || storedToken.RevokedAt != null || storedToken.ExpiresAt < DateTime.UtcNow)
+        if (storedToken == null)
             return Unauthorized(new ProblemDetails
             {
                 Title = "Token inválido",
                 Status = 401,
-                Detail = "El refresh token no es válido o ha expirado."
+                Detail = "El refresh token no es válido."
+            });
+
+        if (storedToken.RevokedAt != null)
+        {
+            var userId = storedToken.UserId;
+            var userTokens = await _context.RefreshTokens
+                .Where(rt => rt.UserId == userId && rt.RevokedAt == null)
+                .ToListAsync();
+
+            foreach (var token in userTokens)
+                token.RevokedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Unauthorized(new ProblemDetails
+            {
+                Title = "Posible robo de token",
+                Status = 401,
+                Detail = "El refresh token ya fue usado. Todos los tokens fueron revocados por seguridad."
+            });
+        }
+
+        if (storedToken.ExpiresAt < DateTime.UtcNow)
+            return Unauthorized(new ProblemDetails
+            {
+                Title = "Token expirado",
+                Status = 401,
+                Detail = "El refresh token ha expirado."
             });
 
         storedToken.RevokedAt = DateTime.UtcNow;
@@ -157,14 +207,21 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("forgot-password")]
+    [EnableRateLimiting("Auth")]
     public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
+        var delay = RandomNumberGenerator.GetInt32(500, 1500);
+        await Task.Delay(delay);
+
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == request.Email && u.DeletedAt == null);
 
         if (user != null)
         {
-            var token = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
+            var tokenBytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(tokenBytes);
+            var token = Convert.ToHexString(tokenBytes).ToLowerInvariant();
 
             _context.PasswordResetTokens.Add(new PasswordResetToken
             {
@@ -185,6 +242,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("reset-password")]
+    [EnableRateLimiting("Auth")]
     public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
         var resetToken = await _context.PasswordResetTokens
@@ -240,5 +298,46 @@ public class AuthController : ControllerBase
             Roles = roles,
             Permissions = permissions
         });
+    }
+
+    private static bool IsAccountLocked(string email)
+    {
+        if (_failedLogins.TryGetValue(email, out var info))
+        {
+            if (info.Attempts >= 5 && DateTime.UtcNow < info.LockedUntil)
+                return true;
+
+            if (DateTime.UtcNow >= info.LockedUntil)
+                _failedLogins.TryRemove(email, out _);
+        }
+
+        return false;
+    }
+
+    private static void RecordFailedAttempt(string email)
+    {
+        _failedLogins.AddOrUpdate(email,
+            _ => new FailedLoginInfo
+            {
+                Attempts = 1,
+                LockedUntil = DateTime.UtcNow.AddMinutes(15),
+                FirstAttemptAt = DateTime.UtcNow
+            },
+            (_, info) =>
+            {
+                info.Attempts++;
+
+                if (info.Attempts >= 5)
+                    info.LockedUntil = DateTime.UtcNow.AddMinutes(15);
+
+                return info;
+            });
+    }
+
+    private class FailedLoginInfo
+    {
+        public int Attempts { get; set; }
+        public DateTime LockedUntil { get; set; }
+        public DateTime FirstAttemptAt { get; set; }
     }
 }

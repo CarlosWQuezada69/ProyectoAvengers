@@ -14,5 +14,12 @@ RUN dotnet publish src/Api/ProyectoAvengers.Api.csproj -c Release -o /app
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 EXPOSE 8080
+
+RUN addgroup --system --gid 1000 appgroup && \
+    adduser --system --uid 1000 --gid 1000 appuser
+
 COPY --from=build /app .
+RUN mkdir -p /app/uploads && chown -R appuser:appgroup /app
+
+USER appuser
 ENTRYPOINT ["dotnet", "ProyectoAvengers.Api.dll"]
