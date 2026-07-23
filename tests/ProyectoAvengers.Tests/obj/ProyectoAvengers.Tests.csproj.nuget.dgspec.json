@@ -1,0 +1,518 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/tests/ProyectoAvengers.Tests/ProyectoAvengers.Tests.csproj": {}
+  },
+  "projects": {
+    "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Api/ProyectoAvengers.Api.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Api/ProyectoAvengers.Api.csproj",
+        "projectName": "ProyectoAvengers.Api",
+        "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Api/ProyectoAvengers.Api.csproj",
+        "packagesPath": "/home/carlosquezada/.nuget/packages/",
+        "outputPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Api/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/carlosquezada/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Application/ProyectoAvengers.Application.csproj": {
+                "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Application/ProyectoAvengers.Application.csproj"
+              },
+              "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Infrastructure/ProyectoAvengers.Infrastructure.csproj": {
+                "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Infrastructure/ProyectoAvengers.Infrastructure.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "FluentValidation.AspNetCore": {
+              "target": "Package",
+              "version": "[11.3.0, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.4, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.4, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.6.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.29, 8.0.29]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.linux-x64",
+              "version": "[8.0.29, 8.0.29]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.110/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Application/ProyectoAvengers.Application.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Application/ProyectoAvengers.Application.csproj",
+        "projectName": "ProyectoAvengers.Application",
+        "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Application/ProyectoAvengers.Application.csproj",
+        "packagesPath": "/home/carlosquezada/.nuget/packages/",
+        "outputPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Application/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/carlosquezada/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Domain/ProyectoAvengers.Domain.csproj": {
+                "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Domain/ProyectoAvengers.Domain.csproj"
+              },
+              "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/ProyectoAvengers.Shared.csproj": {
+                "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/ProyectoAvengers.Shared.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "FluentValidation.AspNetCore": {
+              "target": "Package",
+              "version": "[11.3.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.29, 8.0.29]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.110/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Domain/ProyectoAvengers.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Domain/ProyectoAvengers.Domain.csproj",
+        "projectName": "ProyectoAvengers.Domain",
+        "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Domain/ProyectoAvengers.Domain.csproj",
+        "packagesPath": "/home/carlosquezada/.nuget/packages/",
+        "outputPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/carlosquezada/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.29, 8.0.29]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.110/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Infrastructure/ProyectoAvengers.Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Infrastructure/ProyectoAvengers.Infrastructure.csproj",
+        "projectName": "ProyectoAvengers.Infrastructure",
+        "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Infrastructure/ProyectoAvengers.Infrastructure.csproj",
+        "packagesPath": "/home/carlosquezada/.nuget/packages/",
+        "outputPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Infrastructure/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/carlosquezada/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Application/ProyectoAvengers.Application.csproj": {
+                "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Application/ProyectoAvengers.Application.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.4, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.4, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.0.4, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.29, 8.0.29]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.110/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/ProyectoAvengers.Shared.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/ProyectoAvengers.Shared.csproj",
+        "projectName": "ProyectoAvengers.Shared",
+        "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/ProyectoAvengers.Shared.csproj",
+        "packagesPath": "/home/carlosquezada/.nuget/packages/",
+        "outputPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/carlosquezada/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.29, 8.0.29]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.110/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/tests/ProyectoAvengers.Tests/ProyectoAvengers.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/tests/ProyectoAvengers.Tests/ProyectoAvengers.Tests.csproj",
+        "projectName": "ProyectoAvengers.Tests",
+        "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/tests/ProyectoAvengers.Tests/ProyectoAvengers.Tests.csproj",
+        "packagesPath": "/home/carlosquezada/.nuget/packages/",
+        "outputPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/tests/ProyectoAvengers.Tests/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/carlosquezada/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Api/ProyectoAvengers.Api.csproj": {
+                "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Api/ProyectoAvengers.Api.csproj"
+              },
+              "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Application/ProyectoAvengers.Application.csproj": {
+                "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Application/ProyectoAvengers.Application.csproj"
+              },
+              "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Domain/ProyectoAvengers.Domain.csproj": {
+                "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Domain/ProyectoAvengers.Domain.csproj"
+              },
+              "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Infrastructure/ProyectoAvengers.Infrastructure.csproj": {
+                "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Infrastructure/ProyectoAvengers.Infrastructure.csproj"
+              },
+              "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/ProyectoAvengers.Shared.csproj": {
+                "projectPath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/ProyectoAvengers.Shared.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.100"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore.InMemory": {
+              "target": "Package",
+              "version": "[8.0.4, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.6.0, )"
+            },
+            "Moq": {
+              "target": "Package",
+              "version": "[4.20.70, )"
+            },
+            "coverlet.collector": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.4.2, )"
+            },
+            "xunit.runner.visualstudio": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.4.5, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.29, 8.0.29]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.110/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

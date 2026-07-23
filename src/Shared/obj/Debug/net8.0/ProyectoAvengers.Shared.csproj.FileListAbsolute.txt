@@ -1,0 +1,12 @@
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/bin/Debug/net8.0/ProyectoAvengers.Shared.deps.json
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/bin/Debug/net8.0/ProyectoAvengers.Shared.dll
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/bin/Debug/net8.0/ProyectoAvengers.Shared.pdb
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/obj/Debug/net8.0/ProyectoAvengers.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/obj/Debug/net8.0/ProyectoAvengers.Shared.AssemblyInfoInputs.cache
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/obj/Debug/net8.0/ProyectoAvengers.Shared.AssemblyInfo.cs
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/obj/Debug/net8.0/ProyectoAvengers.Shared.csproj.CoreCompileInputs.cache
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/obj/Debug/net8.0/ProyectoAvengers.Shared.sourcelink.json
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/obj/Debug/net8.0/ProyectoAvengers.Shared.dll
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/obj/Debug/net8.0/refint/ProyectoAvengers.Shared.dll
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/obj/Debug/net8.0/ProyectoAvengers.Shared.pdb
+/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Shared/obj/Debug/net8.0/ref/ProyectoAvengers.Shared.dll

@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: avengers-db
+    environment:
+      POSTGRES_DB: proyecto_avengers
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: src/Api/Dockerfile
+    container_name: avengers-api
+    environment:
+      CONNECTIONSTRINGS__DEFAULT: "Host=postgres;Database=proyecto_avengers;Username=postgres;Password=postgres"
+      JWT__SECRET: "SuperSecretKey_Dev_ChangeInProduction_MinLength32Chars!"
+      JWT__ISSUER: "ProyectoAvengers"
+      JWT__AUDIENCE: "ProyectoAvengers"
+      ADMIN_EMAIL: "admin@avengers.com"
+      ADMIN_PASSWORD: "Admin123!"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      FILESTORAGE__PATH: "/app/uploads"
+      FILESTORAGE__URL: "/uploads"
+    ports:
+      - "5000:8080"
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  uploads:

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "oThanaKVh34=",
+  "success": true,
+  "projectFilePath": "/home/carlosquezada/Documentos/GitHub/ProyectoAvengers/src/Domain/ProyectoAvengers.Domain.csproj",
+  "expectedPackageFiles": [
+    "/home/carlosquezada/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.29/microsoft.aspnetcore.app.ref.8.0.29.nupkg.sha512"
+  ],
+  "logs": []
+}
