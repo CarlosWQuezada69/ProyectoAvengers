@@ -177,6 +177,29 @@ CREATE TABLE site_settings (
 );
 
 -- =========================================================
+-- 3b. NOSOTROS (About Us)
+-- =========================================================
+
+CREATE TABLE about_info (
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title      VARCHAR(200) NOT NULL,
+    history    TEXT NOT NULL,
+    mission    TEXT,
+    vision     TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ
+);
+
+CREATE TABLE about_gallery (
+    id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    about_info_id  UUID NOT NULL REFERENCES about_info(id) ON DELETE CASCADE,
+    url            TEXT NOT NULL,
+    alt_text       VARCHAR(200),
+    display_order  INT NOT NULL DEFAULT 0,
+    section        VARCHAR(50) NOT NULL -- 'founder', 'employees', 'location'
+);
+
+-- =========================================================
 -- 4. AUDITORÍA
 -- =========================================================
 
@@ -222,7 +245,9 @@ INSERT INTO permissions (code, module, action, description) VALUES
     ('roles.update', 'roles', 'update', 'Editar roles y sus permisos'),
     ('roles.delete', 'roles', 'delete', 'Eliminar roles'),
     ('stats.view', 'stats', 'view', 'Ver estadísticas'),
-    ('audit.view', 'audit', 'view', 'Ver bitácora de auditoría');
+    ('audit.view', 'audit', 'view', 'Ver bitácora de auditoría'),
+    ('about.view', 'about', 'view', 'Ver información de la empresa'),
+    ('about.update', 'about', 'update', 'Editar información y galería de la empresa');
 
 INSERT INTO roles (name, description) VALUES
     ('SuperAdmin', 'Acceso total al sistema');

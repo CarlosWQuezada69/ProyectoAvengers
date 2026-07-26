@@ -53,6 +53,8 @@ public class DatabaseSeeder : IDatabaseSeeder
             new() { Code = "roles.delete",                Module = "roles",       Action = "delete", Description = "Eliminar roles" },
             new() { Code = "stats.view",                  Module = "stats",       Action = "view",   Description = "Ver estadísticas" },
             new() { Code = "audit.view",                  Module = "audit",       Action = "view",   Description = "Ver bitácora de auditoría" },
+            new() { Code = "about.view",                  Module = "about",       Action = "view",   Description = "Ver información de la empresa" },
+            new() { Code = "about.update",                Module = "about",       Action = "update", Description = "Editar información y galería de la empresa" },
         };
 
         _context.Permissions.AddRange(permissions);
