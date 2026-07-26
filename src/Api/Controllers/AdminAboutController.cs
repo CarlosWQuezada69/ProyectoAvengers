@@ -25,9 +25,9 @@ public class AdminAboutController : AdminBaseController
     [RequirePermission("about.view")]
     public async Task<ActionResult<AboutInfoDto>> GetAbout()
     {
-        var about = await _context.AboutInfo
+        var about = await _context.AboutInfos
             .AsNoTracking()
-            .Include(a => a.Gallery.OrderBy(g => g.DisplayOrder))
+            .Include(a => a.Galleries.OrderBy(g => g.DisplayOrder))
             .FirstOrDefaultAsync();
 
         if (about == null)
@@ -40,8 +40,8 @@ public class AdminAboutController : AdminBaseController
     [RequirePermission("about.update")]
     public async Task<ActionResult<AboutInfoDto>> UpdateAbout([FromBody] UpdateAboutInfoRequest request)
     {
-        var about = await _context.AboutInfo
-            .Include(a => a.Gallery)
+        var about = await _context.AboutInfos
+            .Include(a => a.Galleries)
             .FirstOrDefaultAsync();
 
         if (about == null)
@@ -53,7 +53,7 @@ public class AdminAboutController : AdminBaseController
                 Mission = request.Mission,
                 Vision = request.Vision
             };
-            _context.AboutInfo.Add(about);
+            _context.AboutInfos.Add(about);
         }
         else
         {
@@ -75,14 +75,14 @@ public class AdminAboutController : AdminBaseController
     public async Task<ActionResult<AboutGalleryDto>> UploadImage(
         [FromQuery] string section, IFormFile file)
     {
-        var about = await _context.AboutInfo
-            .Include(a => a.Gallery)
+        var about = await _context.AboutInfos
+            .Include(a => a.Galleries)
             .FirstOrDefaultAsync();
 
         if (about == null)
         {
             about = new AboutInfo();
-            _context.AboutInfo.Add(about);
+            _context.AboutInfos.Add(about);
             await _context.SaveChangesAsync();
         }
 
@@ -119,11 +119,11 @@ public class AdminAboutController : AdminBaseController
             AboutInfoId = about.Id,
             Url = url,
             AltText = file.FileName,
-            DisplayOrder = about.Gallery.Count,
+            DisplayOrder = about.Galleries.Count,
             Section = section
         };
 
-        _context.AboutGallery.Add(image);
+        _context.AboutGalleries.Add(image);
         await _context.SaveChangesAsync();
 
         return Ok(new AboutGalleryDto
@@ -140,14 +140,14 @@ public class AdminAboutController : AdminBaseController
     [RequirePermission("about.update")]
     public async Task<ActionResult> DeleteImage(Guid id)
     {
-        var image = await _context.AboutGallery
+        var image = await _context.AboutGalleries
             .FirstOrDefaultAsync(i => i.Id == id);
 
         if (image == null)
             return NotFound();
 
         await _fileStorage.DeleteAsync(image.Url);
-        _context.AboutGallery.Remove(image);
+        _context.AboutGalleries.Remove(image);
         await _context.SaveChangesAsync();
 
         return NoContent();
@@ -158,7 +158,7 @@ public class AdminAboutController : AdminBaseController
     public async Task<ActionResult> UpdateOrder([FromBody] List<UpdateGalleryOrderItem> order)
     {
         var ids = order.Select(o => o.Id).ToList();
-        var images = await _context.AboutGallery
+        var images = await _context.AboutGalleries
             .Where(i => ids.Contains(i.Id))
             .ToListAsync();
 
@@ -184,7 +184,7 @@ public class AdminAboutController : AdminBaseController
             Vision = about.Vision,
             CreatedAt = about.CreatedAt,
             UpdatedAt = about.UpdatedAt,
-            Gallery = about.Gallery
+            Gallery = about.Galleries
                 .OrderBy(g => g.DisplayOrder)
                 .Select(g => new AboutGalleryDto
                 {

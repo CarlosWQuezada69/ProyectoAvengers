@@ -58,7 +58,8 @@ namespace ProyectoAvengers.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AboutInfoId");
+                    b.HasIndex("AboutInfoId")
+                        .HasDatabaseName("ix_about_gallery_about_info_id");
 
                     b.ToTable("about_gallery", (string)null);
                 });
@@ -871,7 +872,7 @@ namespace ProyectoAvengers.Infrastructure.Migrations
             modelBuilder.Entity("ProyectoAvengers.Domain.Entities.AboutGallery", b =>
                 {
                     b.HasOne("ProyectoAvengers.Domain.Entities.AboutInfo", "AboutInfo")
-                        .WithMany("Gallery")
+                        .WithMany("Galleries")
                         .HasForeignKey("AboutInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1042,7 +1043,7 @@ namespace ProyectoAvengers.Infrastructure.Migrations
 
             modelBuilder.Entity("ProyectoAvengers.Domain.Entities.AboutInfo", b =>
                 {
-                    b.Navigation("Gallery");
+                    b.Navigation("Galleries");
                 });
 
             modelBuilder.Entity("ProyectoAvengers.Domain.Entities.Category", b =>

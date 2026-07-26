@@ -64,7 +64,7 @@ namespace ProyectoAvengers.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_about_gallery_about_info_id",
+                name: "ix_about_gallery_about_info_id",
                 table: "about_gallery",
                 column: "about_info_id");
         }

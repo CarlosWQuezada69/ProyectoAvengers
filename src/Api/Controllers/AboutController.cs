@@ -22,9 +22,9 @@ public class AboutController : ControllerBase
     [ResponseCache(Duration = 120)]
     public async Task<ActionResult<AboutInfoDto>> GetAbout()
     {
-        var about = await _context.AboutInfo
+        var about = await _context.AboutInfos
             .AsNoTracking()
-            .Include(a => a.Gallery.OrderBy(g => g.DisplayOrder))
+            .Include(a => a.Galleries.OrderBy(g => g.DisplayOrder))
             .FirstOrDefaultAsync();
 
         if (about == null)
@@ -44,7 +44,7 @@ public class AboutController : ControllerBase
             Vision = about.Vision,
             CreatedAt = about.CreatedAt,
             UpdatedAt = about.UpdatedAt,
-            Gallery = about.Gallery.Select(g => new AboutGalleryDto
+            Gallery = about.Galleries.Select(g => new AboutGalleryDto
             {
                 Id = g.Id,
                 Url = g.Url,

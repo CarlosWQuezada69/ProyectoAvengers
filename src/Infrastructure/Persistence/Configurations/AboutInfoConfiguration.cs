@@ -41,10 +41,5 @@ public class AboutInfoConfiguration : IEntityTypeConfiguration<AboutInfo>
 
         builder.Property(e => e.UpdatedAt)
             .HasColumnName("updated_at");
-
-        builder.HasMany(e => e.Gallery)
-            .WithOne(g => g.AboutInfo)
-            .HasForeignKey(g => g.AboutInfoId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

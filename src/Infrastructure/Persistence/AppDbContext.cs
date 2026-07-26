@@ -40,8 +40,8 @@ public class AppDbContext : DbContext
     public DbSet<SliderItem> SliderItems => Set<SliderItem>();
     public DbSet<SiteSetting> SiteSettings => Set<SiteSetting>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
-    public DbSet<AboutInfo> AboutInfo => Set<AboutInfo>();
-    public DbSet<AboutGallery> AboutGallery => Set<AboutGallery>();
+    public DbSet<AboutInfo> AboutInfos => Set<AboutInfo>();
+    public DbSet<AboutGallery> AboutGalleries => Set<AboutGallery>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -10,5 +10,5 @@ public class AboutInfo
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 
-    public ICollection<AboutGallery> Gallery { get; set; } = new List<AboutGallery>();
+    public ICollection<AboutGallery> Galleries { get; set; } = new List<AboutGallery>();
 }

@@ -38,8 +38,11 @@ public class AboutGalleryConfiguration : IEntityTypeConfiguration<AboutGallery>
             .HasMaxLength(50)
             .IsRequired();
 
+        builder.HasIndex(e => e.AboutInfoId)
+            .HasDatabaseName("ix_about_gallery_about_info_id");
+
         builder.HasOne(e => e.AboutInfo)
-            .WithMany(a => a.Gallery)
+            .WithMany(a => a.Galleries)
             .HasForeignKey(e => e.AboutInfoId)
             .OnDelete(DeleteBehavior.Cascade);
     }
