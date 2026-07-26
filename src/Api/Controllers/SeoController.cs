@@ -35,6 +35,7 @@ public class SeoController : ControllerBase
     public async Task<ActionResult> SitemapXml()
     {
         var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        var ns = (XNamespace)"http://www.sitemaps.org/schemas/sitemap/0.9";
 
         var products = await _context.Products
             .AsNoTracking()
@@ -50,33 +51,31 @@ public class SeoController : ControllerBase
 
         var urls = new List<XElement>
         {
-            new XElement("url",
-                new XElement("loc", $"{baseUrl}/"),
-                new XElement("changefreq", "daily"),
-                new XElement("priority", "1.0")),
+            new(ns + "url",
+                new XElement(ns + "loc", $"{baseUrl}/"),
+                new XElement(ns + "changefreq", "daily"),
+                new XElement(ns + "priority", "1.0")),
         };
 
         foreach (var category in categories)
         {
-            urls.Add(new XElement("url",
-                new XElement("loc", $"{baseUrl}/categorias/{category.Slug}"),
-                new XElement("changefreq", "weekly"),
-                new XElement("priority", "0.8")));
+            urls.Add(new(ns + "url",
+                new XElement(ns + "loc", $"{baseUrl}/categorias/{category.Slug}"),
+                new XElement(ns + "changefreq", "weekly"),
+                new XElement(ns + "priority", "0.8")));
         }
 
         foreach (var product in products)
         {
-            urls.Add(new XElement("url",
-                new XElement("loc", $"{baseUrl}/productos/{product.Slug}"),
-                new XElement("lastmod", product.UpdatedAt?.ToString("yyyy-MM-dd") ?? DateTime.UtcNow.ToString("yyyy-MM-dd")),
-                new XElement("changefreq", "weekly"),
-                new XElement("priority", "0.6")));
+            urls.Add(new(ns + "url",
+                new XElement(ns + "loc", $"{baseUrl}/productos/{product.Slug}"),
+                new XElement(ns + "lastmod", product.UpdatedAt?.ToString("yyyy-MM-dd") ?? DateTime.UtcNow.ToString("yyyy-MM-dd")),
+                new XElement(ns + "changefreq", "weekly"),
+                new XElement(ns + "priority", "0.6")));
         }
 
         var xml = new XDocument(
-            new XElement("urlset",
-                new XAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9"),
-                urls));
+            new XElement(ns + "urlset", urls));
 
         return Content(xml.ToString(), "application/xml", Encoding.UTF8);
     }
