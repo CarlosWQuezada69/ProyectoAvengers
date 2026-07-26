@@ -11,8 +11,18 @@ public class SecurityHeadersMiddleware
         _next = next;
     }
 
+    private static readonly string[] SwaggerPaths = ["/swagger", "/swagger/"];
+
     public async Task InvokeAsync(HttpContext context)
     {
+        var path = context.Request.Path.Value?.TrimEnd('/') ?? "";
+
+        if (SwaggerPaths.Any(p => path.StartsWith(p, StringComparison.OrdinalIgnoreCase)))
+        {
+            await _next(context);
+            return;
+        }
+
         var nonce = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
         context.Items["CspNonce"] = nonce;
 
