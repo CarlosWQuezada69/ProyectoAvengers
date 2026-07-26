@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Api.Authorization;
 using ProyectoAvengers.Domain.Entities;
@@ -7,6 +8,7 @@ using ProyectoAvengers.Shared.DTOs.Admin;
 
 namespace ProyectoAvengers.Api.Controllers;
 
+[EnableRateLimiting("Admin")]
 public class RolesController : AdminBaseController
 {
     private readonly AppDbContext _context;
@@ -21,6 +23,7 @@ public class RolesController : AdminBaseController
     public async Task<ActionResult<List<RoleDto>>> GetRoles()
     {
         var roles = await _context.Roles
+            .AsNoTracking()
             .Include(r => r.RolePermissions)
             .Include(r => r.UserRoles)
             .OrderBy(r => r.Name)
@@ -41,6 +44,7 @@ public class RolesController : AdminBaseController
     public async Task<ActionResult<List<PermissionDto>>> GetPermissions()
     {
         var permissions = await _context.Permissions
+            .AsNoTracking()
             .OrderBy(p => p.Module)
             .ThenBy(p => p.Action)
             .ToListAsync();

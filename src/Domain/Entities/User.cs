@@ -10,6 +10,8 @@ public class User
     public string? Phone { get; set; }
     public bool IsActive { get; set; } = true;
     public bool EmailConfirmed { get; set; }
+    public int FailedLoginAttempts { get; set; }
+    public DateTime? LockedUntilUtc { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
     public DateTime? LastLoginAt { get; set; }

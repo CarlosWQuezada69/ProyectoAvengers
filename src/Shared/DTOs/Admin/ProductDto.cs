@@ -19,6 +19,7 @@ public class ProductDto
     public DateTime? UpdatedAt { get; set; }
     public List<ProductImageDto> Images { get; set; } = new();
     public List<ProductRestrictionDto> Restrictions { get; set; } = new();
+    public string? StructuredData { get; set; }
 }
 
 public class ProductListDto

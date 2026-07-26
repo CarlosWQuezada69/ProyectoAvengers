@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Api.Authorization;
 using ProyectoAvengers.Application.Interfaces;
@@ -7,6 +8,7 @@ using ProyectoAvengers.Shared.DTOs.Admin;
 
 namespace ProyectoAvengers.Api.Controllers;
 
+[EnableRateLimiting("Admin")]
 public class AdminSettingsController : AdminBaseController
 {
     private readonly AppDbContext _context;
@@ -25,6 +27,7 @@ public class AdminSettingsController : AdminBaseController
     public async Task<ActionResult<List<SiteSettingDto>>> GetSettings()
     {
         var settings = await _context.SiteSettings
+            .AsNoTracking()
             .OrderBy(s => s.Key)
             .ToListAsync();
 

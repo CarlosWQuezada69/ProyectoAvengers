@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Infrastructure.Persistence;
 using ProyectoAvengers.Shared.DTOs.Admin;
@@ -7,6 +8,7 @@ namespace ProyectoAvengers.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/slider")]
+[EnableRateLimiting("Catalog")]
 public class SliderController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -23,6 +25,7 @@ public class SliderController : ControllerBase
         var now = DateTime.UtcNow;
 
         var items = await _context.SliderItems
+            .AsNoTracking()
             .Where(s => s.IsActive &&
                 (s.StartsAt == null || s.StartsAt <= now) &&
                 (s.EndsAt == null || s.EndsAt >= now))

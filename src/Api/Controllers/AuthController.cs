@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -16,8 +14,6 @@ namespace ProyectoAvengers.Api.Controllers;
 [Route("api/v1/auth")]
 public class AuthController : ControllerBase
 {
-    private static readonly ConcurrentDictionary<string, FailedLoginInfo> _failedLogins = new();
-
     private readonly AppDbContext _context;
     private readonly ITokenService _tokenService;
     private readonly ICurrentUserService _currentUser;
@@ -41,24 +37,18 @@ public class AuthController : ControllerBase
     {
         var normalizedEmail = request.Email.ToLowerInvariant().Trim();
 
-        if (IsAccountLocked(normalizedEmail))
-            return Unauthorized(new ProblemDetails
-            {
-                Title = "Cuenta bloqueada",
-                Status = 401,
-                Detail = "Demasiados intentos fallidos. Intenta de nuevo en 15 minutos."
-            });
-
         var user = await _context.Users
-            .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-                    .ThenInclude(r => r.RolePermissions)
-                        .ThenInclude(rp => rp.Permission)
             .FirstOrDefaultAsync(u => u.Email == normalizedEmail && u.DeletedAt == null);
 
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            RecordFailedAttempt(normalizedEmail);
+            if (user != null)
+            {
+                user.FailedLoginAttempts++;
+                if (user.FailedLoginAttempts >= 5)
+                    user.LockedUntilUtc = DateTime.UtcNow.AddMinutes(15);
+                await _context.SaveChangesAsync();
+            }
             return Unauthorized(new ProblemDetails
             {
                 Title = "Credenciales inválidas",
@@ -67,24 +57,29 @@ public class AuthController : ControllerBase
             });
         }
 
-        _failedLogins.TryRemove(normalizedEmail, out _);
-
-        if (!user.IsActive)
+        if (user.LockedUntilUtc.HasValue && user.LockedUntilUtc > DateTime.UtcNow)
             return Unauthorized(new ProblemDetails
             {
-                Title = "Usuario inactivo",
+                Title = "Cuenta bloqueada",
                 Status = 401,
-                Detail = "La cuenta de usuario está desactivada."
+                Detail = "Demasiados intentos fallidos. Intenta de nuevo en 15 minutos."
             });
 
+        user.FailedLoginAttempts = 0;
+        user.LockedUntilUtc = null;
         user.LastLoginAt = DateTime.UtcNow;
 
-        var roles = user.UserRoles.Select(ur => ur.Role.Name).ToList();
-        var permissions = user.UserRoles
+        var roles = await _context.UserRoles
+            .Where(ur => ur.UserId == user.Id)
+            .Select(ur => ur.Role.Name)
+            .ToListAsync();
+
+        var permissions = await _context.UserRoles
+            .Where(ur => ur.UserId == user.Id)
             .SelectMany(ur => ur.Role.RolePermissions)
             .Select(rp => rp.Permission.Code)
             .Distinct()
-            .ToList();
+            .ToListAsync();
 
         var (accessToken, expiresIn) = _tokenService.GenerateAccessToken(user, roles, permissions);
         var refreshToken = _context.RefreshTokens.Add(new RefreshToken
@@ -119,10 +114,6 @@ public class AuthController : ControllerBase
     {
         var storedToken = await _context.RefreshTokens
             .Include(rt => rt.User)
-                .ThenInclude(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Role)
-                        .ThenInclude(r => r.RolePermissions)
-                            .ThenInclude(rp => rp.Permission)
             .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken);
 
         if (storedToken == null)
@@ -135,9 +126,8 @@ public class AuthController : ControllerBase
 
         if (storedToken.RevokedAt != null)
         {
-            var userId = storedToken.UserId;
             var userTokens = await _context.RefreshTokens
-                .Where(rt => rt.UserId == userId && rt.RevokedAt == null)
+                .Where(rt => rt.UserId == storedToken.UserId && rt.RevokedAt == null)
                 .ToListAsync();
 
             foreach (var token in userTokens)
@@ -164,12 +154,18 @@ public class AuthController : ControllerBase
         storedToken.RevokedAt = DateTime.UtcNow;
 
         var user = storedToken.User;
-        var roles = user.UserRoles.Select(ur => ur.Role.Name).ToList();
-        var permissions = user.UserRoles
+
+        var roles = await _context.UserRoles
+            .Where(ur => ur.UserId == user.Id)
+            .Select(ur => ur.Role.Name)
+            .ToListAsync();
+
+        var permissions = await _context.UserRoles
+            .Where(ur => ur.UserId == user.Id)
             .SelectMany(ur => ur.Role.RolePermissions)
             .Select(rp => rp.Permission.Code)
             .Distinct()
-            .ToList();
+            .ToListAsync();
 
         var (accessToken, expiresIn) = _tokenService.GenerateAccessToken(user, roles, permissions);
         var newRefreshToken = _context.RefreshTokens.Add(new RefreshToken
@@ -210,16 +206,13 @@ public class AuthController : ControllerBase
     [EnableRateLimiting("Auth")]
     public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
-        var delay = RandomNumberGenerator.GetInt32(500, 1500);
-        await Task.Delay(delay);
-
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == request.Email && u.DeletedAt == null);
 
         if (user != null)
         {
             var tokenBytes = new byte[64];
-            using var rng = RandomNumberGenerator.Create();
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
             rng.GetBytes(tokenBytes);
             var token = Convert.ToHexString(tokenBytes).ToLowerInvariant();
 
@@ -274,21 +267,22 @@ public class AuthController : ControllerBase
             return Unauthorized();
 
         var user = await _context.Users
-            .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-                    .ThenInclude(r => r.RolePermissions)
-                        .ThenInclude(rp => rp.Permission)
             .FirstOrDefaultAsync(u => u.Id == userId && u.DeletedAt == null);
 
         if (user == null)
             return NotFound();
 
-        var roles = user.UserRoles.Select(ur => ur.Role.Name).ToList();
-        var permissions = user.UserRoles
+        var roles = await _context.UserRoles
+            .Where(ur => ur.UserId == userId)
+            .Select(ur => ur.Role.Name)
+            .ToListAsync();
+
+        var permissions = await _context.UserRoles
+            .Where(ur => ur.UserId == userId)
             .SelectMany(ur => ur.Role.RolePermissions)
             .Select(rp => rp.Permission.Code)
             .Distinct()
-            .ToList();
+            .ToListAsync();
 
         return Ok(new UserInfo
         {
@@ -298,46 +292,5 @@ public class AuthController : ControllerBase
             Roles = roles,
             Permissions = permissions
         });
-    }
-
-    private static bool IsAccountLocked(string email)
-    {
-        if (_failedLogins.TryGetValue(email, out var info))
-        {
-            if (info.Attempts >= 5 && DateTime.UtcNow < info.LockedUntil)
-                return true;
-
-            if (DateTime.UtcNow >= info.LockedUntil)
-                _failedLogins.TryRemove(email, out _);
-        }
-
-        return false;
-    }
-
-    private static void RecordFailedAttempt(string email)
-    {
-        _failedLogins.AddOrUpdate(email,
-            _ => new FailedLoginInfo
-            {
-                Attempts = 1,
-                LockedUntil = DateTime.UtcNow.AddMinutes(15),
-                FirstAttemptAt = DateTime.UtcNow
-            },
-            (_, info) =>
-            {
-                info.Attempts++;
-
-                if (info.Attempts >= 5)
-                    info.LockedUntil = DateTime.UtcNow.AddMinutes(15);
-
-                return info;
-            });
-    }
-
-    private class FailedLoginInfo
-    {
-        public int Attempts { get; set; }
-        public DateTime LockedUntil { get; set; }
-        public DateTime FirstAttemptAt { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Api.Authorization;
 using ProyectoAvengers.Application.Interfaces;
@@ -9,6 +10,7 @@ using ProyectoAvengers.Shared.DTOs.Admin;
 
 namespace ProyectoAvengers.Api.Controllers;
 
+[EnableRateLimiting("Admin")]
 public class AdminProductsController : AdminBaseController
 {
     private readonly AppDbContext _context;
@@ -37,6 +39,7 @@ public class AdminProductsController : AdminBaseController
         pageSize = Math.Clamp(pageSize, 1, 100);
 
         var query = _context.Products
+            .AsNoTracking()
             .Include(p => p.Category)
             .AsQueryable();
 
@@ -94,6 +97,7 @@ public class AdminProductsController : AdminBaseController
     public async Task<ActionResult<ProductDto>> GetProduct(Guid id)
     {
         var product = await _context.Products
+            .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.ProductImages.OrderBy(pi => pi.DisplayOrder))
             .Include(p => p.ProductRestrictions)

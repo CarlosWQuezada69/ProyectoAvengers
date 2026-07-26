@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -9,6 +11,12 @@ namespace ProyectoAvengers.Infrastructure.Persistence;
 public class AppDbContext : DbContext
 {
     private readonly ICurrentUserService _currentUserService;
+    private static readonly ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>> PropertyCache = new();
+
+    private static readonly HashSet<string> AuditExcludedProperties = new(StringComparer.Ordinal)
+    {
+        "RowVersion", "ConcurrencyStamp", "UpdatedAt", "UpdatedByUserId"
+    };
 
     public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService currentUserService)
         : base(options)
@@ -66,21 +74,21 @@ public class AppDbContext : DbContext
             switch (entry.State)
             {
                 case EntityState.Added:
-                    SetProperty(entity, "CreatedAt", now);
-                    SetProperty(entity, "CreatedByUserId", userId);
+                    SetPropertyCached(entity, "CreatedAt", now);
+                    SetPropertyCached(entity, "CreatedByUserId", userId);
                     break;
 
                 case EntityState.Modified:
-                    SetProperty(entity, "UpdatedAt", now);
-                    SetProperty(entity, "UpdatedByUserId", userId);
+                    SetPropertyCached(entity, "UpdatedAt", now);
+                    SetPropertyCached(entity, "UpdatedByUserId", userId);
                     break;
 
                 case EntityState.Deleted:
-                    if (HasProperty(entity, "DeletedAt"))
+                    if (HasPropertyCached(entity, "DeletedAt"))
                     {
                         entry.State = EntityState.Modified;
-                        SetProperty(entity, "DeletedAt", now);
-                        SetProperty(entity, "DeletedByUserId", userId);
+                        SetPropertyCached(entity, "DeletedAt", now);
+                        SetPropertyCached(entity, "DeletedByUserId", userId);
                     }
                     break;
             }
@@ -130,16 +138,26 @@ public class AppDbContext : DbContext
         return logs;
     }
 
-    private static void SetProperty(object entity, string propertyName, object? value)
+    private static Dictionary<string, PropertyInfo> GetCachedProperties(object entity)
     {
-        var prop = entity.GetType().GetProperty(propertyName);
-        if (prop != null && prop.CanWrite)
+        var type = entity.GetType();
+        return PropertyCache.GetOrAdd(type, t =>
+            t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.CanWrite)
+                .ToDictionary(p => p.Name, StringComparer.Ordinal));
+    }
+
+    private static void SetPropertyCached(object entity, string propertyName, object? value)
+    {
+        var props = GetCachedProperties(entity);
+        if (props.TryGetValue(propertyName, out var prop))
             prop.SetValue(entity, value);
     }
 
-    private static bool HasProperty(object entity, string propertyName)
+    private static bool HasPropertyCached(object entity, string propertyName)
     {
-        return entity.GetType().GetProperty(propertyName) != null;
+        var props = GetCachedProperties(entity);
+        return props.ContainsKey(propertyName);
     }
 
     private static Guid? GetPrimaryKey(EntityEntry entry)
@@ -163,10 +181,11 @@ public class AppDbContext : DbContext
             if (!prop.IsModified)
                 continue;
 
-            if (prop.Metadata.Name is "RowVersion" or "ConcurrencyStamp" or "UpdatedAt" or "UpdatedByUserId")
+            if (AuditExcludedProperties.Contains(prop.Metadata.Name))
                 continue;
 
-            if (prop.Metadata.GetColumnType() is "text" or "bytea")
+            var colType = prop.Metadata.GetColumnType();
+            if (colType is "text" or "bytea")
             {
                 changes[prop.Metadata.Name] = "[truncated]";
                 continue;

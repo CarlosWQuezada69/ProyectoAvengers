@@ -1,4 +1,6 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Application.Interfaces;
 using ProyectoAvengers.Infrastructure.Persistence;
@@ -9,6 +11,7 @@ namespace ProyectoAvengers.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/products")]
+[EnableRateLimiting("Catalog")]
 public class ProductsController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -35,6 +38,7 @@ public class ProductsController : ControllerBase
         pageSize = Math.Clamp(pageSize, 1, 100);
 
         var query = _context.Products
+            .AsNoTracking()
             .Include(p => p.Category)
             .Where(p => p.IsActive)
             .AsQueryable();
@@ -110,6 +114,7 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult<List<ProductListDto>>> GetFeatured()
     {
         var items = await _context.Products
+            .AsNoTracking()
             .Where(p => p.IsActive && p.IsFeatured)
             .OrderByDescending(p => p.CreatedAt)
             .Take(10)
@@ -140,6 +145,7 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult<ProductDto>> GetProduct(string slug)
     {
         var product = await _context.Products
+            .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.ProductImages.OrderBy(pi => pi.DisplayOrder))
             .Include(p => p.ProductRestrictions.Where(r => r.IsActive))
@@ -148,13 +154,16 @@ public class ProductsController : ControllerBase
         if (product == null)
             return NotFound();
 
-        return Ok(MapToDto(product));
+        var dto = MapToDto(product);
+        dto.StructuredData = GenerateStructuredData(product);
+        return Ok(dto);
     }
 
     [HttpPost("{id:guid}/track-view")]
     public async Task<ActionResult> TrackView(Guid id)
     {
         var productExists = await _context.Products
+            .AsNoTracking()
             .AnyAsync(p => p.Id == id && p.IsActive);
 
         if (!productExists)
@@ -200,5 +209,34 @@ public class ProductsController : ControllerBase
                 IsActive = r.IsActive
             }).ToList()
         };
+    }
+
+    private static string? GenerateStructuredData(Domain.Entities.Product product)
+    {
+        var primaryImage = product.ProductImages
+            .OrderByDescending(i => i.IsPrimary)
+            .ThenBy(i => i.DisplayOrder)
+            .Select(i => i.Url)
+            .FirstOrDefault();
+
+        var structured = new
+        {
+            @context = "https://schema.org",
+            @type = "Product",
+            name = product.Name,
+            description = product.Description,
+            sku = product.Sku,
+            image = primaryImage,
+            offers = new
+            {
+                @type = "Offer",
+                price = product.Price,
+                priceCurrency = "MXN",
+                availability = product.Stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                url = $"/productos/{product.Slug}"
+            }
+        };
+
+        return JsonSerializer.Serialize(structured);
     }
 }

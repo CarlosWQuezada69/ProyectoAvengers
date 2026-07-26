@@ -42,25 +42,14 @@ public class InMemoryViewTracker : IViewTracker
             if (!DateOnly.TryParse(parts[1], out var date))
                 continue;
 
-            var existing = await context.ProductStatsDailies
-                .FirstOrDefaultAsync(s => s.ProductId == productId && s.Date == date, ct);
-
-            if (existing == null)
-            {
-                context.ProductStatsDailies.Add(new ProductStatsDaily
-                {
-                    ProductId = productId,
-                    Date = date,
-                    Views = count
-                });
-            }
-            else
-            {
-                existing.Views += count;
-            }
+            await context.Database.ExecuteSqlRawAsync(
+                """
+                INSERT INTO product_stats_daily (product_id, date, views, purchases)
+                VALUES ({0}, {1}, {2}, 0)
+                ON CONFLICT (product_id, date)
+                DO UPDATE SET views = product_stats_daily.views + {2}
+                """, productId, date, count, ct);
         }
-
-        await context.SaveChangesAsync(ct);
 
         foreach (var key in snapshot.Keys)
         {

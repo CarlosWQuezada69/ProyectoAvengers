@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Api.Authorization;
 using ProyectoAvengers.Infrastructure.Persistence;
@@ -6,6 +7,7 @@ using ProyectoAvengers.Shared.DTOs.Admin;
 
 namespace ProyectoAvengers.Api.Controllers;
 
+[EnableRateLimiting("Admin")]
 public class AdminCategoriesController : AdminBaseController
 {
     private readonly AppDbContext _context;

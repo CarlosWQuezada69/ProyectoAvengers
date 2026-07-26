@@ -50,6 +50,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("email_confirmed")
             .HasDefaultValue(false);
 
+        builder.Property(e => e.FailedLoginAttempts)
+            .HasColumnName("failed_login_attempts")
+            .HasDefaultValue(0);
+
+        builder.Property(e => e.LockedUntilUtc)
+            .HasColumnName("locked_until_utc");
+
         builder.Property(e => e.CreatedAt)
             .HasColumnName("created_at")
             .HasDefaultValueSql("now()")

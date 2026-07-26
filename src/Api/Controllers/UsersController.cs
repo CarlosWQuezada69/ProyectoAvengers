@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Api.Authorization;
 using ProyectoAvengers.Domain.Entities;
@@ -8,6 +9,7 @@ using ProyectoAvengers.Shared.DTOs.Admin;
 
 namespace ProyectoAvengers.Api.Controllers;
 
+[EnableRateLimiting("Admin")]
 public class UsersController : AdminBaseController
 {
     private readonly AppDbContext _context;
@@ -29,6 +31,7 @@ public class UsersController : AdminBaseController
         pageSize = Math.Clamp(pageSize, 1, 100);
 
         var query = _context.Users
+            .AsNoTracking()
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
             .Where(u => u.DeletedAt == null)
@@ -83,6 +86,7 @@ public class UsersController : AdminBaseController
     public async Task<ActionResult<UserDto>> GetUser(Guid id)
     {
         var user = await _context.Users
+            .AsNoTracking()
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.Id == id && u.DeletedAt == null);

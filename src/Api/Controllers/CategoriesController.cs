@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Infrastructure.Persistence;
 using ProyectoAvengers.Shared.DTOs.Admin;
@@ -7,6 +8,7 @@ namespace ProyectoAvengers.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/categories")]
+[EnableRateLimiting("Catalog")]
 public class CategoriesController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -21,6 +23,7 @@ public class CategoriesController : ControllerBase
     public async Task<ActionResult> GetCategories([FromQuery] bool tree = false)
     {
         var categories = await _context.Categories
+            .AsNoTracking()
             .Where(c => c.IsActive)
             .OrderBy(c => c.DisplayOrder)
             .ThenBy(c => c.Name)
@@ -54,6 +57,7 @@ public class CategoriesController : ControllerBase
     public async Task<ActionResult<CategoryDto>> GetCategory(string slug)
     {
         var category = await _context.Categories
+            .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Slug == slug && c.IsActive);
 
         if (category == null)
