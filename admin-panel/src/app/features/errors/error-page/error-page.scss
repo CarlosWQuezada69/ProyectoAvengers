@@ -1,0 +1,138 @@
+.error-page {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  padding: 24px;
+  overflow: hidden;
+}
+
+.error-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.3;
+  mask-image: radial-gradient(ellipse at 50% 40%, black 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 30%, transparent 70%);
+  pointer-events: none;
+}
+
+.error-bg-glow {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(232, 185, 35, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.error-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: rgba(20, 20, 20, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(42, 42, 42, 0.6);
+  border-radius: var(--radius-xl);
+  padding: 48px 40px;
+  text-align: center;
+  animation: cardIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.error-brand {
+  margin-bottom: 32px;
+  justify-content: center;
+}
+
+.error-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  color: var(--accent);
+  opacity: 0.6;
+
+  svg { width: 100%; height: 100%; }
+}
+
+.error-code {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 1;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.error-title {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.error-message {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 32px;
+}
+
+.error-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.error-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+
+  svg { width: 16px; height: 16px; }
+}
+
+.error-btn--primary {
+  background: var(--accent-gradient);
+  border: none;
+  color: #0A0A0A;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(232, 185, 35, 0.3);
+  }
+}
+
+.error-btn--secondary {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+
+  &:hover {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+    background: var(--bg-hover);
+  }
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: scale(0.95) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}

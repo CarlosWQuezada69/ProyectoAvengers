@@ -1,0 +1,24 @@
+<div
+  class="uploader"
+  [class.dragging]="dragging"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave()"
+  (drop)="onDrop($event)"
+>
+  <input
+    #fileInput
+    type="file"
+    [accept]="accept()"
+    [multiple]="multiple()"
+    class="file-input"
+    (change)="onFileSelect($event)"
+  />
+  <div class="uploader-content" (click)="fileInput.click()">
+    <span class="upload-icon">↑</span>
+    <p>Arrastra archivos aquí o haz clic para seleccionar</p>
+    <span class="upload-hint">Máx. {{ maxSizeMb() }}MB por archivo</span>
+  </div>
+</div>
+@if (error) {
+  <span class="upload-error">{{ error }}</span>
+}

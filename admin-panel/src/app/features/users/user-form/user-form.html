@@ -1,0 +1,44 @@
+<div class="user-form-page">
+  <header class="section-header">
+    <h2>{{ editMode ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
+    <app-btn variant="secondary" routerLink="/users">Volver</app-btn>
+  </header>
+
+  @if (loading) {
+    <div class="loading-state"><div class="spinner"></div></div>
+  } @else {
+    <div class="form-card">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="user-form">
+        <div class="form-grid">
+          <app-input formControlName="firstName" label="Nombre" [required]="true" />
+          <app-input formControlName="lastName" label="Apellido" [required]="true" />
+        </div>
+        <app-input formControlName="email" label="Correo electrónico" type="email" [required]="true" />
+        @if (!editMode) {
+          <app-input formControlName="password" label="Contraseña" type="password" placeholder="Dejar vacío = generar aleatoria" />
+        }
+        <label class="checkbox">
+          <input type="checkbox" formControlName="isActive" />
+          <span>Activo</span>
+        </label>
+
+        <div class="roles-section">
+          <label class="input-label">Roles</label>
+          <div class="roles-grid">
+            @for (role of roles; track role.id) {
+              <label class="checkbox">
+                <input type="checkbox" [value]="role.id" (change)="toggleRole(role.id)" [checked]="selectedRoleIds.includes(role.id)" />
+                <span>{{ role.name }}</span>
+              </label>
+            }
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <app-btn variant="secondary" type="button" routerLink="/users">Cancelar</app-btn>
+          <app-btn type="submit" [disabled]="form.invalid">{{ editMode ? 'Guardar' : 'Crear' }}</app-btn>
+        </div>
+      </form>
+    </div>
+  }
+</div>

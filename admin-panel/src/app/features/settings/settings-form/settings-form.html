@@ -1,0 +1,56 @@
+<div class="settings-page">
+  <header class="section-header">
+    <h2>Configuración del sitio</h2>
+  </header>
+
+  @if (loading) {
+    <div class="loading-state"><div class="spinner"></div></div>
+  } @else {
+    <div class="settings-section">
+      <h3>Identidad</h3>
+      <div class="logo-section">
+        @if (logoUrl) {
+          <img [src]="logoUrl" alt="Logo" class="logo-preview" />
+        }
+        <app-uploader (filesChange)="onLogoUpload($event)" />
+      </div>
+      <form [formGroup]="form" class="settings-form">
+        <app-input formControlName="business_name" label="Nombre del negocio" />
+        <div class="form-actions">
+          <app-btn size="sm" (click)="save('business_name')">Guardar</app-btn>
+        </div>
+      </form>
+    </div>
+
+    <div class="settings-section">
+      <h3>Legal</h3>
+      <form [formGroup]="form" class="settings-form">
+        <app-input formControlName="copyright_text" label="Copyright" placeholder="© 2026 Mi Empresa" />
+        <div class="form-actions">
+          <app-btn size="sm" (click)="save('copyright_text')">Guardar</app-btn>
+        </div>
+      </form>
+    </div>
+
+    <div class="settings-section">
+      <h3>Contacto</h3>
+      <form [formGroup]="form" class="settings-form">
+        <app-input formControlName="contact_email" label="Correo de contacto" type="email" />
+        <app-input formControlName="contact_phone" label="Teléfono" />
+        <div class="form-actions">
+          <app-btn size="sm" (click)="save('contact_email')">Guardar</app-btn>
+        </div>
+      </form>
+    </div>
+
+    <div class="settings-section">
+      <h3>Redes sociales</h3>
+      <form [formGroup]="form" class="settings-form">
+        <app-input formControlName="social_links" label="URLs (JSON)" placeholder='{"facebook":"...","instagram":"..."}' />
+        <div class="form-actions">
+          <app-btn size="sm" (click)="save('social_links')">Guardar</app-btn>
+        </div>
+      </form>
+    </div>
+  }
+</div>

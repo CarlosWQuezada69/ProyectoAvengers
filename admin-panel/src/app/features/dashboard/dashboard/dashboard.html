@@ -1,0 +1,101 @@
+<div class="dashboard">
+  <header class="section-header">
+    <h2>Dashboard</h2>
+  </header>
+
+  @if (loading) {
+    <div class="kpi-grid">
+      @for (_ of [1,2,3,4]; track $index) {
+        <div class="kpi-card">
+          <app-skeleton height="14px" width="60%" />
+          <app-skeleton height="28px" width="40%" />
+        </div>
+      }
+    </div>
+  } @else if (overview) {
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-label">Productos activos</span>
+        <span class="kpi-value">{{ overview.activeProducts }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Stock bajo</span>
+        <span class="kpi-value accent-danger">{{ overview.lowStockProducts }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Vistas del mes</span>
+        <span class="kpi-value">{{ overview.monthlyViews | number }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Vendidos del mes</span>
+        <span class="kpi-value">{{ overview.monthlyPurchases | number }}</span>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>Más vistos</h3>
+        <div class="bar-chart">
+          @for (item of topViewed; track item.productId) {
+            <div class="bar-row">
+              <span class="bar-label">{{ item.productName }}</span>
+              <div class="bar-track">
+                <div class="bar-fill" [style.width.%]="(item.count / maxCount(topViewed)) * 100"></div>
+              </div>
+              <span class="bar-value">{{ item.count }}</span>
+            </div>
+          }
+          @if (topViewed.length === 0) {
+            <p class="empty">Sin datos</p>
+          }
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Más vendidos</h3>
+        <div class="bar-chart">
+          @for (item of topSellers; track item.productId) {
+            <div class="bar-row">
+              <span class="bar-label">{{ item.productName }}</span>
+              <div class="bar-track">
+                <div class="bar-fill accent-gold" [style.width.%]="(item.count / maxCount(topSellers)) * 100"></div>
+              </div>
+              <span class="bar-value">{{ item.count }}</span>
+            </div>
+          }
+          @if (topSellers.length === 0) {
+            <p class="empty">Sin datos</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h3>Stock bajo</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of lowStock; track item.productId) {
+            <tr>
+              <td>{{ item.productName }}</td>
+              <td>
+                <app-badge [variant]="item.count === 0 ? 'danger' : 'warning'">
+                  {{ item.count }}
+                </app-badge>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="2" class="empty">Sin productos con stock bajo</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

@@ -1,0 +1,42 @@
+.date-range {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.date-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #B3B3B3;
+}
+
+.date-input {
+  padding: 8px 12px;
+  background: #0D0D0D;
+  border: 1px solid #2A2A2A;
+  border-radius: 6px;
+  color: #FFFFFF;
+  font-size: 14px;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+
+  &:focus {
+    border-color: #E8B923;
+  }
+
+  &::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}
+
+.date-separator {
+  color: #B3B3B3;
+  padding-bottom: 8px;
+  font-size: 16px;
+}

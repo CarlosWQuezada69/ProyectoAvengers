@@ -1,0 +1,12 @@
+.user-form-page { display: flex; flex-direction: column; gap: 20px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.loading-state { display: flex; align-items: center; justify-content: center; padding: 64px; .spinner { width: 40px; height: 40px; border: 3px solid #2A2A2A; border-top-color: #E8B923; border-radius: 50%; animation: spin 0.6s linear infinite; } }
+.form-card { background: #1A1A1A; border: 1px solid #2A2A2A; border-radius: 8px; padding: 24px; }
+.user-form { display: flex; flex-direction: column; gap: 20px; max-width: 560px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.checkbox { display: flex; align-items: center; gap: 8px; cursor: pointer; color: #FFFFFF; input[type="checkbox"] { width: 16px; height: 16px; accent-color: #E8B923; } }
+.input-label { font-size: 13px; font-weight: 600; color: #FFFFFF; }
+.roles-section { display: flex; flex-direction: column; gap: 8px; }
+.roles-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+.form-actions { display: flex; gap: 12px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid #2A2A2A; }
+@keyframes spin { to { transform: rotate(360deg); } }

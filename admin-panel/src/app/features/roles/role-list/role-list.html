@@ -1,0 +1,39 @@
+<div class="roles-page">
+  <header class="section-header">
+    <h2>Roles</h2>
+    <div *hasPermission="'roles.create'">
+      <app-btn>Nuevo rol</app-btn>
+    </div>
+  </header>
+
+  <div class="table-card">
+    @if (loading) { <div class="loading-state"><div class="spinner"></div></div> }
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nombre</th><th>Descripción</th><th>Permisos</th><th>Usuarios</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (role of roles; track role.id) {
+          <tr>
+            <td class="role-name">{{ role.name }}</td>
+            <td>{{ role.description }}</td>
+            <td><app-badge variant="info">{{ role.permissionCount ?? 0 }}</app-badge></td>
+            <td>{{ role.userCount ?? 0 }}</td>
+            <td>
+              <div class="actions">
+                <a [routerLink]="['/roles', role.id]" class="icon-btn">✏️</a>
+                <div *hasPermission="'roles.delete'">
+                  <button class="icon-btn danger" (click)="deleteRole(role.id)">🗑️</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5" class="empty">Sin roles</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

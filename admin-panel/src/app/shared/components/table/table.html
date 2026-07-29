@@ -1,0 +1,54 @@
+<div class="table-wrapper">
+  @if (loading()) {
+    <div class="table-loading">
+      <div class="spinner"></div>
+    </div>
+  }
+  <table class="table">
+    <thead>
+      <tr>
+        @for (col of columns(); track col.key) {
+          <th
+            [class.sortable]="col.sortable"
+            (click)="col.sortable && onSort(col.key)"
+          >
+            {{ col.header }}
+            @if (col.sortable && sortField() === col.key) {
+              <span class="sort-icon">{{ sortDir() === 'asc' ? '▲' : '▼' }}</span>
+            }
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of data(); track row['id'] || $index) {
+        <tr>
+          @for (col of columns(); track col.key) {
+            <td>{{ col.cell ? col.cell(row) : row[col.key] }}</td>
+          }
+        </tr>
+      } @empty {
+        <tr>
+          <td [attr.colspan]="columns().length" class="empty">
+            Sin datos disponibles
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (totalPages > 1) {
+    <div class="pagination">
+      <button class="page-btn" [disabled]="page() <= 1" (click)="onPage(page() - 1)">‹</button>
+      @for (p of [].constructor(totalPages); track $index) {
+        <button
+          class="page-btn"
+          [class.active]="page() === $index + 1"
+          (click)="onPage($index + 1)"
+        >
+          {{ $index + 1 }}
+        </button>
+      }
+      <button class="page-btn" [disabled]="page() >= totalPages" (click)="onPage(page() + 1)">›</button>
+    </div>
+  }
+</div>

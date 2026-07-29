@@ -1,0 +1,43 @@
+.select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.select-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.required {
+  color: #E74C3C;
+}
+
+.select {
+  width: 100%;
+  padding: 10px 14px;
+  background: #0D0D0D;
+  border: 1px solid #2A2A2A;
+  border-radius: 6px;
+  color: #FFFFFF;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  appearance: auto;
+
+  &:focus {
+    border-color: #E8B923;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  option {
+    background: #1A1A1A;
+    color: #FFFFFF;
+  }
+}

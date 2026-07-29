@@ -1,0 +1,97 @@
+<div class="product-list">
+  <header class="section-header">
+    <h2>Productos</h2>
+    <div class="header-actions">
+      <div class="search-bar">
+        <input
+          class="search-input"
+          [(ngModel)]="search"
+          placeholder="Buscar productos..."
+          (keyup.enter)="onSearch()"
+        />
+      </div>
+      <div *hasPermission="'products.create'">
+        <app-btn routerLink="/products/new">Nuevo producto</app-btn>
+      </div>
+    </div>
+  </header>
+
+  <div class="table-card">
+    @if (loading) {
+      <div class="table-loading">
+        <div class="spinner"></div>
+      </div>
+    }
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="sortable" (click)="onSort('name')">
+            Producto
+            @if (sortBy === 'name') { <span class="sort-icon">{{ sortDir === 'asc' ? '▲' : '▼' }}</span> }
+          </th>
+          <th>SKU</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Estado</th>
+          <th class="sortable" (click)="onSort('createdAt')">
+            Creado
+            @if (sortBy === 'createdAt') { <span class="sort-icon">{{ sortDir === 'asc' ? '▲' : '▼' }}</span> }
+          </th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (product of products; track product.id) {
+          <tr>
+            <td>
+              <div class="product-cell">
+                @if (product.primaryImageUrl) {
+                  <img [src]="product.primaryImageUrl" alt="" class="product-thumb" />
+                }
+                <div>
+                  <span class="product-name">{{ product.name }}</span>
+                  @if (product.categoryName) {
+                    <span class="product-category">{{ product.categoryName }}</span>
+                  }
+                </div>
+              </div>
+            </td>
+            <td>{{ product.sku }}</td>
+            <td class="price">${{ product.price.toFixed(2) }}</td>
+            <td>{{ product.stock }}</td>
+            <td>
+              <app-badge [variant]="product.isActive ? 'success' : 'neutral'">
+                {{ product.isActive ? 'Activo' : 'Inactivo' }}
+              </app-badge>
+            </td>
+            <td>{{ product.createdAt | date:'short' }}</td>
+            <td>
+              <div class="actions">
+                <a [routerLink]="['/products', product.id]" class="action-btn">✏️</a>
+                <div *hasPermission="'products.delete'">
+                  <button class="action-btn danger" (click)="deleteProduct(product.id)">🗑️</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="empty">Sin productos</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <button class="page-btn" [disabled]="page <= 1" (click)="onPage(page - 1)">‹</button>
+        @for (p of [].constructor(totalPages); track $index) {
+          <button class="page-btn" [class.active]="page === $index + 1" (click)="onPage($index + 1)">
+            {{ $index + 1 }}
+          </button>
+        }
+        <button class="page-btn" [disabled]="page >= totalPages" (click)="onPage(page + 1)">›</button>
+      </div>
+    }
+  </div>
+</div>

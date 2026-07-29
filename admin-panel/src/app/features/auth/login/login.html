@@ -1,0 +1,86 @@
+<div class="login-page">
+  <div class="login-bg-grid"></div>
+  <div class="login-bg-glow"></div>
+  <div class="login-bg-dots"></div>
+
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-brand-icon">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="16 2 30 12 30 26 16 30 2 26 2 12" stroke-linejoin="round"/>
+          <line x1="12" y1="14" x2="20" y2="14"/>
+          <line x1="12" y1="18" x2="20" y2="18"/>
+          <line x1="14" y1="22" x2="18" y2="22"/>
+        </svg>
+      </div>
+      <div class="login-brand-text">
+        <span class="login-brand-name">Avengers</span>
+        <span class="login-brand-sub">Panel Administrativo</span>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+      @if (error) {
+        <div class="login-error">{{ error }}</div>
+      }
+
+      <div class="login-field">
+        <label class="login-label" for="email">Correo electrónico</label>
+        <div class="login-input-wrapper">
+          <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <input
+            id="email"
+            class="login-input"
+            type="email"
+            formControlName="email"
+            placeholder="admin@correo.com"
+            autocomplete="email"
+            spellcheck="false"
+          />
+        </div>
+        @if (form.controls.email.invalid && form.controls.email.touched) {
+          <span class="login-field-error">Ingresa un correo válido</span>
+        }
+      </div>
+
+      <div class="login-field">
+        <label class="login-label" for="password">Contraseña</label>
+        <div class="login-input-wrapper">
+          <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <input
+            id="password"
+            class="login-input"
+            type="password"
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+        </div>
+        @if (form.controls.password.invalid && form.controls.password.touched) {
+          <span class="login-field-error">La contraseña es requerida</span>
+        }
+      </div>
+
+      <button
+        class="login-submit"
+        type="submit"
+        [disabled]="loading"
+      >
+        @if (loading) {
+          <span class="login-submit-spinner"></span>
+        }
+        <span>{{ loading ? 'Ingresando…' : 'Iniciar sesión' }}</span>
+      </button>
+
+      <div class="login-links">
+        <a routerLink="/auth/forgot-password">¿Olvidaste tu contraseña?</a>
+      </div>
+    </form>
+  </div>
+</div>

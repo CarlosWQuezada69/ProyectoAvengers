@@ -1,0 +1,19 @@
+<div class="select-group">
+  @if (label()) {
+    <label class="select-label">
+      {{ label() }}
+      @if (required()) { <span class="required">*</span> }
+    </label>
+  }
+  <select
+    class="select"
+    [value]="value"
+    [disabled]="disabled()"
+    (change)="onSelect($any($event).target.value)"
+  >
+    <option value="" disabled>{{ placeholder() }}</option>
+    @for (opt of options(); track opt.value) {
+      <option [value]="opt.value">{{ opt.label }}</option>
+    }
+  </select>
+</div>

@@ -1,0 +1,71 @@
+<div class="slider-page">
+  <header class="section-header">
+    <h2>Slider / Carrusel</h2>
+    <div *hasPermission="'slider.create'">
+      <app-btn (click)="openCreateModal()">Nuevo ítem</app-btn>
+    </div>
+  </header>
+
+  <div class="table-card">
+    @if (loading) {
+      <div class="loading-state"><div class="spinner"></div></div>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Título</th>
+            <th>Subtítulo</th>
+            <th>Vigencia</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items; track item.id) {
+            <tr>
+              <td><img [src]="item.imageUrl" alt="" class="thumb" /></td>
+              <td>{{ item.title }}</td>
+              <td>{{ item.subtitle }}</td>
+              <td>{{ item.startsAt ? (item.startsAt | date:'shortDate') : '—' }} - {{ item.endsAt ? (item.endsAt | date:'shortDate') : '—' }}</td>
+              <td><app-badge [variant]="item.isActive ? 'success' : 'neutral'">{{ item.isActive ? 'Activo' : 'Inactivo' }}</app-badge></td>
+              <td>
+                <div class="actions">
+                  <button class="icon-btn" (click)="openEditModal(item)">✏️</button>
+                  <div *hasPermission="'slider.delete'">
+                    <button class="icon-btn danger" (click)="deleteItem(item.id)">🗑️</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty">Sin ítems en el slider</td></tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+<app-modal [open]="modalOpen" [title]="editingItem ? 'Editar slider' : 'Nuevo slider'" (close)="modalOpen = false">
+  <form [formGroup]="form" (ngSubmit)="save()" class="slider-form">
+    <app-input formControlName="title" label="Título" placeholder="Título del slide" />
+    <app-input formControlName="subtitle" label="Subtítulo" placeholder="Subtítulo" />
+    <app-input formControlName="linkUrl" label="Enlace" placeholder="https://..." />
+    <div class="form-grid">
+      <app-input formControlName="startsAt" label="Inicio" type="text" placeholder="2026-01-01" />
+      <app-input formControlName="endsAt" label="Fin" type="text" placeholder="2026-12-31" />
+    </div>
+    <label class="checkbox">
+      <input type="checkbox" formControlName="isActive" />
+      <span>Activo</span>
+    </label>
+    @if (!editingItem) {
+      <app-uploader />
+    }
+    <div class="modal-actions">
+      <app-btn variant="secondary" type="button" (click)="modalOpen = false">Cancelar</app-btn>
+      <app-btn type="submit">{{ editingItem ? 'Guardar' : 'Crear' }}</app-btn>
+    </div>
+  </form>
+</app-modal>

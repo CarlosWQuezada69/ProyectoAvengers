@@ -1,0 +1,77 @@
+<div class="categories-page">
+  <header class="section-header">
+    <h2>Categorías</h2>
+    <div *hasPermission="'categories.create'">
+      <app-btn (click)="openCreateModal()">Nueva categoría</app-btn>
+    </div>
+  </header>
+
+  <div class="table-card">
+    @if (loading) {
+      <div class="loading-state"><div class="spinner"></div></div>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Slug</th>
+            <th>Orden</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cat of flatCategories(); track cat.id) {
+            <tr>
+              <td>{{ cat.name }}</td>
+              <td>{{ cat.slug }}</td>
+              <td>{{ cat.displayOrder }}</td>
+              <td>
+                <app-badge [variant]="cat.isActive ? 'success' : 'neutral'">
+                  {{ cat.isActive ? 'Activa' : 'Inactiva' }}
+                </app-badge>
+              </td>
+              <td>
+                <div class="actions">
+                  <button class="icon-btn" (click)="openEditModal(cat)">✏️</button>
+                  <div *hasPermission="'categories.delete'">
+                    <button class="icon-btn danger" (click)="deleteCategory(cat.id)">🗑️</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty">Sin categorías</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+<app-modal [open]="modalOpen" [title]="editingCategory ? 'Editar categoría' : 'Nueva categoría'" (close)="modalOpen = false">
+  <form [formGroup]="form" (ngSubmit)="save()" class="category-form">
+    <app-input formControlName="name" label="Nombre" [required]="true" placeholder="Nombre de la categoría" />
+    <app-input formControlName="slug" label="Slug" [required]="true" placeholder="nombre-de-la-categoria" />
+    <div class="form-group">
+      <label class="input-label">Categoría padre</label>
+      <select class="select" formControlName="parentCategoryId">
+        <option value="">Sin padre (raíz)</option>
+        @for (cat of flatCategories(); track cat.id) {
+          <option [value]="cat.id" [disabled]="cat.id === editingCategory?.id">{{ cat.name }}</option>
+        }
+      </select>
+    </div>
+    <app-input formControlName="displayOrder" label="Orden" type="number" placeholder="0" />
+    <label class="checkbox">
+      <input type="checkbox" formControlName="isActive" />
+      <span>Activa</span>
+    </label>
+    <div class="modal-actions">
+      <app-btn variant="secondary" type="button" (click)="modalOpen = false">Cancelar</app-btn>
+      <app-btn type="submit" [disabled]="form.invalid">{{ editingCategory ? 'Guardar' : 'Crear' }}</app-btn>
+    </div>
+  </form>
+</app-modal>

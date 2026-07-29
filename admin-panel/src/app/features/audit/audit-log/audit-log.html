@@ -1,0 +1,51 @@
+<div class="audit-page">
+  <header class="section-header">
+    <h2>Auditoría</h2>
+    <div class="filters">
+      <input class="filter-input" [(ngModel)]="entityName" placeholder="Entidad..." />
+      <input class="filter-input" [(ngModel)]="from" type="date" placeholder="Desde" />
+      <input class="filter-input" [(ngModel)]="to" type="date" placeholder="Hasta" />
+      <app-btn size="sm" (click)="onFilter()">Filtrar</app-btn>
+    </div>
+  </header>
+
+  <div class="table-card">
+    @if (loading) { <div class="loading-state"><div class="spinner"></div></div> }
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Usuario</th><th>Acción</th><th>Entidad</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (log of logs; track log.id) {
+          <tr (click)="toggleExpand(log.id)" class="clickable">
+            <td>{{ log.createdAt | date:'medium' }}</td>
+            <td>{{ log.userName || '—' }}</td>
+            <td><app-badge [variant]="actionVariant(log.action)">{{ log.action }}</app-badge></td>
+            <td>{{ log.entityName }}</td>
+            <td>{{ expandedId === log.id ? '▲' : '▼' }}</td>
+          </tr>
+          @if (expandedId === log.id && log.changes) {
+            <tr class="expanded-row">
+              <td colspan="5">
+                <pre class="changes-json">{{ log.changes | json }}</pre>
+              </td>
+            </tr>
+          }
+        } @empty {
+          <tr><td colspan="5" class="empty">Sin registros de auditoría</td></tr>
+        }
+      </tbody>
+    </table>
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <button class="page-btn" [disabled]="page <= 1" (click)="onPage(page - 1)">‹</button>
+        @for (p of [].constructor(totalPages); track $index) {
+          <button class="page-btn" [class.active]="page === $index + 1" (click)="onPage($index + 1)">{{ $index + 1 }}</button>
+        }
+        <button class="page-btn" [disabled]="page >= totalPages" (click)="onPage(page + 1)">›</button>
+      </div>
+    }
+  </div>
+</div>

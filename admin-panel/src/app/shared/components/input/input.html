@@ -1,0 +1,21 @@
+<div class="input-group">
+  @if (label()) {
+    <label class="input-label">
+      {{ label() }}
+      @if (required()) { <span class="required">*</span> }
+    </label>
+  }
+  <input
+    class="input"
+    [class.input-error]="!!error()"
+    [type]="type()"
+    [placeholder]="placeholder()"
+    [value]="value"
+    [disabled]="disabled()"
+    (input)="onInput($any($event).target.value)"
+    (blur)="onBlurHandler()"
+  />
+  @if (error()) {
+    <span class="input-helper error">{{ error() }}</span>
+  }
+</div>

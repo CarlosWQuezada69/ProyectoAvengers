@@ -1,0 +1,168 @@
+<div class="product-form">
+  <header class="section-header">
+    <h2>{{ editMode ? 'Editar producto' : 'Nuevo producto' }}</h2>
+    <div class="header-actions">
+      <app-btn variant="secondary" routerLink="/products">Volver</app-btn>
+    </div>
+  </header>
+
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-section">
+        <h3>Datos generales</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <app-input formControlName="name" label="Nombre" placeholder="Nombre del producto" [required]="true" />
+          </div>
+          <div class="form-group">
+            <app-input formControlName="sku" label="SKU" placeholder="PROD-001" [required]="true" />
+          </div>
+          <div class="form-group">
+            <app-input formControlName="slug" label="Slug" placeholder="nombre-del-producto" [required]="true" />
+          </div>
+          <div class="form-group">
+            <app-select
+              formControlName="categoryId"
+              label="Categoría"
+              [options]="categories.map(c => ({ value: c.id, label: c.name }))"
+            />
+          </div>
+          <div class="form-group">
+            <app-input formControlName="price" label="Precio" type="number" placeholder="0.00" [required]="true" />
+          </div>
+          <div class="form-group">
+            <app-input formControlName="compareAtPrice" label="Precio comparativo" type="number" placeholder="0.00" />
+          </div>
+          <div class="form-group">
+            <app-input formControlName="stock" label="Stock" type="number" placeholder="0" />
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label class="input-label">Descripción</label>
+          <textarea
+            class="textarea"
+            formControlName="description"
+            placeholder="Descripción del producto"
+            rows="4"
+          ></textarea>
+        </div>
+        <div class="form-checkboxes">
+          <label class="checkbox">
+            <input type="checkbox" formControlName="isFeatured" />
+            <span>Producto destacado</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" formControlName="isActive" />
+            <span>Producto activo</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Imágenes</h3>
+        @if (editMode) {
+          <app-uploader (filesChange)="onImagesUploaded($event)" />
+          @if (images.length) {
+            <div class="image-grid">
+              @for (img of images; track img.id) {
+                <div class="image-card" [class.primary]="img.isPrimary">
+                  <img [src]="img.url" [alt]="img.altText || ''" />
+                  <div class="image-overlay">
+                    @if (!img.isPrimary) {
+                      <button type="button" class="img-action" title="Marcar principal">★</button>
+                    }
+                    <button type="button" class="img-action danger" (click)="removeImage(img.id)" title="Eliminar">✕</button>
+                  </div>
+                  @if (img.isPrimary) {
+                    <span class="primary-badge">Principal</span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        } @else {
+          <p class="hint">Guarda el producto primero para poder subir imágenes.</p>
+        }
+      </div>
+
+      <div class="form-section" *hasPermission="'products.manage-restrictions'">
+        <div class="section-header-inline">
+          <h3>Restricciones</h3>
+          @if (editMode) {
+            <app-btn variant="secondary" size="sm" type="button" (click)="openRestrictionModal()">
+              Agregar
+            </app-btn>
+          }
+        </div>
+        @if (!editMode) {
+          <p class="hint">Guarda el producto primero para gestionar restricciones.</p>
+        } @else if (restrictions.length === 0) {
+          <p class="hint">Sin restricciones configuradas.</p>
+        } @else {
+          <div class="restriction-list">
+            @for (r of restrictions; track r.id) {
+              <div class="restriction-item">
+                <div class="restriction-info">
+                  <span class="restriction-type">{{ restrictionTypeLabel(r.restrictionType) }}</span>
+                  <app-badge [variant]="r.isActive ? 'success' : 'neutral'">
+                    {{ r.isActive ? 'Activa' : 'Inactiva' }}
+                  </app-badge>
+                </div>
+                <div class="restriction-actions">
+                  <button type="button" class="icon-btn" (click)="openRestrictionModal(r)">✏️</button>
+                  <button type="button" class="icon-btn danger" (click)="deleteRestriction(r.id)">🗑️</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-actions">
+        <app-btn variant="secondary" type="button" routerLink="/products">Cancelar</app-btn>
+        <app-btn type="submit" [loading]="saving" [disabled]="form.invalid">
+          {{ editMode ? 'Guardar cambios' : 'Crear producto' }}
+        </app-btn>
+      </div>
+    </form>
+  }
+</div>
+
+<app-modal [open]="restrictionModalOpen" title="Restricción" size="md" (close)="restrictionModalOpen = false">
+  <form [formGroup]="restrictionForm" (ngSubmit)="saveRestriction()" class="restriction-form">
+    <app-select
+      formControlName="restrictionType"
+      label="Tipo"
+      [options]="([
+        { value: 'AGE_MIN', label: 'Edad mínima' },
+        { value: 'PURCHASE_LIMIT_USER', label: 'Límite por cliente' },
+        { value: 'PURCHASE_LIMIT_ORDER', label: 'Límite por pedido' },
+        { value: 'AVAILABILITY_WINDOW', label: 'Ventana de disponibilidad' },
+        { value: 'GEOGRAPHIC', label: 'Restricción geográfica' },
+        { value: 'LIMITED_STOCK', label: 'Stock limitado' }
+      ])"
+    />
+    <div class="form-group">
+      <label class="input-label">Configuración (JSON)</label>
+      <textarea class="textarea textarea-sm" formControlName="config" rows="4"></textarea>
+    </div>
+    <div class="form-grid form-grid-2">
+      <app-input formControlName="startsAt" label="Inicio" type="text" placeholder="2026-01-01T00:00:00Z" />
+      <app-input formControlName="endsAt" label="Fin" type="text" placeholder="2026-12-31T23:59:59Z" />
+    </div>
+    <label class="checkbox">
+      <input type="checkbox" formControlName="isActive" />
+      <span>Activa</span>
+    </label>
+    <div class="modal-actions">
+      <app-btn variant="secondary" type="button" (click)="restrictionModalOpen = false">Cancelar</app-btn>
+      <app-btn type="submit" [disabled]="restrictionForm.invalid">
+        {{ editingRestriction ? 'Actualizar' : 'Agregar' }}
+      </app-btn>
+    </div>
+  </form>
+</app-modal>

@@ -1,0 +1,49 @@
+<div class="users-page">
+  <header class="section-header">
+    <h2>Usuarios</h2>
+    <div class="header-actions">
+      <input class="search-input" [(ngModel)]="search" placeholder="Buscar usuarios..." (keyup.enter)="onSearch()" />
+      <div *hasPermission="'users.create'">
+        <app-btn routerLink="/users/new">Nuevo usuario</app-btn>
+      </div>
+    </div>
+  </header>
+
+  <div class="table-card">
+    @if (loading) { <div class="loading-state"><div class="spinner"></div></div> }
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nombre</th><th>Correo</th><th>Roles</th><th>Estado</th><th>Última conexión</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of users; track u.id) {
+          <tr>
+            <td>{{ u.firstName }} {{ u.lastName }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+              <div class="roles-list">
+                @for (role of u.roles; track role) {
+                  <app-badge variant="info">{{ role }}</app-badge>
+                }
+              </div>
+            </td>
+            <td><app-badge [variant]="u.isActive ? 'success' : 'danger'">{{ u.isActive ? 'Activo' : 'Inactivo' }}</app-badge></td>
+            <td>{{ u.lastLoginAt ? (u.lastLoginAt | date:'short') : '—' }}</td>
+            <td>
+              <div class="actions">
+                <a [routerLink]="['/users', u.id]" class="icon-btn">✏️</a>
+                <div *hasPermission="'users.delete'">
+                  <button class="icon-btn danger" (click)="deleteUser(u.id)">🗑️</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6" class="empty">Sin usuarios</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

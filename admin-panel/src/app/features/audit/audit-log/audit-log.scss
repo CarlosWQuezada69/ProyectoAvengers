@@ -1,0 +1,13 @@
+.audit-page { display: flex; flex-direction: column; gap: 20px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.filter-input { padding: 8px 12px; background: #0D0D0D; border: 1px solid #2A2A2A; border-radius: 6px; color: #FFFFFF; font-size: 13px; outline: none; width: 140px; &:focus { border-color: #E8B923; } &::placeholder { color: #666; } &[type="date"] { width: 140px; &::-webkit-calendar-picker-indicator { filter: invert(1); } } }
+.table-card { background: #1A1A1A; border: 1px solid #2A2A2A; border-radius: 8px; overflow: hidden; position: relative; }
+.loading-state { display: flex; align-items: center; justify-content: center; padding: 48px; .spinner { width: 32px; height: 32px; border: 3px solid #2A2A2A; border-top-color: #E8B923; border-radius: 50%; animation: spin 0.6s linear infinite; } }
+.table { width: 100%; border-collapse: collapse; th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #2A2A2A; } th { color: #B3B3B3; font-weight: 600; font-size: 12px; text-transform: uppercase; } td { color: #FFFFFF; } tbody tr.clickable { cursor: pointer; &:hover { background: #242424; } } }
+.expanded-row td { padding: 0; }
+.changes-json { margin: 0; padding: 16px; background: #0D0D0D; font-size: 12px; font-family: monospace; color: #B3B3B3; overflow-x: auto; max-height: 300px; white-space: pre-wrap; }
+.empty { text-align: center; padding: 48px; color: #B3B3B3; }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 16px; }
+.page-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #2A2A2A; border-radius: 4px; background: transparent; color: #B3B3B3; font-size: 14px; cursor: pointer; &:hover:not(:disabled) { background: #242424; color: #FFFFFF; } &.active { background: #E8B923; color: #0D0D0D; border-color: #E8B923; } &:disabled { opacity: 0.3; cursor: not-allowed; } }
+@keyframes spin { to { transform: rotate(360deg); } }
