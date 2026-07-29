@@ -1,11 +1,15 @@
 # Proyecto Avengers
 
-API REST para catálogo de productos con panel de administración, construida con **ASP.NET Core 8**, **Entity Framework Core** y **PostgreSQL 16**, siguiendo **Clean Architecture**.
+Sistema de catálogo de productos con panel de administración full-stack: **API REST** en **ASP.NET Core 8** + **Frontend SPA** en **Angular 22**.
+
+**Backend:** Clean Architecture, EF Core, PostgreSQL 16, JWT, rate limiting, auditoría.
+**Frontend:** Angular 22 standalone, signals, reactive forms, diseño asimétrico, glassmorphism, responsive.
 
 ---
 
 ## Stack Tecnológico
 
+### Backend
 | Capa | Tecnología |
 |------|-----------|
 | Runtime | .NET 8 |
@@ -16,6 +20,18 @@ API REST para catálogo de productos con panel de administración, construida co
 | Validación | FluentValidation 11 |
 | Testing | xUnit + Moq + EF Core InMemory |
 | Infraestructura | Docker Compose |
+
+### Frontend
+| Capa | Tecnología |
+|------|-----------|
+| Framework | Angular 22 (Standalone Components) |
+| Estado | Signals (sin NgRx ni RxJS pesado) |
+| Formularios | Reactive Forms con validación declarativa |
+| UI | CSS custom properties, diseño asimétrico, glassmorphism |
+| Iconos | SVG inline (Lucide-style), sin dependencias de iconos |
+| Responsive | Sidebar overlay en móvil, 3 breakpoints (769px, 768px, 480px) |
+| Páginas de error | 404, 403, 500 con glassmorphism |
+| Branding dinámico | Logo y nombre configurables desde settings |
 
 ---
 
@@ -30,9 +46,18 @@ src/
 └── Shared            → DTOs compartidos (request/response)
 tests/
 └── ProyectoAvengers.Tests → Pruebas unitarias (xUnit)
+admin-panel/
+└── src/
+    ├── app/
+    │   ├── core/         → Servicios, guards, interceptors, modelos
+    │   ├── features/     → Módulos por funcionalidad (auth, dashboard, products, etc.)
+    │   └── shared/       → Componentes UI reutilizables, layout
+    ├── environments/
+    └── styles.scss       → Design tokens (CSS custom properties)
 ```
 
 Clean Architecture con dependencias hacia adentro: `Api → Application → Domain` e `Infrastructure → Application`.
+Frontend Angular con lazy loading por feature y componentes standalone.
 
 ---
 
@@ -41,9 +66,10 @@ Clean Architecture con dependencias hacia adentro: `Api → Application → Doma
 ### Requisitos
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [Node.js 20+](https://nodejs.org/) (para el frontend)
 - PostgreSQL 16 (o `docker compose up -d postgres`)
 
-### Desarrollo
+### Desarrollo — Backend
 
 ```bash
 # 1. Clonar y restaurar dependencias
@@ -64,6 +90,21 @@ dotnet run --project src/Api
 
 El seed crea automáticamente 28 permisos, el rol **SuperAdmin** con todos los permisos y un usuario administrador desde las variables de entorno.
 
+### Desarrollo — Frontend
+
+```bash
+# 1. Ir al directorio del frontend
+cd admin-panel
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Iniciar servidor de desarrollo
+npx ng serve --configuration development --host 0.0.0.0
+```
+
+El frontend se sirve en `http://localhost:4200` y se conecta al backend en `http://localhost:5000`.
+
 ### Docker
 
 ```bash
@@ -74,6 +115,7 @@ docker compose up --build
 |----------|-----|
 | API | http://localhost:5000 |
 | Swagger UI | http://localhost:5000/swagger |
+| Frontend (admin panel) | http://localhost:4200 |
 | PostgreSQL | localhost:5432 |
 
 ### Variables de Entorno
