@@ -71,6 +71,7 @@
         class="login-submit"
         type="submit"
         [disabled]="loading"
+        (click)="onSubmit()"
       >
         @if (loading) {
           <span class="login-submit-spinner"></span>
