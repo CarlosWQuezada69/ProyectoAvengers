@@ -23,16 +23,34 @@ public class DatabaseSeeder : IDatabaseSeeder
 
     private async Task SeedPermissionsAsync(CancellationToken ct)
     {
-        if (await _context.Permissions.AnyAsync(ct))
-            return;
+        var existingCodes = (await _context.Permissions
+            .AsNoTracking()
+            .Select(p => p.Code)
+            .ToListAsync(ct)).ToHashSet();
 
-        var permissions = new List<Permission>
+        if (existingCodes.Count > 0)
         {
-            new() { Code = "products.view",               Module = "products",    Action = "view",   Description = "Ver productos en el panel admin" },
+            var missing = _permissions.Where(p => !existingCodes.Contains(p.Code)).ToList();
+            if (missing.Count > 0)
+            {
+                _context.Permissions.AddRange(missing);
+                await _context.SaveChangesAsync(ct);
+            }
+            return;
+        }
+
+        _context.Permissions.AddRange(_permissions);
+        await _context.SaveChangesAsync(ct);
+    }
+
+    private static readonly List<Permission> _permissions =
+    [
+        new() { Code = "products.view",               Module = "products",    Action = "view",   Description = "Ver productos en el panel admin" },
             new() { Code = "products.create",             Module = "products",    Action = "create", Description = "Crear productos" },
             new() { Code = "products.update",             Module = "products",    Action = "update", Description = "Editar productos" },
             new() { Code = "products.delete",             Module = "products",    Action = "delete", Description = "Eliminar productos" },
             new() { Code = "products.manage-restrictions",Module = "products",    Action = "manage", Description = "Gestionar restricciones de producto" },
+            new() { Code = "categories.view",               Module = "categories",  Action = "view",   Description = "Ver categorías en el panel admin" },
             new() { Code = "categories.create",            Module = "categories", Action = "create", Description = "Crear categorías" },
             new() { Code = "categories.update",            Module = "categories", Action = "update", Description = "Editar categorías" },
             new() { Code = "categories.delete",            Module = "categories", Action = "delete", Description = "Eliminar categorías" },
@@ -55,28 +73,35 @@ public class DatabaseSeeder : IDatabaseSeeder
             new() { Code = "audit.view",                  Module = "audit",       Action = "view",   Description = "Ver bitácora de auditoría" },
             new() { Code = "about.view",                  Module = "about",       Action = "view",   Description = "Ver información de la empresa" },
             new() { Code = "about.update",                Module = "about",       Action = "update", Description = "Editar información y galería de la empresa" },
-        };
-
-        _context.Permissions.AddRange(permissions);
-        await _context.SaveChangesAsync(ct);
-    }
+    ];
 
     private async Task SeedSuperAdminRoleAsync(CancellationToken ct)
     {
-        if (await _context.Roles.AnyAsync(r => r.Name == "SuperAdmin", ct))
-            return;
+        var superAdmin = await _context.Roles
+            .Include(r => r.RolePermissions)
+            .FirstOrDefaultAsync(r => r.Name == "SuperAdmin", ct);
 
-        var role = new Role
+        if (superAdmin != null)
         {
-            Name = "SuperAdmin",
-            Description = "Acceso total al sistema"
-        };
+            var assignedIds = superAdmin.RolePermissions.Select(rp => rp.PermissionId).ToHashSet();
+            var missingIds = await _context.Permissions
+                .AsNoTracking()
+                .Where(p => !assignedIds.Contains(p.Id))
+                .Select(p => p.Id)
+                .ToListAsync(ct);
+
+            if (missingIds.Count > 0)
+            {
+                superAdmin.AssignPermissions(missingIds);
+                await _context.SaveChangesAsync(ct);
+            }
+            return;
+        }
+
+        var role = new Role("SuperAdmin", "Acceso total al sistema");
 
         var allPermissions = await _context.Permissions.ToListAsync(ct);
-        role.RolePermissions = allPermissions.Select(p => new RolePermission
-        {
-            PermissionId = p.Id
-        }).ToList();
+        role.AssignPermissions(allPermissions.Select(p => p.Id).ToList());
 
         _context.Roles.Add(role);
         await _context.SaveChangesAsync(ct);
@@ -99,19 +124,10 @@ public class DatabaseSeeder : IDatabaseSeeder
         if (superAdminRole == null)
             return;
 
-        var user = new User
-        {
-            FirstName = "Admin",
-            LastName = "Super",
-            Email = adminEmail,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
-            IsActive = true,
-            EmailConfirmed = true,
-            UserRoles = new List<UserRole>
-            {
-                new() { RoleId = superAdminRole.Id }
-            }
-        };
+        var user = new User("Admin", "Super", adminEmail,
+            BCrypt.Net.BCrypt.HashPassword(adminPassword), null);
+        user.ConfirmEmail();
+        user.AssignRoles(new List<Guid> { superAdminRole.Id });
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync(ct);

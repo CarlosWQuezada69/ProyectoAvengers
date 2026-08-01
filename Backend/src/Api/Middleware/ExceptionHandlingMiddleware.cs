@@ -21,18 +21,40 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Business rule violation: {Message}", ex.Message);
+
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
+            context.Response.ContentType = "application/problem+json";
+
+            var problem = new ProblemDetails
+            {
+                Title = "Error de validación de negocio",
+                Status = StatusCodes.Status409Conflict,
+                Detail = ex.Message,
+                Instance = context.Request.Path
+            };
+
+            var json = JsonSerializer.Serialize(problem, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            await context.Response.WriteAsync(json);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception processing request {Method} {Path}",
                 context.Request.Method, context.Request.Path);
 
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             context.Response.ContentType = "application/problem+json";
 
             var problem = new ProblemDetails
             {
                 Title = "Internal Server Error",
-                Status = (int)HttpStatusCode.InternalServerError,
+                Status = StatusCodes.Status500InternalServerError,
                 Detail = "Ocurrió un error interno. Intenta de nuevo más tarde.",
                 Instance = context.Request.Path
             };

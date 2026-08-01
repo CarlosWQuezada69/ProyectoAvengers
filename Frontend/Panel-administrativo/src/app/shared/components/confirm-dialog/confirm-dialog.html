@@ -1,0 +1,7 @@
+<app-modal [open]="service.isOpen()" title="Confirmar acción" (close)="service.cancel()">
+  <p class="confirm-message">{{ service.message() }}</p>
+  <div class="confirm-actions">
+    <app-btn variant="secondary" (click)="service.cancel()">Cancelar</app-btn>
+    <app-btn variant="danger" (click)="service.accept()">Confirmar</app-btn>
+  </div>
+</app-modal>

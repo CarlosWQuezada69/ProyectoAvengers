@@ -5,10 +5,12 @@ namespace ProyectoAvengers.Api.Middleware;
 public class SecurityHeadersMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly IWebHostEnvironment _env;
 
-    public SecurityHeadersMiddleware(RequestDelegate next)
+    public SecurityHeadersMiddleware(RequestDelegate next, IWebHostEnvironment env)
     {
         _next = next;
+        _env = env;
     }
 
     private static readonly string[] SwaggerPaths = ["/swagger", "/swagger/"];
@@ -32,13 +34,17 @@ public class SecurityHeadersMiddleware
         context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
         context.Response.Headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
 
+        var apiOrigin = _env.IsDevelopment()
+            ? "http://localhost:4200"
+            : "";
+
         context.Response.Headers["Content-Security-Policy"] =
             $"default-src 'self'; " +
             $"script-src 'self' 'nonce-{nonce}'; " +
             $"style-src 'self' 'nonce-{nonce}'; " +
             $"img-src 'self' data:; " +
             $"font-src 'self'; " +
-            $"connect-src 'self'; " +
+            $"connect-src 'self' {apiOrigin}; " +
             $"frame-ancestors 'none';";
 
         await _next(context);

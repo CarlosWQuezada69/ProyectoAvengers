@@ -15,12 +15,28 @@
   } @else if (overview) {
     <div class="kpi-grid">
       <div class="kpi-card">
-        <span class="kpi-label">Productos activos</span>
+        <span class="kpi-label">Productos totales</span>
+        <span class="kpi-value">{{ overview.totalProducts }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Activos</span>
         <span class="kpi-value">{{ overview.activeProducts }}</span>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">Stock bajo</span>
-        <span class="kpi-value accent-danger">{{ overview.lowStockProducts }}</span>
+        <span class="kpi-value accent-danger">{{ overview.lowStockCount }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Vistas hoy</span>
+        <span class="kpi-value">{{ overview.todayViews | number }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Categorías</span>
+        <span class="kpi-value">{{ overview.totalCategories }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Usuarios</span>
+        <span class="kpi-value">{{ overview.totalUsers }}</span>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">Vistas del mes</span>

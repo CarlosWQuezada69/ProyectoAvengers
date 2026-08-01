@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, ChangeDetectionStrategy } from '@angular/core';
 import { BrandingService } from '../../../core/services/branding.service';
 
 @Component({
@@ -38,6 +38,7 @@ import { BrandingService } from '../../../core/services/branding.service';
       white-space: nowrap;
     }
   `],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BrandComponent {
   private branding = inject(BrandingService);

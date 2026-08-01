@@ -1,18 +1,22 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { BrandingService } from '../../../core/services/branding.service';
 
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
+  protected branding = inject(BrandingService);
   protected loading = false;
   protected error = '';
 
@@ -22,7 +26,7 @@ export class LoginComponent {
   });
 
   protected onSubmit(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.loading) {
       this.form.markAllAsTouched();
       return;
     }
@@ -40,6 +44,7 @@ export class LoginComponent {
       error: (err) => {
         this.loading = false;
         this.error = err.error?.title || 'Credenciales inválidas';
+        this.cdr.markForCheck();
       },
     });
   }

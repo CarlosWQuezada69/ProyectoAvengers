@@ -2,6 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { take } from 'rxjs/operators';
 import type { User } from '../models/user';
 
 export interface LoginResponse {
@@ -74,18 +75,28 @@ export class AuthService {
     return this.http.get<User>(`${environment.apiUrl}/auth/me`);
   }
 
-  loadUser(): void {
-    this.me().subscribe({
-      next: (user) => {
-        this.userSignal.set(user);
-        this.authenticatedSignal.set(true);
-      },
-      error: () => {
-        this.clearTokens();
+  loadUser(): Promise<void> {
+    return new Promise(resolve => {
+      if (!this.isAuthenticated()) {
         this.userSignal.set(null);
         this.authenticatedSignal.set(false);
-        this.router.navigate(['/auth/login']);
-      },
+        resolve();
+        return;
+      }
+      this.me().pipe(take(1)).subscribe({
+        next: (user) => {
+          this.userSignal.set(user);
+          this.authenticatedSignal.set(true);
+          resolve();
+        },
+        error: () => {
+          this.clearTokens();
+          this.userSignal.set(null);
+          this.authenticatedSignal.set(false);
+          this.router.navigate(['/auth/login']);
+          resolve();
+        },
+      });
     });
   }
 }

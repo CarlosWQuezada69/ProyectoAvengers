@@ -3,9 +3,11 @@
     <h2>Configuración del sitio</h2>
   </header>
 
-  @if (loading) {
-    <div class="loading-state"><div class="spinner"></div></div>
-  } @else {
+  <div class="loading-state" [hidden]="!loading">
+    <div class="spinner"></div>
+  </div>
+
+  <div [hidden]="loading">
     <div class="settings-section">
       <h3>Identidad</h3>
       <div class="logo-section">
@@ -52,5 +54,5 @@
         </div>
       </form>
     </div>
-  }
+  </div>
 </div>

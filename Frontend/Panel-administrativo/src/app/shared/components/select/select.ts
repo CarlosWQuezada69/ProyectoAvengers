@@ -1,4 +1,4 @@
-import { Component, input, forwardRef } from '@angular/core';
+import { Component, input, forwardRef, ChangeDetectionStrategy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, type ControlValueAccessor } from '@angular/forms';
 
 export interface SelectOption {
@@ -16,6 +16,7 @@ export interface SelectOption {
     useExisting: forwardRef(() => SelectComponent),
     multi: true,
   }],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SelectComponent implements ControlValueAccessor {
   readonly label = input('');

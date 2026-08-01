@@ -1,4 +1,4 @@
-import { Component, input, output, forwardRef } from '@angular/core';
+import { Component, input, output, forwardRef, ChangeDetectionStrategy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, type ControlValueAccessor } from '@angular/forms';
 
 @Component({
@@ -11,6 +11,7 @@ import { NG_VALUE_ACCESSOR, type ControlValueAccessor } from '@angular/forms';
     useExisting: forwardRef(() => InputComponent),
     multi: true,
   }],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputComponent implements ControlValueAccessor {
   readonly label = input('');

@@ -6,15 +6,19 @@
   <div class="login-card">
     <div class="login-brand">
       <div class="login-brand-icon">
-        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polygon points="16 2 30 12 30 26 16 30 2 26 2 12" stroke-linejoin="round"/>
-          <line x1="12" y1="14" x2="20" y2="14"/>
-          <line x1="12" y1="18" x2="20" y2="18"/>
-          <line x1="14" y1="22" x2="18" y2="22"/>
-        </svg>
+        @if (branding.logoUrl()) {
+          <img [src]="branding.logoUrl()" alt="Logo" class="login-brand-img" />
+        } @else {
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="16 2 30 12 30 26 16 30 2 26 2 12" stroke-linejoin="round"/>
+            <line x1="12" y1="14" x2="20" y2="14"/>
+            <line x1="12" y1="18" x2="20" y2="18"/>
+            <line x1="14" y1="22" x2="18" y2="22"/>
+          </svg>
+        }
       </div>
       <div class="login-brand-text">
-        <span class="login-brand-name">Avengers</span>
+        <span class="login-brand-name">{{ branding.businessName() }}</span>
         <span class="login-brand-sub">Panel Administrativo</span>
       </div>
     </div>
@@ -71,7 +75,6 @@
         class="login-submit"
         type="submit"
         [disabled]="loading"
-        (click)="onSubmit()"
       >
         @if (loading) {
           <span class="login-submit-spinner"></span>

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { ButtonComponent } from '../../../shared/components/button/button';
@@ -6,6 +6,7 @@ import { InputComponent } from '../../../shared/components/input/input';
 import { ModalComponent } from '../../../shared/components/modal/modal';
 import { BadgeComponent } from '../../../shared/components/badge/badge';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import type { Category } from '../../../core/models/category';
 
@@ -14,10 +15,12 @@ import type { Category } from '../../../core/models/category';
   imports: [ReactiveFormsModule, ButtonComponent, InputComponent, ModalComponent, BadgeComponent, HasPermissionDirective],
   templateUrl: './category-list.html',
   styleUrl: './category-list.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryListComponent implements OnInit {
   private categoriesService = inject(CategoriesService);
   private toast = inject(ToastService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   protected categories: Category[] = [];
   protected loading = true;
@@ -83,18 +86,18 @@ export class CategoryListComponent implements OnInit {
     }
   }
 
-  protected deleteCategory(id: string): void {
-    if (confirm('¿Eliminar esta categoría?')) {
-      this.categoriesService.delete(id).subscribe({
-        next: () => {
-          this.toast.show('Categoría eliminada', 'success');
-          this.loadCategories();
-        },
-        error: () => {
-          this.toast.show('No se puede eliminar: tiene productos asociados', 'error');
-        },
-      });
-    }
+  protected async deleteCategory(id: string): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm('¿Eliminar esta categoría?');
+    if (!confirmed) return;
+    this.categoriesService.delete(id).subscribe({
+      next: () => {
+        this.toast.show('Categoría eliminada', 'success');
+        this.loadCategories();
+      },
+      error: () => {
+        this.toast.show('No se puede eliminar: tiene productos asociados', 'error');
+      },
+    });
   }
 
   protected flatCategories(): Category[] {

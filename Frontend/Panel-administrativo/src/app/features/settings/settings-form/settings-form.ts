@@ -1,6 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { SettingsService } from '../../../core/services/settings.service';
+import { BrandingService } from '../../../core/services/branding.service';
+import { environment } from '../../../../environments/environment';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { InputComponent } from '../../../shared/components/input/input';
 import { UploaderComponent } from '../../../shared/components/uploader/uploader';
@@ -14,10 +16,13 @@ type SettingKeys = 'business_name' | 'copyright_text' | 'contact_email' | 'conta
   imports: [ReactiveFormsModule, ButtonComponent, InputComponent, UploaderComponent],
   templateUrl: './settings-form.html',
   styleUrl: './settings-form.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsFormComponent implements OnInit {
   private settingsService = inject(SettingsService);
+  private branding = inject(BrandingService);
   private toast = inject(ToastService);
+  private cdr = inject(ChangeDetectorRef);
 
   protected settings: SiteSetting[] = [];
   protected loading = true;
@@ -32,6 +37,16 @@ export class SettingsFormComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.loadSettings();
+    setTimeout(() => {
+      if (this.loading) {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    }, 5000);
+  }
+
+  private loadSettings(): void {
     this.settingsService.getAll().subscribe({
       next: data => {
         this.settings = data;
@@ -42,22 +57,38 @@ export class SettingsFormComponent implements OnInit {
           }
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
-      error: () => this.loading = false,
+      error: () => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 
   protected save(key: string): void {
     const value = this.form.get(key as SettingKeys)?.value ?? '';
     this.settingsService.update(key, value).subscribe(() => {
+      this.branding.refresh();
       this.toast.show('Configuración guardada', 'success');
     });
   }
 
   protected onLogoUpload(files: File[]): void {
-    this.settingsService.uploadLogo(files[0]).subscribe(res => {
-      this.logoUrl = res.url;
-      this.toast.show('Logo actualizado', 'success');
+    if (!files[0]) return;
+    this.settingsService.uploadLogo(files[0]).subscribe({
+      next: res => {
+        this.logoUrl = this.toAbsolute(res.value ?? '');
+        this.branding.refresh();
+        this.cdr.markForCheck();
+        this.toast.show('Logo actualizado', 'success');
+      },
+      error: () => this.toast.show('Error al subir el logo', 'error'),
     });
+  }
+
+  private toAbsolute(url: string): string {
+    if (!url || /^https?:\/\//.test(url)) return url;
+    return `${environment.apiUrl.replace('/api/v1', '')}${url}`;
   }
 }

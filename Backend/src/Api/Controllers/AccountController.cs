@@ -53,13 +53,8 @@ public class AccountController : ControllerBase
         rng.GetBytes(tokenBytes);
         var token = Convert.ToHexString(tokenBytes).ToLowerInvariant();
 
-        _context.EmailChangeRequests.Add(new Domain.Entities.EmailChangeRequest
-        {
-            UserId = user.Id,
-            NewEmail = request.NewEmail,
-            Token = token,
-            ExpiresAt = DateTime.UtcNow.AddHours(24)
-        });
+        _context.EmailChangeRequests.Add(new Domain.Entities.EmailChangeRequest(
+            user.Id, request.NewEmail, token, DateTime.UtcNow.AddHours(24)));
 
         await _context.SaveChangesAsync();
 
@@ -87,8 +82,8 @@ public class AccountController : ControllerBase
                 Detail = "El token de confirmación no es válido o ha expirado."
             });
 
-        changeRequest.ConfirmedAt = DateTime.UtcNow;
-        changeRequest.User.Email = changeRequest.NewEmail;
+        changeRequest.Confirm();
+        changeRequest.User.ChangeEmail(changeRequest.NewEmail);
 
         await _context.SaveChangesAsync();
 

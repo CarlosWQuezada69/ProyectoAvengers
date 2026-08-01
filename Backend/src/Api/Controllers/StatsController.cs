@@ -31,6 +31,15 @@ public class StatsController : AdminBaseController
             .AsNoTracking()
             .Where(s => s.Date == today)
             .SumAsync(s => s.Views);
+        var monthStart = new DateOnly(today.Year, today.Month, 1);
+        var monthlyViews = await _context.ProductStatsDailies
+            .AsNoTracking()
+            .Where(s => s.Date >= monthStart)
+            .SumAsync(s => s.Views);
+        var monthlyPurchases = await _context.ProductStatsDailies
+            .AsNoTracking()
+            .Where(s => s.Date >= monthStart)
+            .SumAsync(s => s.Purchases);
         var lowStockCount = await _context.Products
             .AsNoTracking()
             .CountAsync(p => p.Stock > 0 && p.Stock <= 5);
@@ -42,7 +51,9 @@ public class StatsController : AdminBaseController
             TotalCategories = totalCategories,
             TotalUsers = totalUsers,
             TodayViews = todayViews,
-            LowStockCount = lowStockCount
+            LowStockCount = lowStockCount,
+            MonthlyViews = monthlyViews,
+            MonthlyPurchases = monthlyPurchases
         });
     }
 

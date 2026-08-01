@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -10,6 +10,7 @@ import { BrandComponent } from '../../../shared/components/brand/brand';
   imports: [ReactiveFormsModule, RouterLink, BrandComponent],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPasswordComponent {
   private http = inject(HttpClient);

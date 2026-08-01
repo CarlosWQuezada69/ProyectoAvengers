@@ -73,7 +73,7 @@
                   <img [src]="img.url" [alt]="img.altText || ''" />
                   <div class="image-overlay">
                     @if (!img.isPrimary) {
-                      <button type="button" class="img-action" title="Marcar principal">★</button>
+                      <button type="button" class="img-action" (click)="setPrimaryImage(img.id)" title="Marcar principal">★</button>
                     }
                     <button type="button" class="img-action danger" (click)="removeImage(img.id)" title="Eliminar">✕</button>
                   </div>

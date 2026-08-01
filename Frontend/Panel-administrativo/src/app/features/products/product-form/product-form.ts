@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProductsService } from '../../../core/services/products.service';
@@ -19,6 +19,7 @@ import type { Category } from '../../../core/models/category';
   imports: [ReactiveFormsModule, RouterLink, ButtonComponent, InputComponent, SelectComponent, BadgeComponent, ModalComponent, UploaderComponent, HasPermissionDirective],
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductFormComponent implements OnInit {
   private productsService = inject(ProductsService);
@@ -121,6 +122,21 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
+  protected setPrimaryImage(imageId: string): void {
+    if (!this.productId) return;
+    const reordered = this.images.map(img => ({
+      imageId: img.id,
+      displayOrder: img.id === imageId ? 0 : (img.displayOrder > 0 ? img.displayOrder : 1),
+    }));
+    this.productsService.reorderImages(this.productId, reordered).subscribe(() => {
+      this.images = this.images.map(img => ({
+        ...img,
+        isPrimary: img.id === imageId,
+        displayOrder: img.id === imageId ? 0 : (img.displayOrder > 0 ? img.displayOrder : 1),
+      }));
+    });
+  }
+
   protected openRestrictionModal(r?: ProductRestriction): void {
     this.editingRestriction = r ?? null;
     if (r) {
@@ -138,7 +154,13 @@ export class ProductFormComponent implements OnInit {
 
   protected saveRestriction(): void {
     if (!this.productId || this.restrictionForm.invalid) return;
-    const data = { ...this.restrictionForm.value, config: JSON.parse(this.restrictionForm.value.config || '{}') };
+    let parsedConfig: Record<string, unknown> = {};
+    try {
+      parsedConfig = JSON.parse(this.restrictionForm.value.config || '{}');
+    } catch {
+      parsedConfig = {};
+    }
+    const data = { ...this.restrictionForm.value, config: parsedConfig };
 
     if (this.editingRestriction) {
       this.productsService.updateRestriction(this.productId, this.editingRestriction.id, data as any).subscribe({

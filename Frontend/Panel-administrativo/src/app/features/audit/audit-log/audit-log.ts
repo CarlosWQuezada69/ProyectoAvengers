@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe, JsonPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuditService } from '../../../core/services/audit.service';
@@ -11,6 +11,7 @@ import type { AuditLog } from '../../../core/models/index';
   imports: [DatePipe, JsonPipe, FormsModule, ButtonComponent, BadgeComponent],
   templateUrl: './audit-log.html',
   styleUrl: './audit-log.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuditLogComponent implements OnInit {
   private auditService = inject(AuditService);

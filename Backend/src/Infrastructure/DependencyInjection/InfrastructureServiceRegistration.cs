@@ -28,6 +28,10 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<ITokenService, TokenService>();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ISliderService, SliderService>();
 
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
         if (environment == "Development")

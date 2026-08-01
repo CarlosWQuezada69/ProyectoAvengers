@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,7 @@ import { UsersService } from '../../../core/services/users.service';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { BadgeComponent } from '../../../shared/components/badge/badge';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
 import type { User } from '../../../core/models/user';
 
 @Component({
@@ -13,9 +14,11 @@ import type { User } from '../../../core/models/user';
   imports: [DatePipe, RouterLink, FormsModule, ButtonComponent, BadgeComponent, HasPermissionDirective],
   templateUrl: './user-list.html',
   styleUrl: './user-list.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserListComponent implements OnInit {
   private usersService = inject(UsersService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   protected users: User[] = [];
   protected loading = true;
@@ -47,9 +50,9 @@ export class UserListComponent implements OnInit {
     this.loadUsers();
   }
 
-  protected deleteUser(id: string): void {
-    if (confirm('¿Desactivar este usuario?')) {
-      this.usersService.delete(id).subscribe(() => this.loadUsers());
-    }
+  protected async deleteUser(id: string): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm('¿Desactivar este usuario?');
+    if (!confirmed) return;
+    this.usersService.delete(id).subscribe(() => this.loadUsers());
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UsersService } from '../../../core/services/users.service';
@@ -12,6 +12,7 @@ import type { Role } from '../../../core/models/role';
   imports: [ReactiveFormsModule, RouterLink, ButtonComponent, InputComponent],
   templateUrl: './user-form.html',
   styleUrl: './user-form.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserFormComponent implements OnInit {
   private usersService = inject(UsersService);

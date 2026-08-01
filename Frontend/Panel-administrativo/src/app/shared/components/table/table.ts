@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 
 export interface ColumnDef<T> {
   key: string;
@@ -13,6 +13,7 @@ export interface ColumnDef<T> {
   imports: [],
   templateUrl: './table.html',
   styleUrl: './table.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableComponent<T extends Record<string, unknown>> {
   readonly columns = input.required<ColumnDef<T>[]>();

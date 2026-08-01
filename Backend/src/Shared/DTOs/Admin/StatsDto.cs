@@ -9,6 +9,8 @@ public class OverviewStats
     public int TotalOrders { get; set; }
     public int TodayViews { get; set; }
     public int LowStockCount { get; set; }
+    public int MonthlyViews { get; set; }
+    public int MonthlyPurchases { get; set; }
 }
 
 public class TopProductStat

@@ -1,10 +1,11 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-skeleton',
   imports: [],
   templateUrl: './skeleton.html',
   styleUrl: './skeleton.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SkeletonComponent {
   readonly width = input('100%');

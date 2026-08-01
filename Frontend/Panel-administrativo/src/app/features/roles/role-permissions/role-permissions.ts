@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { RolesService, PermissionsService } from '../../../core/services/roles.service';
@@ -13,6 +13,7 @@ import type { Permission } from '../../../core/models/permission';
   imports: [FormsModule, ButtonComponent],
   templateUrl: './role-permissions.html',
   styleUrl: './role-permissions.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RolePermissionsComponent implements OnInit {
   private rolesService = inject(RolesService);

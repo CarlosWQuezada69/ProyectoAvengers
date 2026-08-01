@@ -22,6 +22,6 @@ export class SettingsService {
   uploadLogo(file: File) {
     const fd = new FormData();
     fd.append('file', file);
-    return this.http.post<{ url: string }>(`${environment.apiUrl}/admin/settings/logo`, fd);
+    return this.http.post<SiteSetting>(`${environment.apiUrl}/admin/settings/logo`, fd);
   }
 }

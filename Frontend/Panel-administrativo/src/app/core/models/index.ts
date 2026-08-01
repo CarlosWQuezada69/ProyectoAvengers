@@ -31,9 +31,11 @@ export interface AuditLog {
 export interface StatsOverview {
   totalProducts: number;
   activeProducts: number;
-  lowStockProducts: number;
-  totalViews: number;
-  totalPurchases: number;
+  totalCategories: number;
+  totalUsers: number;
+  totalOrders: number;
+  todayViews: number;
+  lowStockCount: number;
   monthlyViews: number;
   monthlyPurchases: number;
 }

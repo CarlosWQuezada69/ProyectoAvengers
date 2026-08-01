@@ -1,10 +1,11 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-uploader',
   imports: [],
   templateUrl: './uploader.html',
   styleUrl: './uploader.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UploaderComponent {
   readonly accept = input('image/*');

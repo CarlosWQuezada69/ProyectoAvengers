@@ -1,4 +1,5 @@
 using FluentValidation;
+using ProyectoAvengers.Domain;
 using ProyectoAvengers.Shared.DTOs.Admin;
 
 namespace ProyectoAvengers.Application.Validators;
@@ -61,7 +62,7 @@ public class CreateCategoryRequestValidator : AbstractValidator<CreateCategoryRe
     {
         RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
         RuleFor(x => x.Slug).NotEmpty().MaximumLength(200)
-            .Matches("^[a-z0-9]+(?:-[a-z0-9]+)*$");
+            .Matches(Constants.SlugPattern);
     }
 }
 
@@ -71,7 +72,7 @@ public class UpdateCategoryRequestValidator : AbstractValidator<UpdateCategoryRe
     {
         RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
         RuleFor(x => x.Slug).NotEmpty().MaximumLength(200)
-            .Matches("^[a-z0-9]+(?:-[a-z0-9]+)*$");
+            .Matches(Constants.SlugPattern);
     }
 }
 
@@ -82,7 +83,7 @@ public class CreateProductRequestValidator : AbstractValidator<CreateProductRequ
         RuleFor(x => x.Sku).NotEmpty().MaximumLength(50);
         RuleFor(x => x.Name).NotEmpty().MaximumLength(500);
         RuleFor(x => x.Slug).NotEmpty().MaximumLength(500)
-            .Matches("^[a-z0-9]+(?:-[a-z0-9]+)*$");
+            .Matches(Constants.SlugPattern);
         RuleFor(x => x.Price).GreaterThan(0);
         RuleFor(x => x.Stock).GreaterThanOrEqualTo(0);
     }
@@ -95,7 +96,7 @@ public class UpdateProductRequestValidator : AbstractValidator<UpdateProductRequ
         RuleFor(x => x.Sku).NotEmpty().MaximumLength(50);
         RuleFor(x => x.Name).NotEmpty().MaximumLength(500);
         RuleFor(x => x.Slug).NotEmpty().MaximumLength(500)
-            .Matches("^[a-z0-9]+(?:-[a-z0-9]+)*$");
+            .Matches(Constants.SlugPattern);
         RuleFor(x => x.Price).GreaterThan(0);
         RuleFor(x => x.Stock).GreaterThanOrEqualTo(0);
     }

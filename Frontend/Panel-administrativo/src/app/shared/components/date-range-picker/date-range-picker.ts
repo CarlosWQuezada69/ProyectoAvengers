@@ -1,10 +1,11 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-date-range-picker',
   imports: [],
   templateUrl: './date-range-picker.html',
   styleUrl: './date-range-picker.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DateRangePickerComponent {
   readonly startDate = input('');

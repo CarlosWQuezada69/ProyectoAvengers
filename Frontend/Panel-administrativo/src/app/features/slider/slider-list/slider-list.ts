@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { SliderService } from '../../../core/services/slider.service';
@@ -8,6 +8,7 @@ import { ModalComponent } from '../../../shared/components/modal/modal';
 import { BadgeComponent } from '../../../shared/components/badge/badge';
 import { UploaderComponent } from '../../../shared/components/uploader/uploader';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import type { SliderItem } from '../../../core/models/index';
 
@@ -16,10 +17,12 @@ import type { SliderItem } from '../../../core/models/index';
   imports: [DatePipe, ReactiveFormsModule, ButtonComponent, InputComponent, ModalComponent, BadgeComponent, UploaderComponent, HasPermissionDirective],
   templateUrl: './slider-list.html',
   styleUrl: './slider-list.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SliderListComponent implements OnInit {
   private sliderService = inject(SliderService);
   private toast = inject(ToastService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   protected items: SliderItem[] = [];
   protected loading = true;
@@ -76,12 +79,12 @@ export class SliderListComponent implements OnInit {
     }
   }
 
-  protected deleteItem(id: string): void {
-    if (confirm('¿Eliminar este ítem del slider?')) {
-      this.sliderService.delete(id).subscribe(() => {
-        this.toast.show('Slider eliminado', 'success');
-        this.loadItems();
-      });
-    }
+  protected async deleteItem(id: string): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm('¿Eliminar este ítem del slider?');
+    if (!confirmed) return;
+    this.sliderService.delete(id).subscribe(() => {
+      this.toast.show('Slider eliminado', 'success');
+      this.loadItems();
+    });
   }
 }

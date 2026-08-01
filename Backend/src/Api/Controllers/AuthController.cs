@@ -44,9 +44,7 @@ public class AuthController : ControllerBase
         {
             if (user != null)
             {
-                user.FailedLoginAttempts++;
-                if (user.FailedLoginAttempts >= 5)
-                    user.LockedUntilUtc = DateTime.UtcNow.AddMinutes(15);
+                user.RecordFailedLogin();
                 await _context.SaveChangesAsync();
             }
             return Unauthorized(new ProblemDetails
@@ -65,9 +63,8 @@ public class AuthController : ControllerBase
                 Detail = "Demasiados intentos fallidos. Intenta de nuevo en 15 minutos."
             });
 
-        user.FailedLoginAttempts = 0;
-        user.LockedUntilUtc = null;
-        user.LastLoginAt = DateTime.UtcNow;
+        user.ResetFailedLogins();
+        user.RecordLogin();
 
         var roles = await _context.UserRoles
             .Where(ur => ur.UserId == user.Id)
@@ -82,13 +79,9 @@ public class AuthController : ControllerBase
             .ToListAsync();
 
         var (accessToken, expiresIn) = _tokenService.GenerateAccessToken(user, roles, permissions);
-        var refreshToken = _context.RefreshTokens.Add(new RefreshToken
-        {
-            UserId = user.Id,
-            Token = _tokenService.GenerateRefreshToken(),
-            ExpiresAt = DateTime.UtcNow.AddDays(7),
-            CreatedByIp = _currentUser.GetIpAddress()
-        }).Entity;
+        var refreshToken = _context.RefreshTokens.Add(new RefreshToken(
+            user.Id, _tokenService.GenerateRefreshToken(),
+            DateTime.UtcNow.AddDays(7), _currentUser.GetIpAddress())).Entity;
 
         await _context.SaveChangesAsync();
 
@@ -100,7 +93,8 @@ public class AuthController : ControllerBase
             User = new UserInfo
             {
                 Id = user.Id,
-                Name = $"{user.FirstName} {user.LastName}",
+                FirstName = user.FirstName,
+                LastName = user.LastName,
                 Email = user.Email,
                 Roles = roles,
                 Permissions = permissions
@@ -131,7 +125,7 @@ public class AuthController : ControllerBase
                 .ToListAsync();
 
             foreach (var token in userTokens)
-                token.RevokedAt = DateTime.UtcNow;
+                token.Revoke();
 
             await _context.SaveChangesAsync();
 
@@ -151,7 +145,7 @@ public class AuthController : ControllerBase
                 Detail = "El refresh token ha expirado."
             });
 
-        storedToken.RevokedAt = DateTime.UtcNow;
+            storedToken.Revoke();
 
         var user = storedToken.User;
 
@@ -168,13 +162,9 @@ public class AuthController : ControllerBase
             .ToListAsync();
 
         var (accessToken, expiresIn) = _tokenService.GenerateAccessToken(user, roles, permissions);
-        var newRefreshToken = _context.RefreshTokens.Add(new RefreshToken
-        {
-            UserId = user.Id,
-            Token = _tokenService.GenerateRefreshToken(),
-            ExpiresAt = DateTime.UtcNow.AddDays(7),
-            CreatedByIp = _currentUser.GetIpAddress()
-        }).Entity;
+        var newRefreshToken = _context.RefreshTokens.Add(new RefreshToken(
+            user.Id, _tokenService.GenerateRefreshToken(),
+            DateTime.UtcNow.AddDays(7), _currentUser.GetIpAddress())).Entity;
 
         await _context.SaveChangesAsync();
 
@@ -195,7 +185,7 @@ public class AuthController : ControllerBase
 
         if (storedToken != null)
         {
-            storedToken.RevokedAt = DateTime.UtcNow;
+        storedToken.Revoke();
             await _context.SaveChangesAsync();
         }
 
@@ -216,12 +206,8 @@ public class AuthController : ControllerBase
             rng.GetBytes(tokenBytes);
             var token = Convert.ToHexString(tokenBytes).ToLowerInvariant();
 
-            _context.PasswordResetTokens.Add(new PasswordResetToken
-            {
-                UserId = user.Id,
-                Token = token,
-                ExpiresAt = DateTime.UtcNow.AddHours(1)
-            });
+            _context.PasswordResetTokens.Add(new PasswordResetToken(
+                user.Id, token, DateTime.UtcNow.AddHours(1)));
 
             await _context.SaveChangesAsync();
 
@@ -250,8 +236,8 @@ public class AuthController : ControllerBase
                 Detail = "El token de recuperación no es válido o ha expirado."
             });
 
-        resetToken.UsedAt = DateTime.UtcNow;
-        resetToken.User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        resetToken.MarkAsUsed();
+        resetToken.User.ChangePassword(BCrypt.Net.BCrypt.HashPassword(request.NewPassword));
 
         await _context.SaveChangesAsync();
 
@@ -287,7 +273,8 @@ public class AuthController : ControllerBase
         return Ok(new UserInfo
         {
             Id = user.Id,
-            Name = $"{user.FirstName} {user.LastName}",
+            FirstName = user.FirstName,
+            LastName = user.LastName,
             Email = user.Email,
             Roles = roles,
             Permissions = permissions

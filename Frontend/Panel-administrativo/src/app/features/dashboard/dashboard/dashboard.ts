@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { StatsService } from '../../../core/services/stats.service';
 import { SkeletonComponent } from '../../../shared/components/skeleton/skeleton';
@@ -10,6 +10,7 @@ import type { StatsOverview, TopProduct } from '../../../core/models/index';
   imports: [DecimalPipe, SkeletonComponent, BadgeComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent implements OnInit {
   private statsService = inject(StatsService);

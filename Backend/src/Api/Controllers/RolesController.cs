@@ -71,19 +71,10 @@ public class RolesController : AdminBaseController
                 Detail = "Ya existe un rol con ese nombre."
             });
 
-        var role = new Role
-        {
-            Name = request.Name,
-            Description = request.Description
-        };
+        var role = new Role(request.Name, request.Description);
 
         if (request.PermissionIds?.Count > 0)
-        {
-            role.RolePermissions = request.PermissionIds.Select(pid => new RolePermission
-            {
-                PermissionId = pid
-            }).ToList();
-        }
+            role.AssignPermissions(request.PermissionIds);
 
         _context.Roles.Add(role);
         await _context.SaveChangesAsync();
@@ -113,8 +104,7 @@ public class RolesController : AdminBaseController
                 Detail = "Ya existe otro rol con ese nombre."
             });
 
-        role.Name = request.Name;
-        role.Description = request.Description;
+        role.UpdateDetails(request.Name, request.Description);
 
         await _context.SaveChangesAsync();
 
@@ -137,7 +127,7 @@ public class RolesController : AdminBaseController
         if (role == null)
             return NotFound();
 
-        if (role.UserRoles.Count > 0)
+        if (role.HasUsersAssigned())
             return Conflict(new ProblemDetails
             {
                 Title = "Rol en uso",
@@ -162,13 +152,7 @@ public class RolesController : AdminBaseController
         if (role == null)
             return NotFound();
 
-        _context.RolePermissions.RemoveRange(role.RolePermissions);
-
-        role.RolePermissions = request.PermissionIds.Select(pid => new RolePermission
-        {
-            RoleId = id,
-            PermissionId = pid
-        }).ToList();
+        role.AssignPermissions(request.PermissionIds);
 
         await _context.SaveChangesAsync();
 

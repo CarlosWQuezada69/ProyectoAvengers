@@ -31,7 +31,7 @@ export const routes: Routes = [
         path: 'categories',
         loadChildren: () => import('./features/categories/categories.routes').then(m => m.categoryRoutes),
         canActivate: [permissionGuard],
-        data: { permission: 'categories.create' },
+        data: { permission: 'categories.view' },
       },
       {
         path: 'slider',

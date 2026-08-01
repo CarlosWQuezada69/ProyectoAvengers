@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
@@ -10,6 +10,7 @@ import { BrandComponent } from '../../../shared/components/brand/brand';
   imports: [RouterLink, BrandComponent],
   templateUrl: './confirm-email.html',
   styleUrl: './confirm-email.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfirmEmailComponent implements OnInit {
   private http = inject(HttpClient);

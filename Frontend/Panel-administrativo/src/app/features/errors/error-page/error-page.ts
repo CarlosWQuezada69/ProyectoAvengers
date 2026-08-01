@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BrandComponent } from '../../../shared/components/brand/brand';
 
@@ -35,6 +35,7 @@ const ERROR_MAP: Record<string, ErrorConfig> = {
   imports: [RouterLink, BrandComponent],
   templateUrl: './error-page.html',
   styleUrl: './error-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErrorPageComponent {
   private route = inject(ActivatedRoute);

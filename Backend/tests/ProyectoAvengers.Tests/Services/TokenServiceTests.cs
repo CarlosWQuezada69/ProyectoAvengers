@@ -25,13 +25,7 @@ public class TokenServiceTests
     [Fact]
     public void GenerateAccessToken_ReturnsTokenAndExpiry()
     {
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Email = "test@test.com",
-            FirstName = "Test",
-            LastName = "User"
-        };
+        var user = new User("Test", "User", "test@test.com", "hash", null);
 
         var (token, expiresIn) = _tokenService.GenerateAccessToken(user, new List<string> { "Admin" }, new List<string> { "products.view" });
 
@@ -52,13 +46,7 @@ public class TokenServiceTests
     [Fact]
     public void ValidateRefreshToken_ValidToken_ReturnsPrincipal()
     {
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            Email = "test@test.com",
-            FirstName = "Test",
-            LastName = "User"
-        };
+        var user = new User("Test", "User", "test@test.com", "hash", null);
 
         var (accessToken, _) = _tokenService.GenerateAccessToken(user, new List<string>(), new List<string>());
         var principal = _tokenService.ValidateRefreshToken(accessToken);

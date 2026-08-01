@@ -35,3 +35,6 @@ coverage/
 .next/
 .cache/
 .angular/
+
+# Uploads
+Backend/src/Api/uploads/
