@@ -1,0 +1,75 @@
+<div class="profile-page">
+  <header class="section-header">
+    <h2>Mi perfil</h2>
+  </header>
+
+  <div class="profile-card">
+    <div class="profile-info">
+      <div class="profile-email">
+        <span class="info-label">Correo electrónico</span>
+        <div>
+          <span class="info-value">{{ email }}</span>
+          <app-badge [variant]="emailConfirmed ? 'success' : 'warning'">
+            {{ emailConfirmed ? 'Verificado' : 'No verificado' }}
+          </app-badge>
+        </div>
+      </div>
+      @if (roles.length) {
+        <div class="profile-roles">
+          <span class="info-label">Roles</span>
+          <div class="roles-badges">
+            @for (role of roles; track role) {
+              <app-badge variant="neutral">{{ role }}</app-badge>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="profile-form">
+      <h3 class="section-title">Datos personales</h3>
+      <div class="form-grid">
+        <app-input formControlName="firstName" label="Nombre" [required]="true" placeholder="Tu nombre" />
+        <app-input formControlName="lastName" label="Apellido" [required]="true" placeholder="Tu apellido" />
+      </div>
+      <app-input formControlName="phone" label="Teléfono" placeholder="Opcional" />
+      <div class="form-actions">
+        <app-btn type="submit" [loading]="saving" [disabled]="form.invalid">Guardar cambios</app-btn>
+      </div>
+    </form>
+  </div>
+
+  <div class="profile-card">
+    <form [formGroup]="emailForm" (ngSubmit)="onChangeEmail()" class="profile-form">
+      <h3 class="section-title">Cambiar correo electrónico</h3>
+      <app-input formControlName="newEmail" label="Nuevo correo" type="email" [required]="true" placeholder="nuevo@correo.com" />
+      @if (confirmationUrl) {
+        <p class="confirm-hint">En modo desarrollo el correo no se envía. Confirma con este enlace:
+          <a [href]="confirmationUrl" target="_blank">{{ confirmationUrl }}</a>
+        </p>
+      }
+      <div class="form-actions">
+        <app-btn type="submit" [loading]="sendingEmailChange" [disabled]="emailForm.invalid">Enviar confirmación</app-btn>
+      </div>
+    </form>
+  </div>
+
+  <div class="profile-card">
+    <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="profile-form">
+      <h3 class="section-title">Cambiar contraseña</h3>
+      <app-input formControlName="currentPassword" label="Contraseña actual" type="password" [required]="true" placeholder="Tu contraseña actual" />
+      <app-input formControlName="newPassword" label="Nueva contraseña" type="password" [required]="true" placeholder="Mínimo 8 caracteres" />
+      <app-input formControlName="confirmPassword" label="Confirmar nueva contraseña" type="password" [required]="true" placeholder="Repite la nueva contraseña" />
+
+      @if (passwordForm.errors?.['mismatch'] && passwordForm.touched) {
+        <p class="form-error">Las contraseñas nuevas no coinciden.</p>
+      }
+
+      <p class="hint">Al cambiar la contraseña se cerrarán tus demás sesiones y deberás iniciar sesión de nuevo.</p>
+
+      <div class="form-actions">
+        <app-btn type="submit" [disabled]="passwordForm.invalid">Actualizar contraseña</app-btn>
+      </div>
+    </form>
+  </div>
+</div>

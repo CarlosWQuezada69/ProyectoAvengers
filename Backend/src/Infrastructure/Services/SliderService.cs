@@ -3,6 +3,7 @@ using ProyectoAvengers.Application.Interfaces;
 using ProyectoAvengers.Domain;
 using ProyectoAvengers.Domain.Entities;
 using ProyectoAvengers.Infrastructure.Persistence;
+using ProyectoAvengers.Infrastructure.Validation;
 using ProyectoAvengers.Shared.DTOs.Admin;
 
 namespace ProyectoAvengers.Infrastructure.Services;
@@ -37,12 +38,8 @@ public class SliderService : ISliderService
 
         if (imageStream != null && imageFileName != null && imageContentType != null)
         {
-            var allowedTypes = Constants.AllowedImageMimeTypes;
-            if (!allowedTypes.Contains(imageContentType))
-                throw new InvalidOperationException("Tipo de imagen no válido.");
-
-            if (imageStream.Length > Constants.MaxImageSizeBytes)
-                throw new InvalidOperationException("La imagen supera el tamaño máximo permitido.");
+            if (!ImageFileValidator.IsValid(imageContentType, imageStream.Length, out var error))
+                throw new InvalidOperationException(error);
 
             imageUrl = await _fileStorage.SaveAsync(imageStream, imageFileName, "slider");
         }
@@ -59,7 +56,7 @@ public class SliderService : ISliderService
 
     public async Task<SliderItemDto?> UpdateAsync(Guid id, UpdateSliderItemRequest request)
     {
-        var item = await _context.SliderItems.FirstOrDefaultAsync(s => s.Id == id);
+        var item = await _context.SliderItems.AsTracking().FirstOrDefaultAsync(s => s.Id == id);
         if (item == null) return null;
 
         item.UpdateDetails(request.Title, request.Subtitle, request.LinkUrl,
@@ -72,7 +69,7 @@ public class SliderService : ISliderService
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var item = await _context.SliderItems.FirstOrDefaultAsync(s => s.Id == id);
+        var item = await _context.SliderItems.AsTracking().FirstOrDefaultAsync(s => s.Id == id);
         if (item == null) return false;
 
         if (!string.IsNullOrEmpty(item.ImageUrl))

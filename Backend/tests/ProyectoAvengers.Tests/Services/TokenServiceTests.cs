@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Configuration;
-using Moq;
 using ProyectoAvengers.Domain.Entities;
 using ProyectoAvengers.Infrastructure.Services;
 
@@ -7,19 +6,21 @@ namespace ProyectoAvengers.Tests.Services;
 
 public class TokenServiceTests
 {
-    private readonly Mock<IConfiguration> _configMock;
     private readonly TokenService _tokenService;
 
     public TokenServiceTests()
     {
-        _configMock = new Mock<IConfiguration>();
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Jwt:Secret"] = "TestSecretKey_MinLength32Chars!!!_12345678",
+                ["Jwt:Issuer"] = "TestIssuer",
+                ["Jwt:Audience"] = "TestAudience",
+                ["Jwt:ExpiryMinutes"] = "15"
+            })
+            .Build();
 
-        _configMock.Setup(x => x.GetSection("Jwt")["Secret"]).Returns("TestSecretKey_MinLength32Chars!!!_12345678");
-        _configMock.Setup(x => x.GetSection("Jwt")["Issuer"]).Returns("TestIssuer");
-        _configMock.Setup(x => x.GetSection("Jwt")["Audience"]).Returns("TestAudience");
-        _configMock.Setup(x => x.GetSection("Jwt")["ExpiryMinutes"]).Returns("15");
-
-        _tokenService = new TokenService(_configMock.Object);
+        _tokenService = new TokenService(new JwtOptions(configuration));
     }
 
     [Fact]

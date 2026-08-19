@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { ButtonComponent } from '../../../shared/components/button/button';
@@ -22,7 +22,7 @@ export class CategoryListComponent implements OnInit {
   private toast = inject(ToastService);
   private confirmDialog = inject(ConfirmDialogService);
 
-  protected categories: Category[] = [];
+  protected categories = signal<Category[]>([]);
   protected loading = true;
   protected modalOpen = false;
   protected editingCategory: Category | null = null;
@@ -43,8 +43,9 @@ export class CategoryListComponent implements OnInit {
   private loadCategories(): void {
     this.categoriesService.list(true).subscribe({
       next: res => {
-        this.categories = Array.isArray(res) ? res : (res as any).data ?? [];
+        this.categories.set(Array.isArray(res) ? res : (res as any).data ?? []);
         this.loading = false;
+        if (this.categories().length === 0) this.toast.info('Aún no hay categorías registradas');
       },
       error: () => this.loading = false,
     });
@@ -108,7 +109,7 @@ export class CategoryListComponent implements OnInit {
         if (item.children) flatten(item.children, depth + 1);
       }
     };
-    flatten(this.categories);
+    flatten(this.categories());
     return result;
   }
 }

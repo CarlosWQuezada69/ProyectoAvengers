@@ -14,6 +14,7 @@ using ProyectoAvengers.Api.Middleware;
 using ProyectoAvengers.Api.Swagger;
 using ProyectoAvengers.Application.Interfaces;
 using ProyectoAvengers.Infrastructure.DependencyInjection;
+using ProyectoAvengers.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,12 +77,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
-var jwtSecret = builder.Configuration["Jwt:Secret"]
-    ?? Environment.GetEnvironmentVariable("JWT_SECRET");
-
-if (string.IsNullOrWhiteSpace(jwtSecret) || jwtSecret.Length < 32)
-    throw new InvalidOperationException(
-        "JWT:Secret no está configurado. Define 'Jwt:Secret' en appsettings o la variable de entorno 'JWT_SECRET' (mínimo 32 caracteres).");
+var jwtOptions = new JwtOptions(builder.Configuration);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -93,11 +89,11 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
         ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "ProyectoAvengers",
+        ValidIssuer = jwtOptions.Issuer,
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "ProyectoAvengers",
+        ValidAudience = jwtOptions.Audience,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
@@ -112,25 +108,14 @@ builder.Services.AddResponseCompression(options =>
 });
 
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-if (corsOrigins is { Length: > 0 })
+var corsEnabled = corsOrigins is { Length: > 0 };
+if (corsEnabled)
 {
     builder.Services.AddCors(options =>
     {
         options.AddDefaultPolicy(policy =>
         {
-            policy.WithOrigins(corsOrigins)
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-    });
-}
-else
-{
-    builder.Services.AddCors(options =>
-    {
-        options.AddDefaultPolicy(policy =>
-        {
-            policy.AllowAnyOrigin()
+            policy.WithOrigins(corsOrigins!)
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -194,7 +179,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
-app.UseCors();
+if (corsEnabled)
+    app.UseCors();
 app.UseResponseCaching();
 app.UseRateLimiter();
 app.UseAuthentication();

@@ -1,12 +1,9 @@
 <div class="permissions-page">
   <header class="section-header">
-    <h2>Permisos: {{ role?.name }}</h2>
+    <h2>Permisos: {{ role()?.name }}</h2>
   </header>
 
-  @if (loading) {
-    <div class="loading-state"><div class="spinner"></div></div>
-  } @else {
-    @for (group of groupedPermissions(); track group.module) {
+  @for (group of groupedPermissions(); track group.module) {
       <div class="perm-section">
         <h3>{{ group.module }}</h3>
         <div class="perm-grid">
@@ -30,5 +27,4 @@
     <div class="form-actions">
       <app-btn (click)="save()">Guardar permisos</app-btn>
     </div>
-  }
 </div>

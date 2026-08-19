@@ -63,6 +63,14 @@ export const routes: Routes = [
         canActivate: [permissionGuard],
         data: { permission: 'audit.view' },
       },
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/profile/profile').then(m => m.ProfileComponent),
+      },
+      {
+        path: 'change-password',
+        loadComponent: () => import('./features/change-password/change-password').then(m => m.ChangePasswordComponent),
+      },
       { path: '**', redirectTo: '/error/404' },
     ],
   },

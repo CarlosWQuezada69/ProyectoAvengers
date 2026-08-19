@@ -5,6 +5,7 @@ using ProyectoAvengers.Api.Authorization;
 using ProyectoAvengers.Application.Interfaces;
 using ProyectoAvengers.Domain.Entities;
 using ProyectoAvengers.Infrastructure.Persistence;
+using ProyectoAvengers.Infrastructure.Validation;
 using ProyectoAvengers.Shared.DTOs.Admin;
 
 namespace ProyectoAvengers.Api.Controllers;
@@ -41,6 +42,7 @@ public class AdminAboutController : AdminBaseController
     public async Task<ActionResult<AboutInfoDto>> UpdateAbout([FromBody] UpdateAboutInfoRequest request)
     {
         var about = await _context.AboutInfos
+            .AsTracking()
             .Include(a => a.Galleries)
             .FirstOrDefaultAsync();
 
@@ -86,21 +88,12 @@ public class AdminAboutController : AdminBaseController
             await _context.SaveChangesAsync();
         }
 
-        var allowedTypes = new[] { "image/jpeg", "image/png", "image/webp", "image/gif" };
-        if (!allowedTypes.Contains(file.ContentType))
+        if (!ImageFileValidator.IsValid(file.ContentType, file.Length, out var error))
             return BadRequest(new ProblemDetails
             {
-                Title = "Tipo no válido",
+                Title = "Archivo no válido",
                 Status = 400,
-                Detail = "Solo se permiten JPEG, PNG, WebP y GIF."
-            });
-
-        if (file.Length > 5 * 1024 * 1024)
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Archivo muy grande",
-                Status = 400,
-                Detail = "El tamaño máximo es 5 MB."
+                Detail = error
             });
 
         var folder = section switch
@@ -141,6 +134,7 @@ public class AdminAboutController : AdminBaseController
     public async Task<ActionResult> DeleteImage(Guid id)
     {
         var image = await _context.AboutGalleries
+            .AsTracking()
             .FirstOrDefaultAsync(i => i.Id == id);
 
         if (image == null)
@@ -159,6 +153,7 @@ public class AdminAboutController : AdminBaseController
     {
         var ids = order.Select(o => o.Id).ToList();
         var images = await _context.AboutGalleries
+            .AsTracking()
             .Where(i => ids.Contains(i.Id))
             .ToListAsync();
 

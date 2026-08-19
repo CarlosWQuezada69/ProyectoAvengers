@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import type { Product, ProductImage, ProductRestriction } from '../models/product';
 import type { PagedResult } from '../models/paged-result';
@@ -17,7 +17,16 @@ export class ProductsService {
     sortBy?: string;
     sortDir?: string;
   }) {
-    return this.http.get<PagedResult<Product>>(`${environment.apiUrl}/admin/products`, { params: params as any });
+    let httpParams = new HttpParams()
+      .set('page', params?.page ?? 1)
+      .set('pageSize', params?.pageSize ?? 20);
+    if (params?.search) httpParams = httpParams.set('search', params.search);
+    if (params?.categoryId) httpParams = httpParams.set('categoryId', params.categoryId);
+    if (params?.isActive !== undefined) httpParams = httpParams.set('isActive', String(params.isActive));
+    if (params?.sortBy) httpParams = httpParams.set('sortBy', params.sortBy);
+    if (params?.sortDir) httpParams = httpParams.set('sortDir', params.sortDir);
+
+    return this.http.get<PagedResult<Product>>(`${environment.apiUrl}/admin/products`, { params: httpParams });
   }
 
   getById(id: string) {

@@ -2,7 +2,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ProyectoAvengers.Application.Interfaces;
 using ProyectoAvengers.Domain.Entities;
@@ -17,23 +16,13 @@ public class TokenService : ITokenService
     private readonly int _expiryMinutes;
     private readonly JwtSecurityTokenHandler _tokenHandler = new();
 
-    public TokenService(IConfiguration configuration)
+    public TokenService(JwtOptions options)
     {
-        var jwtSettings = configuration.GetSection("Jwt");
-        var secretKey = jwtSettings["Secret"]
-            ?? Environment.GetEnvironmentVariable("JWT_SECRET");
-
-        if (string.IsNullOrWhiteSpace(secretKey) || secretKey.Length < 32)
-            throw new InvalidOperationException(
-                "JWT:Secret no está configurado. Define 'Jwt:Secret' en appsettings o la variable de entorno 'JWT_SECRET' (mínimo 32 caracteres).");
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Secret));
         _signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        _issuer = jwtSettings["Issuer"] ?? "ProyectoAvengers";
-        _audience = jwtSettings["Audience"] ?? "ProyectoAvengers";
-        _expiryMinutes = int.Parse(jwtSettings["ExpiryMinutes"]
-            ?? Environment.GetEnvironmentVariable("JWT_EXPIRY_MINUTES")
-            ?? "15");
+        _issuer = options.Issuer;
+        _audience = options.Audience;
+        _expiryMinutes = options.ExpiryMinutes;
     }
 
     public (string token, int expiresIn) GenerateAccessToken(User user, List<string> roles, List<string> permissions)

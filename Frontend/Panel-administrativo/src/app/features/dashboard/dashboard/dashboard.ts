@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { StatsService } from '../../../core/services/stats.service';
 import { SkeletonComponent } from '../../../shared/components/skeleton/skeleton';
@@ -15,21 +15,21 @@ import type { StatsOverview, TopProduct } from '../../../core/models/index';
 export class DashboardComponent implements OnInit {
   private statsService = inject(StatsService);
 
-  protected loading = true;
-  protected overview: StatsOverview | null = null;
-  protected topViewed: TopProduct[] = [];
-  protected topSellers: TopProduct[] = [];
-  protected lowStock: TopProduct[] = [];
+  protected loading = signal(true);
+  protected overview = signal<StatsOverview | null>(null);
+  protected topViewed = signal<TopProduct[]>([]);
+  protected topSellers = signal<TopProduct[]>([]);
+  protected lowStock = signal<TopProduct[]>([]);
 
   ngOnInit(): void {
     this.statsService.getOverview().subscribe({
-      next: data => { this.overview = data; this.loading = false; },
-      error: () => this.loading = false,
+      next: data => { this.overview.set(data); this.loading.set(false); },
+      error: () => this.loading.set(false),
     });
 
-    this.statsService.getTopViewed().subscribe(data => this.topViewed = data);
-    this.statsService.getTopSellers().subscribe(data => this.topSellers = data);
-    this.statsService.getLowStock().subscribe(data => this.lowStock = data);
+    this.statsService.getTopViewed().subscribe(data => this.topViewed.set(data));
+    this.statsService.getTopSellers().subscribe(data => this.topSellers.set(data));
+    this.statsService.getLowStock().subscribe(data => this.lowStock.set(data));
   }
 
   protected maxCount(items: TopProduct[]): number {

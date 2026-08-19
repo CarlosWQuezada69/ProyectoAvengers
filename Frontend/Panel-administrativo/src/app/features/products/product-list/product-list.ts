@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +7,7 @@ import { ButtonComponent } from '../../../shared/components/button/button';
 import { BadgeComponent } from '../../../shared/components/badge/badge';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
+import { ToastService } from '../../../shared/services/toast.service';
 import type { Product } from '../../../core/models/product';
 
 @Component({
@@ -19,14 +20,15 @@ import type { Product } from '../../../core/models/product';
 export class ProductListComponent implements OnInit {
   private productsService = inject(ProductsService);
   private confirmDialog = inject(ConfirmDialogService);
+  private toast = inject(ToastService);
 
-  protected products: Product[] = [];
+  protected products = signal<Product[]>([]);
   protected loading = true;
   protected search = '';
   protected page = 1;
   protected pageSize = 20;
   protected totalCount = 0;
-  protected totalPages = 0;
+  protected totalPages = signal(0);
   protected sortBy = 'createdAt';
   protected sortDir: 'asc' | 'desc' = 'desc';
 
@@ -44,10 +46,15 @@ export class ProductListComponent implements OnInit {
       sortDir: this.sortDir,
     })      .subscribe({
         next: res => {
-          this.products = res.data;
+          this.products.set(res.data);
           this.totalCount = res.totalCount;
-          this.totalPages = res.totalPages;
+          this.totalPages.set(res.totalPages);
           this.loading = false;
+          if (res.data.length === 0) {
+            this.toast.info(this.search
+              ? 'No se encontraron productos para tu búsqueda'
+              : 'Aún no hay productos registrados');
+          }
         },
         error: () => this.loading = false,
       });
@@ -59,7 +66,7 @@ export class ProductListComponent implements OnInit {
   }
 
   protected onPage(p: number): void {
-    if (p >= 1 && p <= this.totalPages) {
+    if (p >= 1 && p <= this.totalPages()) {
       this.page = p;
       this.loadProducts();
     }

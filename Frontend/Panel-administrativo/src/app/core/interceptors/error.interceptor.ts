@@ -10,25 +10,31 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       const problem: ProblemDetails | undefined = error.error;
+      const details = problem?.errors
+        ? Object.values(problem.errors).flat().join(' ')
+        : problem?.detail;
 
       switch (error.status) {
         case 400:
-          toast.show(problem?.title ?? 'Solicitud inválida', 'error');
+          toast.error(details ?? problem?.title ?? 'Solicitud inválida');
+          break;
+        case 401:
+          toast.error('Sesión expirada o credenciales inválidas. Inicia sesión de nuevo.');
           break;
         case 403:
-          toast.show('No tienes permiso para realizar esta acción', 'error');
+          toast.error('No tienes permiso para realizar esta acción');
           break;
         case 404:
-          toast.show('Recurso no encontrado', 'error');
+          toast.error('Recurso no encontrado');
           break;
         case 409:
-          toast.show(problem?.title ?? 'Conflicto al procesar la solicitud', 'error');
+          toast.error(details ?? problem?.title ?? 'Conflicto al procesar la solicitud');
           break;
         case 429:
-          toast.show('Demasiadas solicitudes. Intenta de nuevo más tarde', 'warning');
+          toast.warning('Demasiadas solicitudes. Intenta de nuevo más tarde');
           break;
         case 500:
-          toast.show('Error interno del servidor', 'error');
+          toast.error('Error interno del servidor');
           break;
       }
 

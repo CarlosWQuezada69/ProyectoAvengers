@@ -1,9 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 
+export type ToastType = 'success' | 'error' | 'warning' | 'info';
+
 export interface Toast {
   id: number;
   message: string;
-  type: 'success' | 'error' | 'warning' | 'info';
+  type: ToastType;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -13,10 +15,26 @@ export class ToastService {
 
   readonly toasts = this.toastsSignal.asReadonly();
 
-  show(message: string, type: Toast['type'] = 'info', duration = 4000): void {
+  show(message: string, type: ToastType = 'info', duration = 4000): void {
     const id = this.nextId++;
     this.toastsSignal.update(t => [...t, { id, message, type }]);
     setTimeout(() => this.dismiss(id), duration);
+  }
+
+  success(message: string, duration = 4000): void {
+    this.show(message, 'success', duration);
+  }
+
+  error(message: string, duration = 5000): void {
+    this.show(message, 'error', duration);
+  }
+
+  warning(message: string, duration = 4500): void {
+    this.show(message, 'warning', duration);
+  }
+
+  info(message: string, duration = 4000): void {
+    this.show(message, 'info', duration);
   }
 
   dismiss(id: number): void {

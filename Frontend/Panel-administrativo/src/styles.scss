@@ -132,3 +132,12 @@ input, select, textarea {
     scroll-behavior: auto;
   }
 }
+
+router-outlet + * {
+  animation: pageFadeIn 0.3s ease;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

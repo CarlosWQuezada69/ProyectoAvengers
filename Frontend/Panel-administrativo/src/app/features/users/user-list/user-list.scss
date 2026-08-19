@@ -76,6 +76,9 @@
   td { color: var(--text-primary); }
 
   tbody tr:hover { background: var(--bg-hover); }
+
+  tbody tr.is-me { background: rgba(232, 185, 35, 0.06); }
+  tbody tr.is-me td { border-bottom-color: rgba(232, 185, 35, 0.2); }
 }
 
 .roles-list {

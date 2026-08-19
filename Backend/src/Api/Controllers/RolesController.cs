@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Api.Authorization;
+using ProyectoAvengers.Application.Interfaces;
 using ProyectoAvengers.Domain.Entities;
 using ProyectoAvengers.Infrastructure.Persistence;
 using ProyectoAvengers.Shared.DTOs.Admin;
@@ -12,20 +13,38 @@ namespace ProyectoAvengers.Api.Controllers;
 public class RolesController : AdminBaseController
 {
     private readonly AppDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
-    public RolesController(AppDbContext context)
+    public RolesController(AppDbContext context, ICurrentUserService currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
+    }
+
+    private async Task<int> GetCurrentUserLevelAsync()
+    {
+        var userId = _currentUser.GetUserId();
+        if (!userId.HasValue) return 0;
+
+        return await _context.UserRoles
+            .AsNoTracking()
+            .Where(ur => ur.UserId == userId.Value)
+            .Select(ur => ur.Role.HierarchyLevel)
+            .OrderByDescending(l => l)
+            .FirstOrDefaultAsync();
     }
 
     [HttpGet("roles")]
     [RequirePermission("roles.view")]
     public async Task<ActionResult<List<RoleDto>>> GetRoles()
     {
+        var currentLevel = await GetCurrentUserLevelAsync();
+
         var roles = await _context.Roles
             .AsNoTracking()
             .Include(r => r.RolePermissions)
-            .Include(r => r.UserRoles)
+            .Include(r => r.UserRoles).ThenInclude(ur => ur.User)
+            .Where(r => r.HierarchyLevel <= currentLevel)
             .OrderBy(r => r.Name)
             .ToListAsync();
 
@@ -34,8 +53,15 @@ public class RolesController : AdminBaseController
             Id = r.Id,
             Name = r.Name,
             Description = r.Description,
+            HierarchyLevel = r.HierarchyLevel,
             PermissionIds = r.RolePermissions.Select(rp => rp.PermissionId).ToList(),
-            UserCount = r.UserRoles.Count
+            UserCount = r.UserRoles.Count,
+            Users = r.UserRoles.Select(ur => new UserBriefDto
+            {
+                Id = ur.User.Id,
+                Name = $"{ur.User.FirstName} {ur.User.LastName}".Trim(),
+                Email = ur.User.Email
+            }).ToList()
         }).ToList());
     }
 
@@ -92,7 +118,7 @@ public class RolesController : AdminBaseController
     [RequirePermission("roles.update")]
     public async Task<ActionResult<RoleDto>> UpdateRole(Guid id, [FromBody] UpdateRoleRequest request)
     {
-        var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == id);
+        var role = await _context.Roles.AsTracking().FirstOrDefaultAsync(r => r.Id == id);
         if (role == null)
             return NotFound();
 
@@ -121,6 +147,7 @@ public class RolesController : AdminBaseController
     public async Task<ActionResult> DeleteRole(Guid id)
     {
         var role = await _context.Roles
+            .AsTracking()
             .Include(r => r.UserRoles)
             .FirstOrDefaultAsync(r => r.Id == id);
 
@@ -146,6 +173,7 @@ public class RolesController : AdminBaseController
     public async Task<ActionResult> AssignPermissions(Guid id, [FromBody] AssignPermissionsRequest request)
     {
         var role = await _context.Roles
+            .AsTracking()
             .Include(r => r.RolePermissions)
             .FirstOrDefaultAsync(r => r.Id == id);
 

@@ -22,9 +22,11 @@ public static class InfrastructureServiceRegistration
                 "Connection string 'Default' no está configurada. Define 'ConnectionStrings:Default' en appsettings o la variable de entorno 'CONNECTIONSTRINGS__DEFAULT'.");
 
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(connectionString));
+            options.UseNpgsql(connectionString)
+                   .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
+        services.AddSingleton(new JwtOptions(configuration));
         services.AddScoped<ITokenService, TokenService>();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();

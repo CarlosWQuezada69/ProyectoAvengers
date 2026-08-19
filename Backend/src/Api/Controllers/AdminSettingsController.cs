@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Api.Authorization;
 using ProyectoAvengers.Application.Interfaces;
 using ProyectoAvengers.Infrastructure.Persistence;
+using ProyectoAvengers.Infrastructure.Validation;
 using ProyectoAvengers.Shared.DTOs.Admin;
 
 namespace ProyectoAvengers.Api.Controllers;
@@ -44,6 +45,7 @@ public class AdminSettingsController : AdminBaseController
     public async Task<ActionResult<SiteSettingDto>> UpdateSetting(string key, [FromBody] UpdateSiteSettingRequest request)
     {
         var setting = await _context.SiteSettings
+            .AsTracking()
             .FirstOrDefaultAsync(s => s.Key == key);
 
         if (setting == null)
@@ -81,17 +83,15 @@ public class AdminSettingsController : AdminBaseController
         if (file == null || file.Length == 0)
             return BadRequest(new ProblemDetails { Title = "Archivo vacío", Status = 400 });
 
-        var allowedTypes = new[] { "image/jpeg", "image/png", "image/webp" };
-        if (!allowedTypes.Contains(file.ContentType))
-            return BadRequest(new ProblemDetails { Title = "Tipo no válido", Status = 400 });
-
-        if (file.Length > 2 * 1024 * 1024)
-            return BadRequest(new ProblemDetails { Title = "Archivo muy grande", Status = 400, Detail = "El tamaño máximo es 2 MB." });
+        if (!ImageFileValidator.IsValid(file.ContentType, file.Length, out var error,
+                allowedTypes: ImageFileValidator.LogoMimeTypes, maxSizeBytes: 2 * 1024 * 1024))
+            return BadRequest(new ProblemDetails { Title = "Archivo no válido", Status = 400, Detail = error });
 
         await using var stream = file.OpenReadStream();
         var url = await _fileStorage.SaveAsync(stream, file.FileName, "logo");
 
         var setting = await _context.SiteSettings
+            .AsTracking()
             .FirstOrDefaultAsync(s => s.Key == "logo_url");
 
         if (setting == null)

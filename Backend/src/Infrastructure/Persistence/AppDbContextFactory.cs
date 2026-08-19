@@ -16,9 +16,8 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     {
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRINGS__DEFAULT")
-            ?? "Host=localhost;Database=proyecto_avengers;Username=postgres";
-        if (!connectionString.Contains("Password=", StringComparison.OrdinalIgnoreCase))
-            connectionString += ";Password=postgres";
+            ?? throw new InvalidOperationException(
+                "Define la variable de entorno 'CONNECTIONSTRINGS__DEFAULT' con la connection string de PostgreSQL para las migraciones.");
         optionsBuilder.UseNpgsql(connectionString);
         return new AppDbContext(optionsBuilder.Options, new DesignTimeCurrentUserService());
     }

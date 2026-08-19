@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UsersService } from '../../../core/services/users.service';
@@ -23,7 +23,7 @@ export class UserFormComponent implements OnInit {
   protected editMode = false;
   protected userId: string | null = null;
   protected loading = false;
-  protected roles: Role[] = [];
+  protected roles = signal<Role[]>([]);
   protected selectedRoleIds: string[] = [];
 
   protected form = new FormGroup({
@@ -38,7 +38,7 @@ export class UserFormComponent implements OnInit {
     this.userId = this.route.snapshot.paramMap.get('id');
     this.editMode = !!this.userId;
 
-    this.usersService.getRoles().subscribe(data => this.roles = data);
+    this.usersService.getRoles().subscribe(data => this.roles.set(data));
 
     if (this.editMode && this.userId) {
       this.loading = true;

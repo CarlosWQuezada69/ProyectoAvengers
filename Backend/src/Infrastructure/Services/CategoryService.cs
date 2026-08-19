@@ -60,7 +60,7 @@ public class CategoryService : ICategoryService
 
     public async Task<CategoryDto?> UpdateAsync(Guid id, UpdateCategoryRequest request)
     {
-        var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+        var category = await _context.Categories.AsTracking().FirstOrDefaultAsync(c => c.Id == id);
         if (category == null) return null;
 
         if (await _context.Categories.AnyAsync(c => c.Slug == request.Slug && c.Id != id))
@@ -77,6 +77,7 @@ public class CategoryService : ICategoryService
     public async Task<bool> DeleteAsync(Guid id)
     {
         var category = await _context.Categories
+            .AsTracking()
             .Include(c => c.Products)
             .FirstOrDefaultAsync(c => c.Id == id);
 

@@ -78,11 +78,20 @@ public class DatabaseSeeder : IDatabaseSeeder
     private async Task SeedSuperAdminRoleAsync(CancellationToken ct)
     {
         var superAdmin = await _context.Roles
+            .AsTracking()
             .Include(r => r.RolePermissions)
             .FirstOrDefaultAsync(r => r.Name == "SuperAdmin", ct);
 
         if (superAdmin != null)
         {
+            var changed = false;
+
+            if (superAdmin.HierarchyLevel != 100)
+            {
+                superAdmin.SetHierarchyLevel(100);
+                changed = true;
+            }
+
             var assignedIds = superAdmin.RolePermissions.Select(rp => rp.PermissionId).ToHashSet();
             var missingIds = await _context.Permissions
                 .AsNoTracking()
@@ -93,12 +102,15 @@ public class DatabaseSeeder : IDatabaseSeeder
             if (missingIds.Count > 0)
             {
                 superAdmin.AssignPermissions(missingIds);
-                await _context.SaveChangesAsync(ct);
+                changed = true;
             }
+
+            if (changed)
+                await _context.SaveChangesAsync(ct);
             return;
         }
 
-        var role = new Role("SuperAdmin", "Acceso total al sistema");
+        var role = new Role("SuperAdmin", "Acceso total al sistema", 100);
 
         var allPermissions = await _context.Permissions.ToListAsync(ct);
         role.AssignPermissions(allPermissions.Select(p => p.Id).ToList());

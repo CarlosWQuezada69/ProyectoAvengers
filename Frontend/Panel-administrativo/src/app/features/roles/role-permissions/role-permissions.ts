@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { RolesService, PermissionsService } from '../../../core/services/roles.service';
@@ -21,8 +21,8 @@ export class RolePermissionsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private toast = inject(ToastService);
 
-  protected role: Role | null = null;
-  protected permissions: Permission[] = [];
+  protected role = signal<Role | null>(null);
+  protected permissions = signal<Permission[]>([]);
   protected selectedIds: string[] = [];
   protected loading = true;
 
@@ -30,17 +30,17 @@ export class RolePermissionsComponent implements OnInit {
 
   ngOnInit(): void {
     this.rolesService.list().subscribe(roles => {
-      this.role = roles.find(r => r.id === this.roleId) ?? null;
+      this.role.set(roles.find(r => r.id === this.roleId) ?? null);
     });
     this.permissionsService.list().subscribe({
-      next: data => { this.permissions = data; this.loading = false; },
+      next: data => { this.permissions.set(data); this.loading = false; },
       error: () => this.loading = false,
     });
   }
 
   protected groupedPermissions(): { module: string; perms: Permission[] }[] {
     const groups = new Map<string, Permission[]>();
-    for (const p of this.permissions) {
+    for (const p of this.permissions()) {
       if (!groups.has(p.module)) groups.set(p.module, []);
       groups.get(p.module)!.push(p);
     }

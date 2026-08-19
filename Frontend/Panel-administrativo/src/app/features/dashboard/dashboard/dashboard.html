@@ -3,7 +3,7 @@
     <h2>Dashboard</h2>
   </header>
 
-  @if (loading) {
+  @if (loading()) {
     <div class="kpi-grid">
       @for (_ of [1,2,3,4]; track $index) {
         <div class="kpi-card">
@@ -12,39 +12,39 @@
         </div>
       }
     </div>
-  } @else if (overview) {
+  } @else if (overview()) {
     <div class="kpi-grid">
       <div class="kpi-card">
         <span class="kpi-label">Productos totales</span>
-        <span class="kpi-value">{{ overview.totalProducts }}</span>
+        <span class="kpi-value">{{ overview()!.totalProducts }}</span>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">Activos</span>
-        <span class="kpi-value">{{ overview.activeProducts }}</span>
+        <span class="kpi-value">{{ overview()!.activeProducts }}</span>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">Stock bajo</span>
-        <span class="kpi-value accent-danger">{{ overview.lowStockCount }}</span>
+        <span class="kpi-value accent-danger">{{ overview()!.lowStockCount }}</span>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">Vistas hoy</span>
-        <span class="kpi-value">{{ overview.todayViews | number }}</span>
+        <span class="kpi-value">{{ overview()!.todayViews | number }}</span>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">Categorías</span>
-        <span class="kpi-value">{{ overview.totalCategories }}</span>
+        <span class="kpi-value">{{ overview()!.totalCategories }}</span>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">Usuarios</span>
-        <span class="kpi-value">{{ overview.totalUsers }}</span>
+        <span class="kpi-value">{{ overview()!.totalUsers }}</span>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">Vistas del mes</span>
-        <span class="kpi-value">{{ overview.monthlyViews | number }}</span>
+        <span class="kpi-value">{{ overview()!.monthlyViews | number }}</span>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">Vendidos del mes</span>
-        <span class="kpi-value">{{ overview.monthlyPurchases | number }}</span>
+        <span class="kpi-value">{{ overview()!.monthlyPurchases | number }}</span>
       </div>
     </div>
 
@@ -52,16 +52,16 @@
       <div class="chart-card">
         <h3>Más vistos</h3>
         <div class="bar-chart">
-          @for (item of topViewed; track item.productId) {
+          @for (item of topViewed(); track item.productId) {
             <div class="bar-row">
               <span class="bar-label">{{ item.productName }}</span>
               <div class="bar-track">
-                <div class="bar-fill" [style.width.%]="(item.count / maxCount(topViewed)) * 100"></div>
+                <div class="bar-fill" [style.width.%]="(item.count / maxCount(topViewed())) * 100"></div>
               </div>
               <span class="bar-value">{{ item.count }}</span>
             </div>
           }
-          @if (topViewed.length === 0) {
+          @if (topViewed().length === 0) {
             <p class="empty">Sin datos</p>
           }
         </div>
@@ -70,16 +70,16 @@
       <div class="chart-card">
         <h3>Más vendidos</h3>
         <div class="bar-chart">
-          @for (item of topSellers; track item.productId) {
+          @for (item of topSellers(); track item.productId) {
             <div class="bar-row">
               <span class="bar-label">{{ item.productName }}</span>
               <div class="bar-track">
-                <div class="bar-fill accent-gold" [style.width.%]="(item.count / maxCount(topSellers)) * 100"></div>
+                <div class="bar-fill accent-gold" [style.width.%]="(item.count / maxCount(topSellers())) * 100"></div>
               </div>
               <span class="bar-value">{{ item.count }}</span>
             </div>
           }
-          @if (topSellers.length === 0) {
+          @if (topSellers().length === 0) {
             <p class="empty">Sin datos</p>
           }
         </div>
@@ -96,7 +96,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (item of lowStock; track item.productId) {
+          @for (item of lowStock(); track item.productId) {
             <tr>
               <td>{{ item.productName }}</td>
               <td>

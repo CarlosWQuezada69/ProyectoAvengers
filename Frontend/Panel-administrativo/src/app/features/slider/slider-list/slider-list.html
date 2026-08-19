@@ -7,9 +7,6 @@
   </header>
 
   <div class="table-card">
-    @if (loading) {
-      <div class="loading-state"><div class="spinner"></div></div>
-    } @else {
       <table class="table">
         <thead>
           <tr>
@@ -22,7 +19,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (item of items; track item.id) {
+          @for (item of items(); track item.id) {
             <tr>
               <td><img [src]="item.imageUrl" alt="" class="thumb" /></td>
               <td>{{ item.title }}</td>
@@ -43,7 +40,6 @@
           }
         </tbody>
       </table>
-    }
   </div>
 </div>
 

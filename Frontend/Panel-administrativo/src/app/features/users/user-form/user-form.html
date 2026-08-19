@@ -4,9 +4,6 @@
     <app-btn variant="secondary" routerLink="/users">Volver</app-btn>
   </header>
 
-  @if (loading) {
-    <div class="loading-state"><div class="spinner"></div></div>
-  } @else {
     <div class="form-card">
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="user-form">
         <div class="form-grid">
@@ -25,7 +22,7 @@
         <div class="roles-section">
           <label class="input-label">Roles</label>
           <div class="roles-grid">
-            @for (role of roles; track role.id) {
+            @for (role of roles(); track role.id) {
               <label class="checkbox">
                 <input type="checkbox" [value]="role.id" (change)="toggleRole(role.id)" [checked]="selectedRoleIds.includes(role.id)" />
                 <span>{{ role.name }}</span>
@@ -40,5 +37,4 @@
         </div>
       </form>
     </div>
-  }
 </div>

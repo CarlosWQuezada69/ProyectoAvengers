@@ -18,17 +18,23 @@ public class AuthController : ControllerBase
     private readonly ITokenService _tokenService;
     private readonly ICurrentUserService _currentUser;
     private readonly IEmailSender _emailSender;
+    private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
 
     public AuthController(
         AppDbContext context,
         ITokenService tokenService,
         ICurrentUserService currentUser,
-        IEmailSender emailSender)
+        IEmailSender emailSender,
+        IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
         _context = context;
         _tokenService = tokenService;
         _currentUser = currentUser;
         _emailSender = emailSender;
+        _configuration = configuration;
+        _environment = environment;
     }
 
     [HttpPost("login")]
@@ -38,6 +44,7 @@ public class AuthController : ControllerBase
         var normalizedEmail = request.Email.ToLowerInvariant().Trim();
 
         var user = await _context.Users
+            .AsTracking()
             .FirstOrDefaultAsync(u => u.Email == normalizedEmail && u.DeletedAt == null);
 
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
@@ -107,6 +114,7 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<RefreshTokenResponse>> RefreshToken([FromBody] RefreshTokenRequest request)
     {
         var storedToken = await _context.RefreshTokens
+            .AsTracking()
             .Include(rt => rt.User)
             .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken);
 
@@ -121,6 +129,7 @@ public class AuthController : ControllerBase
         if (storedToken.RevokedAt != null)
         {
             var userTokens = await _context.RefreshTokens
+                .AsTracking()
                 .Where(rt => rt.UserId == storedToken.UserId && rt.RevokedAt == null)
                 .ToListAsync();
 
@@ -181,6 +190,7 @@ public class AuthController : ControllerBase
     public async Task<ActionResult> Logout([FromBody] RefreshTokenRequest request)
     {
         var storedToken = await _context.RefreshTokens
+            .AsTracking()
             .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken);
 
         if (storedToken != null)
@@ -211,10 +221,17 @@ public class AuthController : ControllerBase
 
             await _context.SaveChangesAsync();
 
+            var frontendUrl = _configuration["App:FrontendUrl"] ?? "http://localhost:4200";
+            var resetUrl = $"{frontendUrl}/auth/reset-password?token={token}";
+
             await _emailSender.SendAsync(
                 user.Email,
                 "Recuperación de contraseña",
-                $"Usa este token para recuperar tu contraseña: {token}");
+                $"Para restablecer tu contraseña, abre este enlace: {resetUrl}" +
+                $"\n\nEl enlace es válido por 1 hora.");
+
+            if (_environment.IsDevelopment())
+                return Ok(new { message = "Si el correo existe, recibirás instrucciones para recuperar tu contraseña.", resetUrl });
         }
 
         return Ok(new { message = "Si el correo existe, recibirás instrucciones para recuperar tu contraseña." });
@@ -225,6 +242,7 @@ public class AuthController : ControllerBase
     public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
         var resetToken = await _context.PasswordResetTokens
+            .AsTracking()
             .Include(t => t.User)
             .FirstOrDefaultAsync(t => t.Token == request.Token && t.UsedAt == null);
 

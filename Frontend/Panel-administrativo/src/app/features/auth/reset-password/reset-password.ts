@@ -33,7 +33,7 @@ export class ResetPasswordComponent {
 
     this.http.post(`${environment.apiUrl}/auth/reset-password`, {
       token: this.token,
-      password: this.form.value.password,
+      newPassword: this.form.value.password,
     }).subscribe({
       next: () => {
         this.toast.show('Contraseña restablecida correctamente', 'success');

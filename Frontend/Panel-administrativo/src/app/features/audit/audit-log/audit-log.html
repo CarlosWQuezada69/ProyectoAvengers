@@ -10,7 +10,6 @@
   </header>
 
   <div class="table-card">
-    @if (loading) { <div class="loading-state"><div class="spinner"></div></div> }
     <table class="table">
       <thead>
         <tr>
@@ -18,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (log of logs; track log.id) {
+        @for (log of logs(); track log.id) {
           <tr (click)="toggleExpand(log.id)" class="clickable">
             <td>{{ log.createdAt | date:'medium' }}</td>
             <td>{{ log.userName || '—' }}</td>
@@ -38,13 +37,13 @@
         }
       </tbody>
     </table>
-    @if (totalPages > 1) {
+    @if (totalPages() > 1) {
       <div class="pagination">
         <button class="page-btn" [disabled]="page <= 1" (click)="onPage(page - 1)">‹</button>
-        @for (p of [].constructor(totalPages); track $index) {
+        @for (p of [].constructor(totalPages()); track $index) {
           <button class="page-btn" [class.active]="page === $index + 1" (click)="onPage($index + 1)">{{ $index + 1 }}</button>
         }
-        <button class="page-btn" [disabled]="page >= totalPages" (click)="onPage(page + 1)">›</button>
+        <button class="page-btn" [disabled]="page >= totalPages()" (click)="onPage(page + 1)">›</button>
       </div>
     }
   </div>

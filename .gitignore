@@ -38,3 +38,7 @@ coverage/
 
 # Uploads
 Backend/src/Api/uploads/
+
+# Python
+__pycache__/
+*.pyc

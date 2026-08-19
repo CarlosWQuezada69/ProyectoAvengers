@@ -17,6 +17,7 @@ export class ForgotPasswordComponent {
 
   protected sent = false;
   protected loading = false;
+  protected resetUrl = '';
 
   protected form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -26,10 +27,13 @@ export class ForgotPasswordComponent {
     if (this.form.invalid) return;
     this.loading = true;
 
-    this.http.post(`${environment.apiUrl}/auth/forgot-password`, { email: this.form.value.email }).subscribe({
-      next: () => {
+    this.http.post<{ message: string; resetUrl?: string }>(
+      `${environment.apiUrl}/auth/forgot-password`, { email: this.form.value.email },
+    ).subscribe({
+      next: res => {
         this.sent = true;
         this.loading = false;
+        if (res.resetUrl) this.resetUrl = res.resetUrl;
       },
       error: () => {
         this.sent = true;

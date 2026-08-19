@@ -5,6 +5,7 @@ using ProyectoAvengers.Application.Mapping;
 using ProyectoAvengers.Domain;
 using ProyectoAvengers.Domain.Entities;
 using ProyectoAvengers.Infrastructure.Persistence;
+using ProyectoAvengers.Infrastructure.Validation;
 using ProyectoAvengers.Shared.DTOs;
 using ProyectoAvengers.Shared.DTOs.Admin;
 
@@ -104,7 +105,7 @@ public class ProductService : IProductService
 
     public async Task<ProductDto?> UpdateAsync(Guid id, UpdateProductRequest request)
     {
-        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+        var product = await _context.Products.AsTracking().FirstOrDefaultAsync(p => p.Id == id);
         if (product == null) return null;
 
         if (await _context.Products.AnyAsync(p => p.Sku == request.Sku && p.Id != id))
@@ -137,7 +138,7 @@ public class ProductService : IProductService
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+        var product = await _context.Products.AsTracking().FirstOrDefaultAsync(p => p.Id == id);
         if (product == null) return false;
 
         product.SoftDelete();
@@ -156,12 +157,8 @@ public class ProductService : IProductService
         if (fileStream.Length == 0)
             throw new InvalidOperationException("Archivo vacío.");
 
-        var allowedTypes = Constants.AllowedImageMimeTypes;
-        if (!allowedTypes.Contains(contentType))
-            throw new InvalidOperationException("Tipo de archivo no válido. Solo se permiten JPEG, PNG, WebP y GIF.");
-
-        if (fileStream.Length > Constants.MaxImageSizeBytes)
-            throw new InvalidOperationException("El tamaño máximo es 5 MB.");
+        if (!ImageFileValidator.IsValid(contentType, fileStream.Length, out var error))
+            throw new InvalidOperationException(error);
 
         var url = await _fileStorage.SaveAsync(fileStream, fileName, "products");
 
@@ -176,6 +173,7 @@ public class ProductService : IProductService
     public async Task<bool> DeleteImageAsync(Guid productId, Guid imageId)
     {
         var image = await _context.ProductImages
+            .AsTracking()
             .FirstOrDefaultAsync(i => i.Id == imageId && i.ProductId == productId);
 
         if (image == null) return false;
@@ -189,6 +187,7 @@ public class ProductService : IProductService
     public async Task<bool> UpdateImageOrderAsync(Guid productId, List<UpdateImageOrderItem> order)
     {
         var product = await _context.Products
+            .AsTracking()
             .Include(p => p.ProductImages)
             .FirstOrDefaultAsync(p => p.Id == productId);
 
@@ -222,6 +221,7 @@ public class ProductService : IProductService
     public async Task<ProductRestrictionDto?> UpdateRestrictionAsync(Guid productId, Guid restrictionId, UpdateRestrictionRequest request)
     {
         var restriction = await _context.ProductRestrictions
+            .AsTracking()
             .FirstOrDefaultAsync(r => r.Id == restrictionId && r.ProductId == productId);
 
         if (restriction == null) return null;
@@ -236,6 +236,7 @@ public class ProductService : IProductService
     public async Task<bool> DeleteRestrictionAsync(Guid productId, Guid restrictionId)
     {
         var restriction = await _context.ProductRestrictions
+            .AsTracking()
             .FirstOrDefaultAsync(r => r.Id == restrictionId && r.ProductId == productId);
 
         if (restriction == null) return false;

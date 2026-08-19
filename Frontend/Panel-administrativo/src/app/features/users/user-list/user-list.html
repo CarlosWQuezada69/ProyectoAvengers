@@ -10,7 +10,6 @@
   </header>
 
   <div class="table-card">
-    @if (loading) { <div class="loading-state"><div class="spinner"></div></div> }
     <table class="table">
       <thead>
         <tr>
@@ -18,9 +17,13 @@
         </tr>
       </thead>
       <tbody>
-        @for (u of users; track u.id) {
-          <tr>
-            <td>{{ u.firstName }} {{ u.lastName }}</td>
+        @for (u of users(); track u.id) {
+          <tr [class.is-me]="u.id === currentUserId()?.id">
+            <td>{{ u.firstName }} {{ u.lastName }}
+              @if (u.id === currentUserId()?.id) {
+                <app-badge variant="success">Tú</app-badge>
+              }
+            </td>
             <td>{{ u.email }}</td>
             <td>
               <div class="roles-list">

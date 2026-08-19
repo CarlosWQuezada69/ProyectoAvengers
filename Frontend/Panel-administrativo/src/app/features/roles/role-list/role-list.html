@@ -6,21 +6,56 @@
     </div>
   </header>
 
+  @if (currentUser(); as me) {
+    <div class="access-card">
+      <h3 class="access-title">Mis roles y accesos</h3>
+      <p class="access-user">{{ me.firstName }} {{ me.lastName }} · {{ me.email }}</p>
+      <div class="access-group">
+        <span class="access-label">Roles:</span>
+        <div class="access-chips">
+          @for (role of me.roles; track role) {
+            <app-badge variant="success">{{ role }}</app-badge>
+          }
+        </div>
+      </div>
+      <div class="access-group">
+        <span class="access-label">Permisos ({{ myPermissions().length }}):</span>
+        <div class="access-chips">
+          @for (perm of myPermissions(); track perm) {
+            <span class="perm-chip">{{ perm }}</span>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
   <div class="table-card">
-    @if (loading) { <div class="loading-state"><div class="spinner"></div></div> }
     <table class="table">
       <thead>
         <tr>
-          <th>Nombre</th><th>Descripción</th><th>Permisos</th><th>Usuarios</th><th>Acciones</th>
+          <th>Nombre</th><th>Descripción</th><th>Permisos</th><th>Usuarios con este rol</th><th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        @for (role of roles; track role.id) {
+        @for (role of roles(); track role.id) {
           <tr>
             <td class="role-name">{{ role.name }}</td>
             <td>{{ role.description }}</td>
             <td><app-badge variant="info">{{ role.permissionCount ?? 0 }}</app-badge></td>
-            <td>{{ role.userCount ?? 0 }}</td>
+            <td>
+              @if (role.users?.length) {
+                <div class="role-users">
+                  @for (u of role.users; track u.id) {
+                    <div class="role-user" [class.me]="u.id === currentUser()?.id">
+                      <span>{{ u.name || u.email }}</span>
+                      <small>{{ u.email }}</small>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <span class="muted">Sin usuarios</span>
+              }
+            </td>
             <td>
               <div class="actions">
                 <a [routerLink]="['/roles', role.id]" class="icon-btn">✏️</a>

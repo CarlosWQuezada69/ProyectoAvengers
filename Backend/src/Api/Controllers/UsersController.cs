@@ -43,8 +43,20 @@ public class UsersController : AdminBaseController
     [RequirePermission("users.create")]
     public async Task<ActionResult<UserDto>> CreateUser([FromBody] CreateUserRequest request)
     {
-        var user = await _userService.CreateAsync(request);
-        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+        try
+        {
+            var user = await _userService.CreateAsync(request);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Solicitud inválida",
+                Status = 400,
+                Detail = ex.Message
+            });
+        }
     }
 
     [HttpPut("users/{id:guid}")]

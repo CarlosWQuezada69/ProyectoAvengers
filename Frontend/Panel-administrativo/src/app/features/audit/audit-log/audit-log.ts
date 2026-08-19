@@ -1,9 +1,10 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { DatePipe, JsonPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuditService } from '../../../core/services/audit.service';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { BadgeComponent } from '../../../shared/components/badge/badge';
+import { ToastService } from '../../../shared/services/toast.service';
 import type { AuditLog } from '../../../core/models/index';
 
 @Component({
@@ -15,8 +16,9 @@ import type { AuditLog } from '../../../core/models/index';
 })
 export class AuditLogComponent implements OnInit {
   private auditService = inject(AuditService);
+  private toast = inject(ToastService);
 
-  protected logs: AuditLog[] = [];
+  protected logs = signal<AuditLog[]>([]);
   protected loading = true;
   protected entityName = '';
   protected from = '';
@@ -24,7 +26,7 @@ export class AuditLogComponent implements OnInit {
   protected page = 1;
   protected pageSize = 20;
   protected totalCount = 0;
-  protected totalPages = 0;
+  protected totalPages = signal(0);
   protected expandedId: string | null = null;
 
   ngOnInit(): void {
@@ -34,13 +36,15 @@ export class AuditLogComponent implements OnInit {
   protected loadLogs(): void {
     this.loading = true;
     this.auditService.list({
-      entityName: this.entityName || undefined,
-      from: this.from || undefined,
-      to: this.to || undefined,
+      entityName: this.entityName,
+      from: this.from,
+      to: this.to,
       page: this.page,
       pageSize: this.pageSize,
     }).subscribe({
-      next: res => { this.logs = res.data; this.totalCount = res.totalCount; this.totalPages = res.totalPages; this.loading = false; },
+      next: res => { this.logs.set(res.data); this.totalCount = res.totalCount; this.totalPages.set(res.totalPages); this.loading = false;
+        if (res.data.length === 0) this.toast.info('Aún no hay registros de auditoría');
+      },
       error: () => this.loading = false,
     });
   }

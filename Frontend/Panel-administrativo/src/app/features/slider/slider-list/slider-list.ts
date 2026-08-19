@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { SliderService } from '../../../core/services/slider.service';
@@ -24,7 +24,7 @@ export class SliderListComponent implements OnInit {
   private toast = inject(ToastService);
   private confirmDialog = inject(ConfirmDialogService);
 
-  protected items: SliderItem[] = [];
+  protected items = signal<SliderItem[]>([]);
   protected loading = true;
   protected modalOpen = false;
   protected editingItem: SliderItem | null = null;
@@ -44,7 +44,9 @@ export class SliderListComponent implements OnInit {
 
   private loadItems(): void {
     this.sliderService.list().subscribe({
-      next: data => { this.items = data; this.loading = false; },
+      next: data => { this.items.set(data); this.loading = false;
+        if (data.length === 0) this.toast.info('Aún no hay ítems en el slider');
+      },
       error: () => this.loading = false,
     });
   }

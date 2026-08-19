@@ -6,11 +6,6 @@
     </div>
   </header>
 
-  @if (loading) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-    </div>
-  } @else {
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-section">
         <h3>Datos generales</h3>
@@ -129,7 +124,6 @@
         </app-btn>
       </div>
     </form>
-  }
 </div>
 
 <app-modal [open]="restrictionModalOpen" title="Restricción" size="md" (close)="restrictionModalOpen = false">

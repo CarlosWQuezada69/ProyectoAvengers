@@ -1,6 +1,7 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RolesService } from '../../../core/services/roles.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { BadgeComponent } from '../../../shared/components/badge/badge';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
@@ -17,16 +18,22 @@ import type { Role } from '../../../core/models/role';
 })
 export class RoleListComponent implements OnInit {
   private rolesService = inject(RolesService);
+  private authService = inject(AuthService);
   private toast = inject(ToastService);
   private confirmDialog = inject(ConfirmDialogService);
 
-  protected roles: Role[] = [];
-  protected loading = true;
+  protected roles = signal<Role[]>([]);
+  protected loading = signal(true);
+
+  protected readonly currentUser = this.authService.user;
+  protected readonly myPermissions = this.authService.permissions;
 
   ngOnInit(): void {
     this.rolesService.list().subscribe({
-      next: data => { this.roles = data; this.loading = false; },
-      error: () => this.loading = false,
+      next: data => { this.roles.set(data); this.loading.set(false);
+        if (data.length === 0) this.toast.info('Aún no hay roles registrados');
+      },
+      error: () => this.loading.set(false),
     });
   }
 
@@ -36,7 +43,7 @@ export class RoleListComponent implements OnInit {
     this.rolesService.delete(id).subscribe({
       next: () => {
         this.toast.show('Rol eliminado', 'success');
-        this.roles = this.roles.filter(r => r.id !== id);
+        this.roles.update(r => r.filter(role => role.id !== id));
       },
       error: () => this.toast.show('No se puede eliminar: tiene usuarios asignados', 'error'),
     });
