@@ -125,16 +125,13 @@ public class AppDbContext : DbContext
 
             if (action == null) continue;
 
-            logs.Add(new AuditLog
-            {
-                UserId = userId,
-                Action = action,
-                EntityName = entry.Entity.GetType().Name,
-                EntityId = GetPrimaryKey(entry),
-                Changes = entry.State != EntityState.Added ? SerializeChanges(entry) : null,
-                IpAddress = ipAddress,
-                CreatedAt = now
-            });
+            logs.Add(new AuditLog(
+                userId,
+                action,
+                entry.Entity.GetType().Name,
+                GetPrimaryKey(entry),
+                entry.State != EntityState.Added ? SerializeChanges(entry) : null,
+                ipAddress));
         }
 
         return logs;
@@ -186,14 +183,18 @@ public class AppDbContext : DbContext
             if (AuditExcludedProperties.Contains(prop.Metadata.Name))
                 continue;
 
-            var colType = prop.Metadata.GetColumnType();
-            if (colType is "text" or "bytea")
+            var clrType = Nullable.GetUnderlyingType(prop.Metadata.ClrType) ?? prop.Metadata.ClrType;
+            if (clrType == typeof(byte[]))
             {
                 changes[prop.Metadata.Name] = "[truncated]";
                 continue;
             }
 
-            changes[prop.Metadata.Name] = prop.CurrentValue;
+            var value = prop.CurrentValue;
+            if (value is string str && str.Length > 20)
+                changes[prop.Metadata.Name] = "[truncated]";
+            else
+                changes[prop.Metadata.Name] = prop.CurrentValue;
         }
 
         return changes.Count > 0 ? JsonSerializer.Serialize(changes) : null;

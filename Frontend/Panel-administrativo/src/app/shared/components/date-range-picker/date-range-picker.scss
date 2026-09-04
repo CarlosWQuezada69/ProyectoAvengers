@@ -13,21 +13,23 @@
 .date-label {
   font-size: 12px;
   font-weight: 600;
-  color: #B3B3B3;
+  color: var(--text-secondary);
 }
 
 .date-input {
   padding: 8px 12px;
-  background: #0D0D0D;
-  border: 1px solid #2A2A2A;
-  border-radius: 6px;
-  color: #FFFFFF;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
   font-size: 14px;
   outline: none;
   font-family: 'Inter', sans-serif;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 
   &:focus {
-    border-color: #E8B923;
+    border-color: var(--accent);
+    box-shadow: var(--ring);
   }
 
   &::-webkit-calendar-picker-indicator {
@@ -36,7 +38,7 @@
 }
 
 .date-separator {
-  color: #B3B3B3;
+  color: var(--text-secondary);
   padding-bottom: 8px;
   font-size: 16px;
 }

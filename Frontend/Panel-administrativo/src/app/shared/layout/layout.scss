@@ -30,7 +30,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 20px 20px 16px;
+  height: var(--topbar-height);
+  padding: 0 20px;
   overflow: hidden;
 }
 
@@ -39,7 +40,7 @@
   height: 36px;
   color: var(--accent);
   flex-shrink: 0;
-  filter: drop-shadow(0 0 8px rgba(232, 185, 35, 0.3));
+  filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.3));
 
   img, svg { width: 100%; height: 100%; object-fit: contain; }
 }
@@ -140,7 +141,8 @@
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
   transition: all var(--transition-fast);
   overflow: hidden;
   touch-action: manipulation;
@@ -157,18 +159,23 @@
   &:hover {
     color: var(--text-primary);
     background: var(--bg-hover);
+    border-color: var(--border-light);
 
     .nav-icon { color: var(--accent); }
-    .nav-indicator { opacity: 1; }
+    .nav-indicator { opacity: 1; transform: translateY(-50%) scaleY(1); }
     transform: translateX(4px);
   }
 
   &.active {
     color: var(--accent);
-    background: rgba(232, 185, 35, 0.08);
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
 
     .nav-icon { color: var(--accent); }
-    .nav-indicator { opacity: 1; }
+    .nav-indicator {
+      opacity: 1;
+      transform: translateY(-50%) scaleY(1);
+    }
   }
 }
 
@@ -192,13 +199,14 @@
   position: absolute;
   left: 0;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%) scaleY(0.4);
   width: 3px;
   height: 20px;
   background: var(--accent-gradient);
-  border-radius: 0 2px 2px 0;
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
   opacity: 0;
-  transition: opacity var(--transition-fast);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
 // ─── Sidebar Footer ─────────────────────────────────────
@@ -223,7 +231,7 @@
 .sidebar-avatar {
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-sm);
+  border-radius: 50%;
   background: var(--accent-gradient);
   color: #0A0A0A;
   display: flex;
@@ -232,6 +240,7 @@
   font-weight: 800;
   font-size: 12px;
   flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3);
 }
 
 .sidebar-user-info {
@@ -279,7 +288,9 @@
   justify-content: space-between;
   padding: 0 24px;
   height: var(--topbar-height);
-  background: var(--bg-surface);
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
 
@@ -375,7 +386,7 @@
 .avatar {
   width: 34px;
   height: 34px;
-  border-radius: var(--radius-sm);
+  border-radius: 50%;
   background: var(--accent-gradient);
   color: #0A0A0A;
   display: flex;
@@ -383,9 +394,13 @@
   justify-content: center;
   font-weight: 800;
   font-size: 13px;
-  transition: transform var(--transition-fast);
+  box-shadow: 0 0 0 2px var(--bg-surface), 0 0 12px rgba(var(--accent-rgb), 0.35);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 
-  .avatar-btn:hover & { transform: scale(1.05); }
+  .avatar-btn:hover & {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 2px var(--bg-surface), 0 0 16px rgba(var(--accent-rgb), 0.5);
+  }
 }
 
 .avatar-chevron {
@@ -403,11 +418,13 @@
   top: calc(100% + 8px);
   right: 0;
   min-width: 240px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   padding: 6px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(var(--accent-rgb), 0.06);
   animation: dropdownIn 0.15s ease;
   transform-origin: top right;
   z-index: 200;
@@ -424,7 +441,7 @@
 .dropdown-avatar {
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-sm);
+  border-radius: 50%;
   background: var(--accent-gradient);
   color: #0A0A0A;
   display: flex;
@@ -433,6 +450,7 @@
   font-weight: 800;
   font-size: 13px;
   flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3);
 }
 
 .dropdown-name {
@@ -541,7 +559,7 @@
     .nav-indicator,
     .sidebar-user-info { display: none; }
 
-    .sidebar-brand { justify-content: center; padding: 20px 0 16px; }
+    .sidebar-brand { justify-content: center; padding: 0; }
     .nav-item { justify-content: center; padding: 10px; }
     .sidebar-user { justify-content: center; padding: 8px 0; }
     .sidebar-accent { margin: 0 12px 8px; }

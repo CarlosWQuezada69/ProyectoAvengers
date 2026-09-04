@@ -9,8 +9,8 @@
 
   &:hover,
   &.dragging {
-    border-color: #E8B923;
-    background: rgba(232, 185, 35, 0.05);
+    border-color: var(--accent);
+    background: rgba(var(--accent-rgb), 0.05);
   }
 }
 
@@ -27,7 +27,7 @@
 
 .upload-icon {
   font-size: 32px;
-  color: #E8B923;
+  color: var(--accent);
 }
 
 p {

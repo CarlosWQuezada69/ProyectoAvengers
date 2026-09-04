@@ -29,7 +29,7 @@
   transform: translateX(-50%);
   width: 600px;
   height: 400px;
-  background: radial-gradient(ellipse, rgba(232, 185, 35, 0.06) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(var(--accent-rgb), 0.06) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -116,7 +116,7 @@
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(232, 185, 35, 0.3);
+    box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.3);
   }
 }
 

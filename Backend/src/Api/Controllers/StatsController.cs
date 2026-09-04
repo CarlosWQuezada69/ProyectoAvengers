@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Api.Authorization;
-using ProyectoAvengers.Infrastructure.Persistence;
+using ProyectoAvengers.Application.Interfaces;
 using ProyectoAvengers.Shared.DTOs.Admin;
 
 namespace ProyectoAvengers.Api.Controllers;
@@ -10,52 +9,17 @@ namespace ProyectoAvengers.Api.Controllers;
 [EnableRateLimiting("Admin")]
 public class StatsController : AdminBaseController
 {
-    private readonly AppDbContext _context;
+    private readonly IStatsService _statsService;
 
-    public StatsController(AppDbContext context)
+    public StatsController(IStatsService statsService)
     {
-        _context = context;
+        _statsService = statsService;
     }
 
     [HttpGet("stats/overview")]
     [RequirePermission("stats.view")]
     public async Task<ActionResult<OverviewStats>> GetOverview()
-    {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-
-        var totalProducts = await _context.Products.AsNoTracking().CountAsync();
-        var activeProducts = await _context.Products.AsNoTracking().CountAsync(p => p.IsActive);
-        var totalCategories = await _context.Categories.AsNoTracking().CountAsync();
-        var totalUsers = await _context.Users.AsNoTracking().CountAsync();
-        var todayViews = await _context.ProductStatsDailies
-            .AsNoTracking()
-            .Where(s => s.Date == today)
-            .SumAsync(s => s.Views);
-        var monthStart = new DateOnly(today.Year, today.Month, 1);
-        var monthlyViews = await _context.ProductStatsDailies
-            .AsNoTracking()
-            .Where(s => s.Date >= monthStart)
-            .SumAsync(s => s.Views);
-        var monthlyPurchases = await _context.ProductStatsDailies
-            .AsNoTracking()
-            .Where(s => s.Date >= monthStart)
-            .SumAsync(s => s.Purchases);
-        var lowStockCount = await _context.Products
-            .AsNoTracking()
-            .CountAsync(p => p.Stock > 0 && p.Stock <= 5);
-
-        return Ok(new OverviewStats
-        {
-            TotalProducts = totalProducts,
-            ActiveProducts = activeProducts,
-            TotalCategories = totalCategories,
-            TotalUsers = totalUsers,
-            TodayViews = todayViews,
-            LowStockCount = lowStockCount,
-            MonthlyViews = monthlyViews,
-            MonthlyPurchases = monthlyPurchases
-        });
-    }
+        => Ok(await _statsService.GetOverviewAsync());
 
     [HttpGet("stats/products/top-viewed")]
     [RequirePermission("stats.view")]
@@ -63,28 +27,7 @@ public class StatsController : AdminBaseController
         [FromQuery] DateTime? from,
         [FromQuery] DateTime? to,
         [FromQuery] int limit = 10)
-    {
-        limit = Math.Clamp(limit, 1, 100);
-        var fromDate = from.HasValue ? DateOnly.FromDateTime(from.Value) : DateOnly.MinValue;
-        var toDate = to.HasValue ? DateOnly.FromDateTime(to.Value) : DateOnly.MaxValue;
-
-        var stats = await _context.ProductStatsDailies
-            .AsNoTracking()
-            .Where(s => s.Date >= fromDate && s.Date <= toDate)
-            .GroupBy(s => new { s.ProductId, s.Product.Name, ImageUrl = s.Product.ProductImages.OrderByDescending(i => i.IsPrimary).ThenBy(i => i.DisplayOrder).Select(i => i.Url).FirstOrDefault() })
-            .Select(g => new TopProductStat
-            {
-                ProductId = g.Key.ProductId,
-                ProductName = g.Key.Name,
-                ImageUrl = g.Key.ImageUrl,
-                Count = g.Sum(s => s.Views)
-            })
-            .OrderByDescending(s => s.Count)
-            .Take(limit)
-            .ToListAsync();
-
-        return Ok(stats);
-    }
+        => Ok(await _statsService.GetTopViewedAsync(from, to, limit));
 
     [HttpGet("stats/products/top-sellers")]
     [RequirePermission("stats.view")]
@@ -92,51 +35,10 @@ public class StatsController : AdminBaseController
         [FromQuery] DateTime? from,
         [FromQuery] DateTime? to,
         [FromQuery] int limit = 10)
-    {
-        limit = Math.Clamp(limit, 1, 100);
-        var fromDate = from.HasValue ? DateOnly.FromDateTime(from.Value) : DateOnly.MinValue;
-        var toDate = to.HasValue ? DateOnly.FromDateTime(to.Value) : DateOnly.MaxValue;
-
-        var stats = await _context.ProductStatsDailies
-            .AsNoTracking()
-            .Where(s => s.Date >= fromDate && s.Date <= toDate)
-            .GroupBy(s => new { s.ProductId, s.Product.Name, ImageUrl = s.Product.ProductImages.OrderByDescending(i => i.IsPrimary).ThenBy(i => i.DisplayOrder).Select(i => i.Url).FirstOrDefault() })
-            .Select(g => new TopProductStat
-            {
-                ProductId = g.Key.ProductId,
-                ProductName = g.Key.Name,
-                ImageUrl = g.Key.ImageUrl,
-                Count = g.Sum(s => s.Purchases)
-            })
-            .OrderByDescending(s => s.Count)
-            .Take(limit)
-            .ToListAsync();
-
-        return Ok(stats);
-    }
+        => Ok(await _statsService.GetTopSellersAsync(from, to, limit));
 
     [HttpGet("stats/products/low-stock")]
     [RequirePermission("stats.view")]
     public async Task<ActionResult<List<TopProductStat>>> GetLowStock([FromQuery] int threshold = 5)
-    {
-        var products = await _context.Products
-            .AsNoTracking()
-            .Where(p => p.Stock > 0 && p.Stock <= threshold)
-            .OrderBy(p => p.Stock)
-            .Take(50)
-            .Select(p => new TopProductStat
-            {
-                ProductId = p.Id,
-                ProductName = p.Name,
-                ImageUrl = p.ProductImages
-                    .OrderByDescending(i => i.IsPrimary)
-                    .ThenBy(i => i.DisplayOrder)
-                    .Select(i => i.Url)
-                    .FirstOrDefault(),
-                Count = p.Stock
-            })
-            .ToListAsync();
-
-        return Ok(products);
-    }
+        => Ok(await _statsService.GetLowStockAsync(threshold));
 }

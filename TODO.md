@@ -1,49 +1,46 @@
 # TODO - Próxima sesión: Mejoras de calidad
 
+> Estado actualizado tras la sesión de refactor: las tareas de calidad (OnPush, DomSanitizer, JSON.parse, confirm(), lógica de negocio en Application, encapsulación, Value Objects e integración de los mismos, centralización de DTOs y JWT en variables de entorno) están completadas. A continuación quedan las pendientes restantes.
+
 ## Frontend (Angular) — Prioridades
 
 ### Alta
-- [ ] Agregar `ChangeDetectionStrategy.OnPush` a todos los componentes
-- [ ] Reemplazar `DomSanitizer.bypassSecurityTrustHtml()` en `Frontend/Panel-administrativo/src/app/shared/layout/layout.ts:87`
-- [ ] Agregar `take(1)` a `AuthService.loadUser()` y a petición HTTP en `BrandingService`
-- [ ] Proteger `JSON.parse` con try/catch en `product-form.ts:141`
-- [ ] Reemplazar `confirm()` nativa por modal personalizado (5 componentes)
-
-### Media
 - [ ] Refactorizar `ProductFormComponent` extrayendo sub-componentes (imágenes, restricciones)
 - [ ] Extraer SVG icons del `LayoutComponent` a archivo separado
 - [ ] Usar `TableComponent` compartido en las 6 listas o crear `PaginationComponent`
 - [ ] Reemplazar emojis como iconos (✏️, 🗑️) por SVGs inline
 - [ ] Crear servicios dedicados para forgot-password, reset-password, confirm-email
 
+### Media
+- [ ] Evaluar componentes con estado `loading: boolean` sin signal + `markForCheck` para evitar problemas de render con OnPush
+
 ---
 
 ## Backend (.NET) — Prioridades
 
 ### Crítica
-- [ ] Mover lógica de negocio de controladores a Application (servicios de aplicación / casos de uso)
-- [ ] Encapsular entidades: propiedades `{ get; private set; }`, métodos de dominio
-- [ ] Crear Value Objects: `Email`, `Slug`, `Money`, `PhoneNumber`
+- [ ] Integrar Value Objects (Email, Slug, Money, PhoneNumber) dentro de las entidades (usar en vez de `string`/`decimal` directos)
+- [ ] Mover lógica de negocio de controladores restantes (públicos: Products, Categories, Slider, Settings, About, SEO) a capa Application
 
 ### Alta
-- [ ] Eliminar duplicación de mapeo DTO (considerar AutoMapper o extension methods)
-- [ ] Centralizar validación de archivos MIME (repetido en 3 controladores)
-- [ ] Mover JWT Secret de `appsettings.json` a User Secrets / variables de entorno
-- [ ] Eliminar `UnitTest1.cs` placeholder
-- [ ] Escribir tests de integración para controladores (`WebApplicationFactory`)
+- [ ] Implementar Repository Pattern
+- [ ] Configurar CORS estricto en producción (sin AllowAnyOrigin)
+- [ ] Extraer regex de slug a constante compartida (ya existe en `Constants.SlugPattern`, validar coherencia)
+- [ ] Agregar validación de `IFormFile` de forma unificada para todos los controladores (ya usan `ImageFileValidator`, verificar cobertura total)
+- [ ] Escribir tests de integración para el resto de controladores (Products, Users, Roles, Categories, Slider)
 - [ ] Tests para autorización y audit trail
 
 ### Media
-- [ ] Implementar Repository Pattern
-- [ ] Configurar `UseQueryTrackingBehavior(NoTracking)` global
 - [ ] Remover default password de `AppDbContextFactory`
-- [ ] Configurar CORS estricto (no AllowAnyOrigin en producción)
-- [ ] Extraer regex de slug a constante compartida
 
 ---
 
 ## Notas
 - Backend corre en `http://localhost:5167` (no Docker)
-- Frontend apunta a `http://localhost:5167/api/v1` (ya corregido)
+- Frontend apunta a `http://localhost:5167/api/v1`
 - Admin: `admin@example.com` / `Admin123!`
 - PostgreSQL local sin Docker
+- `JWT_SECRET` se lee de variable de entorno o User Secrets (mínimo 32 caracteres), no está en appsettings
+- `UseQueryTrackingBehavior(NoTracking)` global ya configurado en Infrastructure
+- Tests de integración (`WebApplicationFactory` + EF Core InMemory) añadidos en `tests/ProyectoAvengers.Tests/Integration`
+- `AppDbContext.SerializeChanges` ya no usa `GetColumnType()` (compatible con InMemory)

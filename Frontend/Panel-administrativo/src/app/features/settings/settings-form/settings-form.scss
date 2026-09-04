@@ -8,7 +8,7 @@
 
 .loading-state {
   display: flex; align-items: center; justify-content: center; padding: 64px;
-  .spinner { width: 40px; height: 40px; border: 3px solid #2A2A2A; border-top-color: #E8B923; border-radius: 50%; animation: spin 0.6s linear infinite; }
+  .spinner { width: 40px; height: 40px; border: 3px solid #2A2A2A; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
 }
 
 .settings-section {

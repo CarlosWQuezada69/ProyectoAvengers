@@ -34,6 +34,12 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ISliderService, SliderService>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<ISettingsService, SettingsService>();
+        services.AddScoped<IAboutService, AboutService>();
+        services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<IStatsService, StatsService>();
 
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
         if (environment == "Development")

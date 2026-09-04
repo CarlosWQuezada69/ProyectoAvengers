@@ -7,28 +7,29 @@
 .select-label {
   font-size: 13px;
   font-weight: 600;
-  color: #FFFFFF;
+  color: var(--text-primary);
 }
 
 .required {
-  color: #E74C3C;
+  color: var(--danger);
 }
 
 .select {
   width: 100%;
   padding: 10px 14px;
-  background: #0D0D0D;
-  border: 1px solid #2A2A2A;
-  border-radius: 6px;
-  color: #FFFFFF;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
   font-size: 14px;
   outline: none;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   appearance: auto;
 
   &:focus {
-    border-color: #E8B923;
+    border-color: var(--accent);
+    box-shadow: var(--ring);
   }
 
   &:disabled {
@@ -37,7 +38,7 @@
   }
 
   option {
-    background: #1A1A1A;
-    color: #FFFFFF;
+    background: var(--bg-elevated);
+    color: var(--text-primary);
   }
 }

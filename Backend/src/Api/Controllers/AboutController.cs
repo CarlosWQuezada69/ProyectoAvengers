@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using ProyectoAvengers.Application.Mapping;
 using ProyectoAvengers.Infrastructure.Persistence;
 using ProyectoAvengers.Shared.DTOs.Admin;
 
@@ -30,28 +31,6 @@ public class AboutController : ControllerBase
         if (about == null)
             return Ok(new AboutInfoDto());
 
-        return Ok(MapToDto(about));
-    }
-
-    private static AboutInfoDto MapToDto(Domain.Entities.AboutInfo about)
-    {
-        return new AboutInfoDto
-        {
-            Id = about.Id,
-            Title = about.Title,
-            History = about.History,
-            Mission = about.Mission,
-            Vision = about.Vision,
-            CreatedAt = about.CreatedAt,
-            UpdatedAt = about.UpdatedAt,
-            Gallery = about.Galleries.Select(g => new AboutGalleryDto
-            {
-                Id = g.Id,
-                Url = g.Url,
-                AltText = g.AltText,
-                DisplayOrder = g.DisplayOrder,
-                Section = g.Section
-            }).ToList()
-        };
+        return Ok(about.ToDto());
     }
 }

@@ -106,4 +106,25 @@ public static class DtoMapping
         IsActive = s.IsActive,
         CreatedAt = s.CreatedAt
     };
+
+    public static AboutInfoDto ToDto(this AboutInfo about) => new()
+    {
+        Id = about.Id,
+        Title = about.Title,
+        History = about.History,
+        Mission = about.Mission,
+        Vision = about.Vision,
+        CreatedAt = about.CreatedAt,
+        UpdatedAt = about.UpdatedAt,
+        Gallery = about.Galleries
+            .OrderBy(g => g.DisplayOrder)
+            .Select(g => new AboutGalleryDto
+            {
+                Id = g.Id,
+                Url = g.Url,
+                AltText = g.AltText,
+                DisplayOrder = g.DisplayOrder,
+                Section = g.Section
+            }).ToList()
+    };
 }

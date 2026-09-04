@@ -19,10 +19,10 @@
   padding: 10px 14px;
   background: var(--bg-primary);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   color: var(--text-primary);
   font-size: 14px;
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   outline: none;
 
   &::placeholder {
@@ -31,6 +31,7 @@
 
   &:focus {
     border-color: var(--accent);
+    box-shadow: var(--ring);
   }
 
   &:disabled {

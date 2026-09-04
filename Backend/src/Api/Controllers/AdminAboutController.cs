@@ -1,11 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore;
 using ProyectoAvengers.Api.Authorization;
 using ProyectoAvengers.Application.Interfaces;
-using ProyectoAvengers.Domain.Entities;
-using ProyectoAvengers.Infrastructure.Persistence;
-using ProyectoAvengers.Infrastructure.Validation;
+using ProyectoAvengers.Shared.DTOs;
 using ProyectoAvengers.Shared.DTOs.Admin;
 
 namespace ProyectoAvengers.Api.Controllers;
@@ -13,182 +10,65 @@ namespace ProyectoAvengers.Api.Controllers;
 [EnableRateLimiting("Admin")]
 public class AdminAboutController : AdminBaseController
 {
-    private readonly AppDbContext _context;
-    private readonly IFileStorage _fileStorage;
+    private readonly IAboutService _aboutService;
 
-    public AdminAboutController(AppDbContext context, IFileStorage fileStorage)
+    public AdminAboutController(IAboutService aboutService)
     {
-        _context = context;
-        _fileStorage = fileStorage;
+        _aboutService = aboutService;
     }
 
     [HttpGet("about")]
     [RequirePermission("about.view")]
     public async Task<ActionResult<AboutInfoDto>> GetAbout()
-    {
-        var about = await _context.AboutInfos
-            .AsNoTracking()
-            .Include(a => a.Galleries.OrderBy(g => g.DisplayOrder))
-            .FirstOrDefaultAsync();
-
-        if (about == null)
-            return Ok(new AboutInfoDto());
-
-        return Ok(MapToDto(about));
-    }
+        => Ok(await _aboutService.GetAboutAsync());
 
     [HttpPut("about")]
     [RequirePermission("about.update")]
     public async Task<ActionResult<AboutInfoDto>> UpdateAbout([FromBody] UpdateAboutInfoRequest request)
-    {
-        var about = await _context.AboutInfos
-            .AsTracking()
-            .Include(a => a.Galleries)
-            .FirstOrDefaultAsync();
-
-        if (about == null)
-        {
-            about = new AboutInfo
-            {
-                Title = request.Title,
-                History = request.History,
-                Mission = request.Mission,
-                Vision = request.Vision
-            };
-            _context.AboutInfos.Add(about);
-        }
-        else
-        {
-            about.Title = request.Title;
-            about.History = request.History;
-            about.Mission = request.Mission;
-            about.Vision = request.Vision;
-            about.UpdatedAt = DateTime.UtcNow;
-        }
-
-        await _context.SaveChangesAsync();
-
-        var dto = MapToDto(about);
-        return Ok(dto);
-    }
+        => Ok(await _aboutService.UpdateAboutAsync(request));
 
     [HttpPost("about/gallery")]
     [RequirePermission("about.update")]
     public async Task<ActionResult<AboutGalleryDto>> UploadImage(
         [FromQuery] string section, IFormFile file)
     {
-        var about = await _context.AboutInfos
-            .Include(a => a.Galleries)
-            .FirstOrDefaultAsync();
+        if (file == null || file.Length == 0)
+            return BadRequest(new ProblemDetails { Title = "Archivo vacío", Status = 400 });
 
-        if (about == null)
+        var upload = new FileUpload
         {
-            about = new AboutInfo();
-            _context.AboutInfos.Add(about);
-            await _context.SaveChangesAsync();
-        }
+            Content = file.OpenReadStream(),
+            FileName = file.FileName,
+            ContentType = file.ContentType,
+            Length = file.Length
+        };
 
-        if (!ImageFileValidator.IsValid(file.ContentType, file.Length, out var error))
+        try
+        {
+            var dto = await _aboutService.UploadImageAsync(section, upload);
+            return Ok(dto);
+        }
+        catch (InvalidOperationException ex)
+        {
             return BadRequest(new ProblemDetails
             {
                 Title = "Archivo no válido",
                 Status = 400,
-                Detail = error
+                Detail = ex.Message
             });
-
-        var folder = section switch
-        {
-            "founder" => "about/founder",
-            "employees" => "about/employees",
-            "location" => "about/location",
-            _ => "about"
-        };
-
-        await using var stream = file.OpenReadStream();
-        var url = await _fileStorage.SaveAsync(stream, file.FileName, folder);
-
-        var image = new AboutGallery
-        {
-            AboutInfoId = about.Id,
-            Url = url,
-            AltText = file.FileName,
-            DisplayOrder = about.Galleries.Count,
-            Section = section
-        };
-
-        _context.AboutGalleries.Add(image);
-        await _context.SaveChangesAsync();
-
-        return Ok(new AboutGalleryDto
-        {
-            Id = image.Id,
-            Url = image.Url,
-            AltText = image.AltText,
-            DisplayOrder = image.DisplayOrder,
-            Section = image.Section
-        });
+        }
     }
 
     [HttpDelete("about/gallery/{id:guid}")]
     [RequirePermission("about.update")]
     public async Task<ActionResult> DeleteImage(Guid id)
-    {
-        var image = await _context.AboutGalleries
-            .AsTracking()
-            .FirstOrDefaultAsync(i => i.Id == id);
-
-        if (image == null)
-            return NotFound();
-
-        await _fileStorage.DeleteAsync(image.Url);
-        _context.AboutGalleries.Remove(image);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
-    }
+        => await _aboutService.DeleteImageAsync(id) ? NoContent() : NotFound();
 
     [HttpPut("about/gallery/order")]
     [RequirePermission("about.update")]
     public async Task<ActionResult> UpdateOrder([FromBody] List<UpdateGalleryOrderItem> order)
     {
-        var ids = order.Select(o => o.Id).ToList();
-        var images = await _context.AboutGalleries
-            .AsTracking()
-            .Where(i => ids.Contains(i.Id))
-            .ToListAsync();
-
-        foreach (var item in order)
-        {
-            var image = images.FirstOrDefault(i => i.Id == item.Id);
-            if (image != null)
-                image.DisplayOrder = item.DisplayOrder;
-        }
-
-        await _context.SaveChangesAsync();
+        await _aboutService.UpdateOrderAsync(order);
         return NoContent();
-    }
-
-    private static AboutInfoDto MapToDto(AboutInfo about)
-    {
-        return new AboutInfoDto
-        {
-            Id = about.Id,
-            Title = about.Title,
-            History = about.History,
-            Mission = about.Mission,
-            Vision = about.Vision,
-            CreatedAt = about.CreatedAt,
-            UpdatedAt = about.UpdatedAt,
-            Gallery = about.Galleries
-                .OrderBy(g => g.DisplayOrder)
-                .Select(g => new AboutGalleryDto
-                {
-                    Id = g.Id,
-                    Url = g.Url,
-                    AltText = g.AltText,
-                    DisplayOrder = g.DisplayOrder,
-                    Section = g.Section
-                }).ToList()
-        };
     }
 }
