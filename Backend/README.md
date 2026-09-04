@@ -325,6 +325,42 @@ SiteSetting ──N:1──> User (UpdatedBy)
 
 ---
 
+## Configuración de correo (recuperación de contraseña)
+
+El flujo de "olvidé mi contraseña" está implementado end-to-end y **envía un correo SMTP real** en cuanto se configuran las credenciales. Mientras no haya SMTP configurado, se usa un `MockEmailSender` que solo imprime el contenido del correo en el log (útil en desarrollo).
+
+La detección es automática: **si `Email:SmtpHost` y `Email:SmtpUser` están definidos, se usa `SmtpEmailSender`** (independientemente del entorno). En caso contrario, se usa el mock.
+
+### Opción A — Variables de entorno (recomendada para producción)
+
+El registro DI ya lee estas variables de entorno:
+
+| Variable | Descripción |
+|----------|-------------|
+| `EMAIL_SMTP_HOST` | Host del servidor SMTP (p. ej. `smtp.gmail.com`) |
+| `EMAIL_SMTP_PORT` | Puerto (por defecto `587`) |
+| `EMAIL_SMTP_USER` | Cuenta emisora (p. ej. un correo Gmail) |
+| `EMAIL_SMTP_PASSWORD` | Contraseña o **App Password** |
+| `EMAIL_FROM` | Correo remitente mostrado al destinatario |
+| `APP__FRONTENDURL` | URL pública del frontend usada en el enlace del correo |
+| `JWT_SECRET` | Secreto JWT (mínimo 32 caracteres) |
+
+### Opción B — User Secrets (local, no se commitea)
+
+```bash
+cd Backend/src/Api
+dotnet user-secrets set "Email:SmtpHost" "smtp.gmail.com"
+dotnet user-secrets set "Email:SmtpPort" "587"
+dotnet user-secrets set "Email:SmtpUser" "tu-usuario@correo.com"
+dotnet user-secrets set "Email:SmtpPassword" "tu-app-password"
+dotnet user-secrets set "Email:FromEmail" "noreply@tudominio.com"
+dotnet user-secrets set "App:FrontendUrl" "http://localhost:4200"
+```
+
+> **Nota de seguridad:** nunca pongas credenciales SMTP reales en `appsettings.json` ni las commitees. Usa variables de entorno o User Secrets. En Gmail, la contraseña debe ser una **App Password** (requiere activar la verificación en 2 pasos).
+
+---
+
 ## Tests
 
 18 pruebas unitarias con xUnit + Moq + EF Core InMemory + FluentValidation TestHelper:

@@ -42,35 +42,29 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IStatsService, StatsService>();
 
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
-        if (environment == "Development")
+
+        var smtpHost = configuration["Email:SmtpHost"] ?? Environment.GetEnvironmentVariable("EMAIL_SMTP_HOST");
+        var smtpPort = configuration["Email:SmtpPort"] ?? Environment.GetEnvironmentVariable("EMAIL_SMTP_PORT") ?? "587";
+        var smtpUser = configuration["Email:SmtpUser"] ?? Environment.GetEnvironmentVariable("EMAIL_SMTP_USER");
+        var smtpPass = configuration["Email:SmtpPassword"] ?? Environment.GetEnvironmentVariable("EMAIL_SMTP_PASSWORD");
+        var fromEmail = configuration["Email:FromEmail"] ?? Environment.GetEnvironmentVariable("EMAIL_FROM") ?? "noreply@avengers.com";
+
+        if (!string.IsNullOrWhiteSpace(smtpHost) && !string.IsNullOrWhiteSpace(smtpUser))
         {
-            services.AddScoped<IEmailSender, MockEmailSender>();
+            services.AddScoped<IEmailSender>(sp =>
+            {
+                var logger = sp.GetRequiredService<ILogger<SmtpEmailSender>>();
+                return new SmtpEmailSender(smtpHost, int.Parse(smtpPort), smtpUser, smtpPass ?? string.Empty, fromEmail, logger);
+            });
         }
         else
         {
-            var smtpHost = configuration["Email:SmtpHost"] ?? Environment.GetEnvironmentVariable("EMAIL_SMTP_HOST");
-            var smtpPort = configuration["Email:SmtpPort"] ?? Environment.GetEnvironmentVariable("EMAIL_SMTP_PORT") ?? "587";
-            var smtpUser = configuration["Email:SmtpUser"] ?? Environment.GetEnvironmentVariable("EMAIL_SMTP_USER");
-            var smtpPass = configuration["Email:SmtpPassword"] ?? Environment.GetEnvironmentVariable("EMAIL_SMTP_PASSWORD");
-            var fromEmail = configuration["Email:FromEmail"] ?? Environment.GetEnvironmentVariable("EMAIL_FROM") ?? "noreply@avengers.com";
-
-            if (!string.IsNullOrWhiteSpace(smtpHost) && !string.IsNullOrWhiteSpace(smtpUser))
+            services.AddScoped<IEmailSender>(sp =>
             {
-                services.AddScoped<IEmailSender>(sp =>
-                {
-                    var logger = sp.GetRequiredService<ILogger<SmtpEmailSender>>();
-                    return new SmtpEmailSender(smtpHost, int.Parse(smtpPort), smtpUser, smtpPass ?? string.Empty, fromEmail, logger);
-                });
-            }
-            else
-            {
-                services.AddScoped<IEmailSender>(sp =>
-                {
-                    var logger = sp.GetRequiredService<ILogger<MockEmailSender>>();
-                    logger.LogWarning("SMTP no configurado. Usando MockEmailSender en producción. Configura Email:SmtpHost, Email:SmtpUser, Email:SmtpPassword.");
-                    return new MockEmailSender(logger);
-                });
-            }
+                var logger = sp.GetRequiredService<ILogger<MockEmailSender>>();
+                logger.LogWarning("SMTP no configurado (Email:SmtpHost/Email:SmtpUser). Usando MockEmailSender en el entorno {Environment}. Configura SMTP para envíos reales.", environment);
+                return new MockEmailSender(logger);
+            });
         }
 
         var storagePath = configuration["FileStorage:Path"] ?? Path.Combine(Directory.GetCurrentDirectory(), "uploads");
