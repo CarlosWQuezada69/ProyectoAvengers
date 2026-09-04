@@ -36,10 +36,51 @@
 .login-bg-dots {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(var(--accent) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0.15;
   pointer-events: none;
+  opacity: 0.5;
+}
+
+.login-bg-dots::before,
+.login-bg-dots::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+  animation-duration: var(--stars-speed, 240s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.login-bg-dots::before {
+  background-image:
+    radial-gradient(circle, var(--accent) 1px, transparent 1.5px);
+  background-size: 55px 55px;
+  animation-name: stars-drift-a;
+}
+
+.login-bg-dots::after {
+  background-image:
+    radial-gradient(circle, var(--text-secondary) 1px, transparent 1.5px);
+  background-size: 110px 110px;
+  opacity: 0.7;
+  animation-name: stars-drift-b;
+  animation-duration: calc(var(--stars-speed, 240s) * 1.6);
+}
+
+.login-bg-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(var(--accent-rgb), 0.8) 2px, transparent 2.5px),
+    radial-gradient(circle at 75% 18%, rgba(var(--accent-rgb), 0.6) 1.5px, transparent 2px),
+    radial-gradient(circle at 60% 72%, rgba(var(--accent-rgb), 0.7) 2px, transparent 2.5px),
+    radial-gradient(circle at 12% 82%, rgba(245, 245, 245, 0.5) 1.5px, transparent 2px),
+    radial-gradient(circle at 88% 66%, rgba(var(--accent-rgb), 0.6) 1px, transparent 1.5px);
+  background-repeat: repeat;
+  background-size: 300px 300px;
+  opacity: 0.6;
+  animation: stars-twinkle 6s ease-in-out infinite;
 }
 
 // ─── Card ─────────────────────────────────────────────
@@ -257,6 +298,23 @@
 }
 
 // ─── Keyframes ──────────────────────────────────────────
+
+@keyframes stars-drift-a {
+  0%   { background-position: 0 0; }
+  50%  { background-position: -200px 600px; }
+  100% { background-position: -400px 1200px; }
+}
+
+@keyframes stars-drift-b {
+  0%   { background-position: 0 0; }
+  50%  { background-position: -120px -420px; }
+  100% { background-position: -240px -840px; }
+}
+
+@keyframes stars-twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
+}
 
 @keyframes cardIn {
   from {

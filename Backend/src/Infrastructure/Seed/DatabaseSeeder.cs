@@ -77,46 +77,63 @@ public class DatabaseSeeder : IDatabaseSeeder
 
     private async Task SeedSuperAdminRoleAsync(CancellationToken ct)
     {
+        var allPermissionIds = await _context.Permissions
+            .AsNoTracking()
+            .Select(p => p.Id)
+            .ToListAsync(ct);
+
         var superAdmin = await _context.Roles
             .AsTracking()
             .Include(r => r.RolePermissions)
             .FirstOrDefaultAsync(r => r.Name == "SuperAdmin", ct);
 
-        if (superAdmin != null)
+        if (superAdmin == null)
         {
-            var changed = false;
-
-            if (superAdmin.HierarchyLevel != 100)
-            {
-                superAdmin.SetHierarchyLevel(100);
-                changed = true;
-            }
-
-            var assignedIds = superAdmin.RolePermissions.Select(rp => rp.PermissionId).ToHashSet();
-            var missingIds = await _context.Permissions
-                .AsNoTracking()
-                .Where(p => !assignedIds.Contains(p.Id))
-                .Select(p => p.Id)
-                .ToListAsync(ct);
-
-            if (missingIds.Count > 0)
-            {
-                superAdmin.AssignPermissions(missingIds);
-                changed = true;
-            }
-
-            if (changed)
-                await _context.SaveChangesAsync(ct);
+            superAdmin = new Role("SuperAdmin", "Acceso total al sistema", 100);
+            superAdmin.AssignPermissions(allPermissionIds);
+            _context.Roles.Add(superAdmin);
+            await _context.SaveChangesAsync(ct);
             return;
         }
 
-        var role = new Role("SuperAdmin", "Acceso total al sistema", 100);
+        var changed = false;
 
-        var allPermissions = await _context.Permissions.ToListAsync(ct);
-        role.AssignPermissions(allPermissions.Select(p => p.Id).ToList());
+        if (superAdmin.HierarchyLevel != 100)
+        {
+            superAdmin.SetHierarchyLevel(100);
+            changed = true;
+        }
 
-        _context.Roles.Add(role);
-        await _context.SaveChangesAsync(ct);
+        var assigned = superAdmin.RolePermissions
+            .Select(rp => rp.PermissionId)
+            .ToHashSet();
+
+        var missing = allPermissionIds.Except(assigned).ToList();
+
+        if (missing.Count > 0)
+        {
+            foreach (var permissionId in missing)
+                superAdmin.RolePermissions.Add(new RolePermission
+                {
+                    RoleId = superAdmin.Id,
+                    PermissionId = permissionId
+                });
+            changed = true;
+        }
+
+        var extra = assigned.Except(allPermissionIds).ToList();
+        if (extra.Count > 0)
+        {
+            var toRemove = superAdmin.RolePermissions
+                .Where(rp => extra.Contains(rp.PermissionId))
+                .ToList();
+            foreach (var rp in toRemove)
+                superAdmin.RolePermissions.Remove(rp);
+            changed = true;
+        }
+
+        if (changed)
+            await _context.SaveChangesAsync(ct);
     }
 
     private async Task SeedAdminUserAsync(CancellationToken ct)
