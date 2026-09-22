@@ -1,0 +1,89 @@
+@if (isOpen()) {
+  <div class="cart-backdrop" (click)="close()" aria-hidden="true"></div>
+  <aside class="cart-drawer" role="dialog" aria-label="Carrito de compras">
+    <header class="cart-drawer__header">
+      <h2>Tu carrito</h2>
+      <button class="cart-drawer__close" type="button" aria-label="Cerrar carrito" (click)="close()">
+        <app-icon name="close" size="20"></app-icon>
+      </button>
+    </header>
+
+    @if (isEmpty()) {
+      <div class="cart-drawer__empty">
+        <app-icon name="cart" size="48"></app-icon>
+        <p>Tu carrito está vacío.</p>
+        <a class="btn btn-gold" routerLink="/productos" (click)="close()">Explorar colecciones</a>
+      </div>
+    } @else {
+      <ul class="cart-drawer__list">
+        @for (line of lines(); track line.product.id) {
+          <li class="cart-line">
+            <a
+              class="cart-line__media"
+              [routerLink]="['/productos', line.product.slug]"
+              (click)="close()"
+            >
+              <app-product-image-fallback
+                [product]="line.product"
+                [imageUrl]="line.product.primaryImageUrl"
+                [alt]="line.product.name"
+              />
+            </a>
+            <div class="cart-line__body">
+              <a
+                class="cart-line__name"
+                [routerLink]="['/productos', line.product.slug]"
+                (click)="close()"
+              >
+                {{ line.product.name }}
+              </a>
+              <span class="cart-line__price">{{ linePrice(line) }}</span>
+              <div class="cart-line__controls">
+                <button
+                  class="cart-line__qty-btn"
+                  type="button"
+                  aria-label="Reducir cantidad"
+                  (click)="updateQuantity(line.product.id, line.quantity - 1)"
+                >
+                  <app-icon name="minus" size="14"></app-icon>
+                </button>
+                <span class="cart-line__qty">{{ line.quantity }}</span>
+                <button
+                  class="cart-line__qty-btn"
+                  type="button"
+                  aria-label="Aumentar cantidad"
+                  (click)="updateQuantity(line.product.id, line.quantity + 1)"
+                >
+                  <app-icon name="plus" size="14"></app-icon>
+                </button>
+                <button
+                  class="cart-line__remove"
+                  type="button"
+                  aria-label="Eliminar {{ line.product.name }}"
+                  (click)="remove(line.product.id)"
+                >
+                  <app-icon name="trash" size="16"></app-icon>
+                </button>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+
+      <footer class="cart-drawer__footer">
+        <div class="cart-drawer__subtotal">
+          <span>Subtotal</span>
+          <strong>{{ subtotal() }}</strong>
+        </div>
+        <button class="btn btn-gold cart-drawer__checkout" type="button" (click)="requestQuote()">
+          <app-icon name="whatsapp" size="18"></app-icon>
+          Cotizar por WhatsApp
+        </button>
+        <p class="cart-drawer__note">Este carrito es una cotización: no se procesa ningún pago en línea.</p>
+        <button class="cart-drawer__clear" type="button" (click)="clear()">
+          Vaciar carrito
+        </button>
+      </footer>
+    }
+  </aside>
+}

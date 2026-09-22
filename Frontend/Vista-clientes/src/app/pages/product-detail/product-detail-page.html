@@ -1,0 +1,129 @@
+@if (loading()) {
+  <div class="container detail-skeleton" aria-hidden="true">
+    <div class="detail-skeleton__media"></div>
+    <div class="detail-skeleton__info">
+      <div class="detail-skeleton__line"></div>
+      <div class="detail-skeleton__line short"></div>
+      <div class="detail-skeleton__line medium"></div>
+    </div>
+  </div>
+} @else if (product(); as product) {
+  <div class="container detail">
+    <nav class="breadcrumb" aria-label="Migajas">
+      <a routerLink="/">Inicio</a>
+      <span aria-hidden="true">/</span>
+      <a routerLink="/productos">Productos</a>
+      <span aria-hidden="true">/</span>
+      <span class="breadcrumb__current">{{ product.name }}</span>
+    </nav>
+
+    <div class="detail__grid">
+      <div class="gallery">
+        <div class="gallery__main">
+          <app-product-image-fallback
+            [product]="product"
+            [imageUrl]="gallery().image?.url ?? null"
+            [alt]="gallery().image?.altText ?? product.name"
+          />
+          @if (hasDiscount()) {
+            <span class="gallery__badge">OFERTA</span>
+          }
+        </div>
+
+        @if (gallery().count > 1) {
+          <div class="gallery__thumbs">
+            @for (image of product.images; track image.id; let i = $index) {
+              <button
+                class="gallery__thumb"
+                [class.is-active]="i === selectedImageIndex()"
+                type="button"
+                [attr.aria-label]="'Ver imagen ' + (i + 1)"
+                (click)="selectImage(i)"
+              >
+                <app-product-image-fallback [product]="product" [imageUrl]="image.url" [alt]="image.altText ?? product.name" />
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="detail__info">
+        @if (product.categoryName) {
+          <a class="detail__category" routerLink="/productos" [queryParams]="{ cat: product.categoryId ?? '' }">
+            {{ product.categoryName }}
+          </a>
+        }
+
+        <h1 class="detail__title">{{ product.name }}</h1>
+
+        <div class="detail__price">
+          @if (compareAt(); as compare) {
+            <span class="detail__price-compare">{{ compare }}</span>
+          }
+          <span class="detail__price-current">{{ price() }}</span>
+        </div>
+
+        <p class="detail__stock" [class.is-low]="lowStock()" [class.is-out]="!inStock()">
+          <span class="detail__stock-dot" aria-hidden="true"></span>
+          {{ stockLabel() }}
+        </p>
+
+        <p class="detail__sku">SKU: {{ product.sku }}</p>
+
+        @if (product.description) {
+          <div class="detail__description">{{ product.description }}</div>
+        }
+
+        <div class="detail__buy">
+          <div class="qty" aria-label="Cantidad">
+            <button
+              class="qty__btn"
+              type="button"
+              aria-label="Disminuir cantidad"
+              [disabled]="quantity() <= 1"
+              (click)="changeQuantity(-1)"
+            >
+              <app-icon name="minus" size="16"></app-icon>
+            </button>
+            <span class="qty__value">{{ quantity() }}</span>
+            <button
+              class="qty__btn"
+              type="button"
+              aria-label="Aumentar cantidad"
+              [disabled]="quantity() >= maxQuantity()"
+              (click)="changeQuantity(1)"
+            >
+              <app-icon name="plus" size="16"></app-icon>
+            </button>
+          </div>
+
+          <button
+            class="btn btn-gold detail__cta"
+            type="button"
+            [disabled]="!inStock()"
+            (click)="addToCart()"
+          >
+            <app-icon name="cart" size="18"></app-icon>
+            Añadir al carrito
+          </button>
+        </div>
+
+        @if (product.restrictions.length > 0) {
+          <ul class="detail__restrictions">
+            @for (restriction of product.restrictions; track restriction.id) {
+              <li>
+                <app-icon name="shield" size="16"></app-icon>
+                {{ restrictionLabel(restriction.restrictionType) }}
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="empty-state">
+    <p>Este producto no está disponible.</p>
+    <a class="btn btn-gold" routerLink="/productos">Volver al catálogo</a>
+  </div>
+}

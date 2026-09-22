@@ -1,0 +1,13 @@
+<nav class="site-nav" aria-label="Navegación principal">
+  @for (link of navLinks; track link.label) {
+    <a
+      class="site-nav__link"
+      [routerLink]="link.href"
+      [queryParams]="link.query"
+      [fragment]="link.fragment"
+      routerLinkActive="is-active"
+    >
+      {{ link.label }}
+    </a>
+  }
+</nav>

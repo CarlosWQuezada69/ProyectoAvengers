@@ -35,8 +35,11 @@
       <form [formGroup]="form" class="settings-form">
         <app-input formControlName="contact_email" label="Correo de contacto" type="email" />
         <app-input formControlName="contact_phone" label="Teléfono" />
+        <app-input formControlName="contact_whatsapp" label="WhatsApp" placeholder="+34 612 345 678" />
         <div class="form-actions">
           <app-btn size="sm" (click)="save('contact_email')">Guardar</app-btn>
+          <app-btn size="sm" (click)="save('contact_phone')">Guardar</app-btn>
+          <app-btn size="sm" (click)="save('contact_whatsapp')">Guardar</app-btn>
         </div>
       </form>
     </div>

@@ -1,0 +1,42 @@
+<div class="container about">
+  <h1 class="about__title">Acerca de The Avengers Joyero</h1>
+
+  <div class="about__grid">
+    <section class="about__block">
+      <h2>Nuestra historia</h2>
+      <p>
+        The Avengers Joyero nació de la unión entre la pasión por el cómic y la joyería de autor.
+        Cada pieza es una edición limitada inspirada en los héroes más poderosos de la Tierra,
+        elaborada a mano con materiales nobles y acabados que buscan tributar a la leyenda.
+      </p>
+      <p>
+        Creemos que el poder también se lleva puesto: por eso diseñamos colecciones que
+        combinan la estética oscura y premium con destellos de oro, tal y como merece un héroe.
+      </p>
+    </section>
+
+    <section class="about__block">
+      <h2>Nuestro compromiso</h2>
+      <ul class="about__list">
+        <li>Producción de ediciones limitadas y numeradas.</li>
+        <li>Materiales seleccionados con trazabilidad.</li>
+        <li>Envíos cuidados y seguros a todo el territorio.</li>
+        <li>Atención personalizada antes y después de la compra.</li>
+      </ul>
+    </section>
+
+    <section class="about__block about__block--contact" id="contacto">
+      <h2>Contacto</h2>
+      <p>¿Dudas sobre tallas, materiales o tu pedido? Escríbenos:</p>
+      <div class="about__contact-row">
+        <app-icon name="user" size="18"></app-icon>
+        <a [href]="'mailto:' + contactEmail()">{{ contactEmail() }}</a>
+      </div>
+      <div class="about__contact-row">
+        <app-icon name="cart" size="18"></app-icon>
+        <a [href]="'tel:' + contactPhone()">{{ contactPhone() }}</a>
+      </div>
+      <a class="btn btn-gold about__cta" routerLink="/productos">Ver colecciones</a>
+    </section>
+  </div>
+</div>

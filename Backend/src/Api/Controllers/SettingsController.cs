@@ -14,7 +14,7 @@ public class SettingsController : ControllerBase
     private static readonly HashSet<string> PublicKeys = new(StringComparer.OrdinalIgnoreCase)
     {
         "logo_url", "business_name", "copyright_text",
-        "contact_email", "contact_phone", "social_links",
+        "contact_email", "contact_phone", "contact_whatsapp", "social_links",
         "seo_title", "seo_description", "seo_keywords"
     };
 

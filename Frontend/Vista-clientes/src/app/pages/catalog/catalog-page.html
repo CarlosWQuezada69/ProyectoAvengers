@@ -1,0 +1,133 @@
+<section class="page-hero">
+  <div class="container">
+    <h1>Colecciones</h1>
+    <p>Joyería de edición limitada inspirada en los héroes más poderosos.</p>
+  </div>
+</section>
+
+<section class="catalog">
+  <div class="container">
+    <!-- Filtros -->
+    <div class="filters">
+      <form class="filters__search" (ngSubmit)="onSearch()">
+        <input
+          type="search"
+          aria-label="Buscar en el catálogo"
+          placeholder="Buscar joyas…"
+          [value]="search()"
+          (input)="search.set(($any($event.target)).value)"
+        />
+        <button class="filters__search-btn" type="submit" aria-label="Buscar">
+          <app-icon name="search" size="18"></app-icon>
+        </button>
+      </form>
+
+      <select
+        class="filters__select"
+        aria-label="Filtrar por categoría"
+        [value]="categoryId()"
+        (change)="onCategoryChange(($any($event.target)).value)"
+      >
+        <option value="">Todas las categorías</option>
+        @for (category of flatCategories(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+
+      <select
+        class="filters__select"
+        aria-label="Ordenar productos"
+        [value]="sort()"
+        (change)="onSortChange(($any($event.target)).value)"
+      >
+        @for (option of sortOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+
+      <label class="filters__check">
+        <input
+          type="checkbox"
+          [checked]="onlyAvailable()"
+          (change)="onAvailabilityChange(($any($event.target)).checked)"
+        />
+        Solo disponibles
+      </label>
+
+      @if (search() || categoryId() || onlyAvailable() || sort() !== 'newest') {
+        <button class="filters__reset" type="button" (click)="resetFilters()">Limpiar filtros</button>
+      }
+    </div>
+
+    <!-- Resultados -->
+    <div class="catalog__meta">
+      @if (!loading() && result()) {
+        <p>
+          Mostrando {{ rangeStart() }}–{{ rangeEnd() }} de {{ totalCount() }} producto{{
+            totalCount() === 1 ? '' : 's'
+          }}
+        </p>
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="catalog__grid">
+        @for (_ of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
+          <div class="catalog__skeleton" aria-hidden="true">
+            <div class="catalog__skeleton-media"></div>
+            <div class="catalog__skeleton-line"></div>
+            <div class="catalog__skeleton-line short"></div>
+          </div>
+        }
+      </div>
+    } @else if (result() && result()!.data.length > 0) {
+      <div class="catalog__grid">
+        @for (product of result()!.data; track product.id) {
+          <app-product-card [product]="product" (addRequested)="addToCart($event)" />
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <nav class="pagination" aria-label="Paginación">
+          <button
+            class="pagination__btn"
+            type="button"
+            aria-label="Página anterior"
+            [disabled]="page() <= 1"
+            (click)="goToPage(page() - 1)"
+          >
+            <app-icon name="chevron-left" size="18"></app-icon>
+          </button>
+
+          @for (p of pages(); track p) {
+            <button
+              class="pagination__btn"
+              [class.is-active]="p === page()"
+              type="button"
+              (click)="goToPage(p)"
+            >
+              {{ p }}
+            </button>
+          }
+
+          <button
+            class="pagination__btn"
+            type="button"
+            aria-label="Página siguiente"
+            [disabled]="page() >= totalPages()"
+            (click)="goToPage(page() + 1)"
+          >
+            <app-icon name="chevron-right" size="18"></app-icon>
+          </button>
+        </nav>
+      }
+    } @else {
+      <div class="empty-state">
+        <p>No encontramos productos con esos filtros.</p>
+        <button class="btn btn-gold" type="button" (click)="resetFilters()">
+          Ver todo el catálogo
+        </button>
+      </div>
+    }
+  </div>
+</section>

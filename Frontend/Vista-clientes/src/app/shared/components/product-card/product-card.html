@@ -1,0 +1,37 @@
+<article class="product-card">
+  <a class="product-card__media" [routerLink]="['/productos', product().slug]" aria-label="Ver {{ product().name }}">
+    <app-product-image-fallback
+      [product]="product()"
+      [imageUrl]="product().primaryImageUrl"
+      [alt]="product().name"
+    />
+    @if (hasDiscount()) {
+      <span class="product-card__badge">OFERTA</span>
+    }
+    @if (outOfStock()) {
+      <span class="product-card__badge product-card__badge--soldout">AGOTADO</span>
+    }
+  </a>
+
+  <a class="product-card__name" [routerLink]="['/productos', product().slug]">{{ product().name }}</a>
+
+  <p class="product-card__desc">
+    @if (product().categoryName) {
+      {{ product().categoryName }}
+    } @else {
+      Joyería de edición limitada inspirada en los héroes.
+    }
+  </p>
+
+  <div class="product-card__price">
+    @if (displayCompareAt(); as compare) {
+      <span class="product-card__price--compare">{{ compare }}</span>
+    }
+    <span class="product-card__price--current">{{ displayPrice() }}</span>
+  </div>
+
+  <button class="btn btn-gold product-card__cta" type="button" (click)="onAdd()" [disabled]="outOfStock()">
+    <app-icon name="cart" size="16"></app-icon>
+    Añadir al carrito
+  </button>
+</article>

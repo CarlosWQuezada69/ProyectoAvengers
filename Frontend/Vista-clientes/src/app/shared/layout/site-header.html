@@ -1,0 +1,72 @@
+<header class="site-header">
+  <div class="container site-header__row">
+    <button
+      class="site-header__menu-btn"
+      type="button"
+      aria-label="Abrir menú"
+      (click)="toggleMenu()"
+    >
+      <app-icon name="menu" size="24"></app-icon>
+    </button>
+
+    <a class="site-header__logo" routerLink="/" aria-label="The Avengers Joyero — Inicio">
+      <app-icon class="site-header__logo-icon" name="shield" size="30"></app-icon>
+      <span class="site-header__logo-text">
+        <span>AVENGERS</span>
+        <small>JOYERO</small>
+      </span>
+    </a>
+
+    <div class="site-header__actions">
+      <form class="site-header__search" [class.is-open]="searchOpen()" (ngSubmit)="onSearchSubmit()">
+        <label class="site-header__search-toggle" aria-label="Buscar" (click)="toggleSearch()">
+          <app-icon name="search" size="20"></app-icon>
+        </label>
+        <input
+          class="site-header__search-input"
+          type="search"
+          placeholder="Buscar"
+          aria-label="Buscar productos"
+          [formControl]="search"
+        />
+        <button class="site-header__search-btn" type="submit" aria-label="Buscar">
+          <app-icon name="search" size="18"></app-icon>
+        </button>
+      </form>
+
+      <button class="site-header__action" type="button" aria-label="Tu cuenta" title="Tu cuenta (próximamente)">
+        <app-icon name="user" size="22"></app-icon>
+      </button>
+
+      <button class="site-header__action" type="button" aria-label="Carrito" (click)="openCart()">
+        <app-icon name="cart" size="22"></app-icon>
+        @if (cartCount() > 0) {
+          <span class="site-header__badge">{{ cartCount() }}</span>
+        }
+      </button>
+    </div>
+  </div>
+
+  <app-site-nav class="site-nav" />
+
+  @if (menuOpen()) {
+    <div class="mobile-menu">
+      <button class="mobile-menu__close" type="button" aria-label="Cerrar menú" (click)="toggleMenu()">
+        <app-icon name="close" size="22"></app-icon>
+      </button>
+      <nav class="mobile-menu__nav" aria-label="Menú móvil">
+        @for (link of navLinks; track link.label) {
+          <a
+            class="mobile-menu__link"
+            [routerLink]="link.href"
+            [queryParams]="link.query"
+            [fragment]="link.fragment"
+            (click)="menuOpen.set(false)"
+          >
+            {{ link.label }}
+          </a>
+        }
+      </nav>
+    </div>
+  }
+</header>

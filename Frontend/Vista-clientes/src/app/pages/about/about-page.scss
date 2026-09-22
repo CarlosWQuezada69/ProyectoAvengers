@@ -1,0 +1,98 @@
+.about {
+  padding-block: 48px 32px;
+}
+
+.about__title {
+  text-align: center;
+  font-size: clamp(30px, 5vw, 44px);
+  letter-spacing: 3px;
+}
+
+.about__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-top: 44px;
+}
+
+.about__block {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 28px;
+}
+
+.about__block h2 {
+  font-size: 22px;
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+  color: var(--color-gold);
+}
+
+.about__block p {
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.about__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.about__list li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.about__list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 8px;
+  height: 8px;
+  background: var(--grad-gold);
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+.about__block--contact {
+  grid-column: 1 / -1;
+}
+
+.about__contact-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: var(--color-text-muted);
+}
+
+.about__contact-row app-icon {
+  color: var(--color-gold);
+}
+
+.about__contact-row a {
+  color: var(--color-text-muted);
+  transition: color var(--ease);
+}
+
+.about__contact-row a:hover {
+  color: var(--color-gold);
+}
+
+.about__cta {
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .about__grid {
+    grid-template-columns: 1fr;
+  }
+}

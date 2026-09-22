@@ -9,7 +9,13 @@ import { UploaderComponent } from '../../../shared/components/uploader/uploader'
 import { ToastService } from '../../../shared/services/toast.service';
 import type { SiteSetting } from '../../../core/models/index';
 
-type SettingKeys = 'business_name' | 'copyright_text' | 'contact_email' | 'contact_phone' | 'social_links';
+type SettingKeys =
+  | 'business_name'
+  | 'copyright_text'
+  | 'contact_email'
+  | 'contact_phone'
+  | 'contact_whatsapp'
+  | 'social_links';
 
 @Component({
   selector: 'app-settings-form',
@@ -33,6 +39,7 @@ export class SettingsFormComponent implements OnInit {
     copyright_text: new FormControl(''),
     contact_email: new FormControl(''),
     contact_phone: new FormControl(''),
+    contact_whatsapp: new FormControl(''),
     social_links: new FormControl(''),
   });
 

@@ -1,0 +1,83 @@
+<section class="hero hex-pattern" aria-label="Destacados">
+  <div class="hero__beams" aria-hidden="true"></div>
+
+  <div class="container hero__slides">
+    @for (slide of slides(); track slide.id) {
+      <div
+        class="hero__slide"
+        [class.is-active]="slide.id === currentSlide().id"
+        [class.is-hidden]="slide.id !== currentSlide().id"
+      >
+        <div class="hero__copy">
+          <p class="hero__kicker">{{ slide.kicker }}</p>
+          <h1 class="hero__title">
+            <span>{{ slide.titleLine1 }}</span>
+            <span class="hero__title-accent">{{ slide.titleLine2 }}</span>
+          </h1>
+          <button class="btn btn-gold hero__cta" type="button" (click)="goToSlide(slide)">
+            Explorar colección
+          </button>
+        </div>
+        <div class="hero__media">
+          <a class="hero__image" [attr.href]="slide.linkUrl || undefined" tabindex="-1">
+            <app-product-image-fallback
+              [product]="slide.productRef"
+              [imageUrl]="slide.imageUrl"
+              [alt]="slide.titleLine1 + ' ' + slide.titleLine2"
+            />
+          </a>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="container hero__controls">
+    <button class="hero__arrow" type="button" aria-label="Anterior" (click)="prev()">
+      <app-icon name="chevron-left" size="20"></app-icon>
+    </button>
+
+    <div class="hero__dots" role="tablist" aria-label="Seleccionar destacado">
+      @for (slide of slides(); track slide.id) {
+        <button
+          class="hero__dot"
+          [class.is-active]="slide.id === currentSlide().id"
+          type="button"
+          [attr.aria-label]="'Ir a ' + slide.titleLine1"
+          aria-selected="slide.id === currentSlide().id"
+          (click)="goTo(slide)"
+        ></button>
+      }
+    </div>
+
+    <button class="hero__arrow" type="button" aria-label="Siguiente" (click)="next()">
+      <app-icon name="chevron-right" size="20"></app-icon>
+    </button>
+  </div>
+</section>
+
+<section class="collections" aria-labelledby="colecciones-title">
+  <div class="container">
+    <h2 class="section-title" id="colecciones-title">Colecciones destacadas</h2>
+
+    @if (loading()) {
+      <div class="collections__grid">
+        @for (_ of [1, 2, 3, 4]; track $index) {
+          <div class="collections__skeleton" aria-hidden="true">
+            <div class="collections__skeleton-media"></div>
+            <div class="collections__skeleton-line"></div>
+            <div class="collections__skeleton-line short"></div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="collections__grid">
+        @for (product of featured(); track product.id) {
+          <app-product-card
+            [product]="product"
+            (addRequested)="addToCart($event)"
+          />
+        }
+      </div>
+    }
+  </div>
+</section>
