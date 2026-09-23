@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, ChangeDetectionStrategy, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { SliderService } from '../../../core/services/slider.service';
 import { ButtonComponent } from '../../../shared/components/button/button';
@@ -15,7 +14,7 @@ import type { SliderItem } from '../../../core/models/index';
 
 @Component({
   selector: 'app-slider-list',
-  imports: [DatePipe, ReactiveFormsModule, ButtonComponent, InputComponent, ModalComponent, BadgeComponent, UploaderComponent, HasPermissionDirective, AssetUrlPipe],
+  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, ModalComponent, BadgeComponent, UploaderComponent, HasPermissionDirective, AssetUrlPipe],
   templateUrl: './slider-list.html',
   styleUrl: './slider-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,8 +35,6 @@ export class SliderListComponent implements OnInit {
     title: new FormControl(''),
     subtitle: new FormControl(''),
     linkUrl: new FormControl(''),
-    startsAt: new FormControl(''),
-    endsAt: new FormControl(''),
     isActive: new FormControl(true),
   });
 
@@ -66,8 +63,6 @@ export class SliderListComponent implements OnInit {
     this.editingItem = item;
     this.form.patchValue({
       ...item,
-      startsAt: item.startsAt?.split('T')[0] ?? '',
-      endsAt: item.endsAt?.split('T')[0] ?? '',
     });
     this.selectedFile = null;
     this.selectedFilePreview.set(null);

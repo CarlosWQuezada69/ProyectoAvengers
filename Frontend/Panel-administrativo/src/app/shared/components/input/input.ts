@@ -20,6 +20,7 @@ export class InputComponent implements ControlValueAccessor {
   readonly disabled = input(false);
   readonly required = input(false);
   readonly error = input('');
+  readonly hint = input('');
   readonly onBlur = output<void>();
 
   protected value = '';

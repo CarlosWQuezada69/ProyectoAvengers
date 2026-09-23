@@ -50,4 +50,8 @@
   &.error {
     color: var(--danger);
   }
+
+  &.hint {
+    color: var(--text-muted);
+  }
 }

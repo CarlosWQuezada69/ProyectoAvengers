@@ -17,5 +17,7 @@
   />
   @if (error()) {
     <span class="input-helper error">{{ error() }}</span>
+  } @else if (hint()) {
+    <span class="input-helper hint">{{ hint() }}</span>
   }
 </div>

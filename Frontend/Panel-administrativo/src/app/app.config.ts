@@ -1,4 +1,4 @@
-import { ApplicationConfig, ErrorHandler, APP_INITIALIZER } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, APP_INITIALIZER, LOCALE_ID } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
@@ -20,6 +20,7 @@ function initializeAuth(authService: AuthService): () => Promise<void> {
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    { provide: LOCALE_ID, useValue: 'es-DO' },
     provideRouter(routes),
     provideHttpClient(
       withInterceptors([authInterceptor, errorInterceptor])

@@ -132,7 +132,7 @@ public class StatsService : IStatsService
 
             result.Add(new DailyViewsStat
             {
-                Label = d.ToString("ddd dd/MM", CultureInfo.InvariantCulture),
+                Label = d.ToString("ddd dd/MM", CultureInfo.GetCultureInfo("es-DO")),
                 ProductViews = productViews,
                 PageViews = pageViews,
                 Total = productViews + pageViews

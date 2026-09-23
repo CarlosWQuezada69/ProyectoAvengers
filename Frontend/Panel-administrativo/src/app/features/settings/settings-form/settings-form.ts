@@ -39,6 +39,8 @@ export class SettingsFormComponent implements OnInit {
   protected form = new FormGroup({
     business_name: new FormControl(''),
     copyright_text: new FormControl(''),
+    rnc: new FormControl(''),
+    address: new FormControl(''),
     contact_email: new FormControl(''),
     contact_phone: new FormControl(''),
     contact_whatsapp: new FormControl(''),

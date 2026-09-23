@@ -13,7 +13,6 @@
             <th>Imagen</th>
             <th>Título</th>
             <th>Subtítulo</th>
-            <th>Vigencia</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
@@ -21,10 +20,9 @@
         <tbody>
           @for (item of items(); track item.id) {
             <tr>
-              <td><img [src]="item.imageUrl" alt="" class="thumb" /></td>
+              <td class="thumb-cell"><img [src]="item.imageUrl | assetUrl" alt="" class="thumb" /></td>
               <td>{{ item.title }}</td>
               <td>{{ item.subtitle }}</td>
-              <td>{{ item.startsAt ? (item.startsAt | date:'shortDate') : '—' }} - {{ item.endsAt ? (item.endsAt | date:'shortDate') : '—' }}</td>
               <td><app-badge [variant]="item.isActive ? 'success' : 'neutral'">{{ item.isActive ? 'Activo' : 'Inactivo' }}</app-badge></td>
               <td>
                 <div class="actions">
@@ -36,7 +34,7 @@
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="6" class="empty">Sin ítems en el slider</td></tr>
+            <tr><td colspan="5" class="empty">Sin ítems en el slider</td></tr>
           }
         </tbody>
       </table>
@@ -48,10 +46,6 @@
     <app-input formControlName="title" label="Título" placeholder="Título del slide" />
     <app-input formControlName="subtitle" label="Subtítulo" placeholder="Subtítulo" />
     <app-input formControlName="linkUrl" label="Enlace" placeholder="https://..." />
-    <div class="form-grid">
-      <app-input formControlName="startsAt" label="Inicio" type="text" placeholder="2026-01-01" />
-      <app-input formControlName="endsAt" label="Fin" type="text" placeholder="2026-12-31" />
-    </div>
     <label class="checkbox">
       <input type="checkbox" formControlName="isActive" />
       <span>Activo</span>
