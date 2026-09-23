@@ -57,4 +57,5 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 public class TestDatabaseSeeder : IDatabaseSeeder
 {
     public Task SeedAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+    public Task SeedDemoDataAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
 }

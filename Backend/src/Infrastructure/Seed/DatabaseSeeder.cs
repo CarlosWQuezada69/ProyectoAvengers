@@ -21,6 +21,83 @@ public class DatabaseSeeder : IDatabaseSeeder
         await SeedAdminUserAsync(cancellationToken);
     }
 
+    public async Task SeedDemoDataAsync(CancellationToken cancellationToken = default)
+    {
+        await SeedDemoCatalogAsync(cancellationToken);
+        await SeedDemoSettingsAsync(cancellationToken);
+        await SeedDemoSliderAsync(cancellationToken);
+    }
+
+    private async Task SeedDemoCatalogAsync(CancellationToken ct)
+    {
+        if (await _context.Categories.AnyAsync(ct) || await _context.Products.AnyAsync(ct))
+            return;
+
+        var cadenas = new Category(null, "Cadenas", "cadenas",
+            "Cadenas de oro para lucir con estilo", null, true, 1);
+        var pulseras = new Category(null, "Pulseras", "pulseras",
+            "Pulseras elegantes para cualquier ocasión", null, true, 2);
+        var anillos = new Category(null, "Anillos", "anillos",
+            "Anillos de diseño exclusivo", null, true, 3);
+
+        _context.Categories.AddRange(cadenas, pulseras, anillos);
+
+        _context.Products.AddRange(
+            new Product("DEMO-CAD-001", "Cadena de oro 18k", "cadena-de-oro-18k",
+                "Cadena clásica de oro 18k, edición limitada para héroes.",
+                18500, 21999, 12, cadenas.Id, true, true, null),
+            new Product("DEMO-PUL-001", "Pulsera Reactor Arc", "pulsera-reactor-arc",
+                "Inspirada en el reactor de Iron Man, acabado premium.",
+                12400, null, 8, pulseras.Id, true, true, null),
+            new Product("DEMO-ANI-001", "Anillo Gema del Infinito", "anillo-gema-del-infinito",
+                "Con detalle de gema. Acero inoxidable y baño dorado.",
+                9800, 12400, 15, anillos.Id, true, false, null),
+            new Product("DEMO-CAD-002", "Cadena Mjolnir", "cadena-mjolnir",
+                "Diseño inspirado en el martillo de Thor.",
+                21000, 24500, 6, cadenas.Id, true, true, null),
+            new Product("DEMO-PUL-002", "Pulsera Escudo", "pulsera-escudo",
+                "Un tributo al escudo del Capitán América.",
+                8900, null, 20, pulseras.Id, true, false, null));
+
+        await _context.SaveChangesAsync(ct);
+    }
+
+    private async Task SeedDemoSettingsAsync(CancellationToken ct)
+    {
+        if (await _context.SiteSettings.AnyAsync(ct))
+            return;
+
+        var defaults = new (string Key, string Value)[]
+        {
+            ("business_name", "The Avengers Joyero"),
+            ("copyright_text", "© 2026 The Avengers Joyero"),
+            ("rnc", "1-01-00000-0"),
+            ("address", "Santo Domingo, República Dominicana"),
+            ("contact_email", "hola@avengersjoyero.com"),
+            ("contact_phone", "+1 809 000 0000"),
+            ("contact_whatsapp", "+18090000000"),
+            ("seo_title", "The Avengers Joyero · Joyería de edición limitada"),
+            ("seo_description", "Joyería inspirada en superhéroes. Piezas de edición limitada en República Dominicana."),
+            ("seo_keywords", "joyería, edición limitada, avengers, colecciones")
+        };
+
+        _context.SiteSettings.AddRange(defaults.Select(d => new SiteSetting(d.Key, d.Value, null)));
+        await _context.SaveChangesAsync(ct);
+    }
+
+    private async Task SeedDemoSliderAsync(CancellationToken ct)
+    {
+        if (await _context.SliderItems.AnyAsync(ct))
+            return;
+
+        _context.SliderItems.AddRange(
+            new SliderItem("Joyas de Superhéroes", "Edición limitada", "", null, 0, null, null, true, null),
+            new SliderItem("Nueva Colección 2026", "Elegancia y poder", "", null, 1, null, null, true, null),
+            new SliderItem("Envío a todo el país", "República Dominicana", "", null, 2, null, null, true, null));
+
+        await _context.SaveChangesAsync(ct);
+    }
+
     private async Task SeedPermissionsAsync(CancellationToken ct)
     {
         var existingCodes = (await _context.Permissions
