@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { RouterLink } from '@angular/router';
 
 import { ProductListDto } from '../../../core/models/product';
+import { formatDiscountPercent, formatPrice } from '../../../core/utils/format';
 import { IconComponent } from '../../icon/icon';
 import { ProductImageFallbackComponent } from '../product-image-fallback/product-image-fallback';
 
@@ -18,21 +19,20 @@ export class ProductCardComponent {
 
   readonly addRequested = output<ProductListDto>();
 
-  readonly displayPrice = computed(() => this.formatPrice(this.product().price));
+  readonly displayPrice = computed(() => formatPrice(this.product().price));
   readonly displayCompareAt = computed(() =>
-    this.product().compareAtPrice ? this.formatPrice(this.product().compareAtPrice!) : null
+    this.product().compareAtPrice ? formatPrice(this.product().compareAtPrice!) : null
   );
   readonly hasDiscount = computed(
     () => this.product().compareAtPrice != null && this.product().compareAtPrice! > this.product().price
+  );
+  readonly discountPercent = computed(() =>
+    formatDiscountPercent(this.product().price, this.product().compareAtPrice)
   );
   readonly outOfStock = computed(() => this.product().stock <= 0);
 
   protected onAdd(): void {
     if (this.outOfStock()) return;
     this.addRequested.emit(this.product());
-  }
-
-  private formatPrice(value: number): string {
-    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'EUR' }).format(value);
   }
 }

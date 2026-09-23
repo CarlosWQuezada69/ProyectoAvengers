@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval } from 'rxjs';
 
@@ -150,7 +151,7 @@ function toSlide(item: SliderItemDto, index: number): HeroSlide {
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [IconComponent, ProductCardComponent, ProductImageFallbackComponent],
+  imports: [IconComponent, ProductCardComponent, ProductImageFallbackComponent, RouterLink, DecimalPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home-page.html',
   styleUrls: ['./home-page.scss']
@@ -158,7 +159,6 @@ function toSlide(item: SliderItemDto, index: number): HeroSlide {
 export class HomePageComponent {
   private readonly catalog = inject(CatalogService);
   private readonly cart = inject(CartService);
-  private readonly router = inject(Router);
 
   readonly slides = signal<HeroSlide[]>(FALLBACK_SLIDES);
   readonly current = signal(0);
@@ -203,11 +203,5 @@ export class HomePageComponent {
 
   protected addToCart(product: ProductListDto): void {
     this.cart.add(product);
-  }
-
-  protected goToSlide(slide: HeroSlide): void {
-    if (slide.linkUrl) {
-      this.router.navigateByUrl(slide.linkUrl);
-    }
   }
 }

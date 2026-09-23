@@ -75,15 +75,83 @@
           <span>Subtotal</span>
           <strong>{{ subtotal() }}</strong>
         </div>
-        <button class="btn btn-gold cart-drawer__checkout" type="button" (click)="requestQuote()">
-          <app-icon name="whatsapp" size="18"></app-icon>
-          Cotizar por WhatsApp
+        <button class="btn btn-gold cart-drawer__checkout" type="button" (click)="printQuote()">
+          <app-icon name="printer" size="18"></app-icon>
+          Imprimir cotización (PDF)
         </button>
-        <p class="cart-drawer__note">Este carrito es una cotización: no se procesa ningún pago en línea.</p>
+        <button class="btn btn-ghost cart-drawer__whatsapp" type="button" (click)="requestQuote()">
+          <app-icon name="whatsapp" size="18"></app-icon>
+          Enviar por WhatsApp
+        </button>
+        <p class="cart-drawer__note">
+          Esta cotización no procesa ningún pago. Incluye nombre de la empresa, RNC, contacto y
+          precio individual por artículo.
+        </p>
         <button class="cart-drawer__clear" type="button" (click)="clear()">
           Vaciar carrito
         </button>
       </footer>
     }
   </aside>
+
+  <!-- Plantilla imprimible de la cotización -->
+  <div class="quote-print">
+    <header class="quote-print__head">
+      <div class="quote-print__brand">
+        @if (businessLogo(); as logo) {
+          <img [src]="logo | assetUrl" class="quote-print__logo" alt="" />
+        }
+        <div>
+          <strong>{{ businessName() }}</strong>
+          @if (rnc()) {
+            <span>RNC: {{ rnc() }}</span>
+          }
+          @if (address()) {
+            <span>{{ address() }}</span>
+          }
+        </div>
+      </div>
+      <div class="quote-print__meta">
+        <h1>Cotización</h1>
+        <span>N.º: {{ quoteNumber() }}</span>
+        <span>Fecha: {{ quoteDate() }}</span>
+      </div>
+    </header>
+
+    <table class="quote-print__table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Artículo</th>
+          <th class="is-num">Cantidad</th>
+          <th class="is-num">Precio unitario</th>
+          <th class="is-num">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (line of lines(); track line.product.id; let i = $index) {
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td>{{ line.product.name }}</td>
+            <td class="is-num">{{ line.quantity }}</td>
+            <td class="is-num">{{ formatPrice(line.product.price) }}</td>
+            <td class="is-num">{{ formatPrice(line.product.price * line.quantity) }}</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4">Subtotal</td>
+          <td class="is-num">{{ subtotal() }}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <p class="quote-print__note">
+      Cotización sin valor de pago. Precios en pesos dominicanos (DOP). Vigencia: 15 días.
+      @if (contactEmail() || contactPhone()) {
+        <span>Contacto: {{ contactEmail() }}{{ contactEmail() && contactPhone() ? ' · ' : '' }}{{ contactPhone() }}</span>
+      }
+    </p>
+  </div>
 }

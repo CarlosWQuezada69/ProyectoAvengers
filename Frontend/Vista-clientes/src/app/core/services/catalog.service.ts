@@ -8,6 +8,7 @@ import { ProductDto, ProductListDto, ProductQuery } from '../models/product';
 import { CategoryDto } from '../models/category';
 import { SliderItemDto } from '../models/slider';
 import { PublicSettings } from '../models/settings';
+import { AboutInfoDto } from '../models/about';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
@@ -51,6 +52,10 @@ export class CatalogService {
     return this.http.post<void>(`${this.apiUrl}/products/${productId}/track-view`, null);
   }
 
+  trackPageView(page: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/analytics/page-view`, { page });
+  }
+
   getSlider(): Observable<SliderItemDto[]> {
     return this.http.get<SliderItemDto[]>(`${this.apiUrl}/slider`);
   }
@@ -63,5 +68,9 @@ export class CatalogService {
 
   getPublicSettings(): Observable<PublicSettings> {
     return this.http.get<PublicSettings>(`${this.apiUrl}/settings/public`);
+  }
+
+  getAbout(): Observable<AboutInfoDto> {
+    return this.http.get<AboutInfoDto>(`${this.apiUrl}/about`);
   }
 }

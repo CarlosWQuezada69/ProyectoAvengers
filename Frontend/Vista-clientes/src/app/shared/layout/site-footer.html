@@ -1,32 +1,79 @@
 <footer class="site-footer" id="contacto">
-  <div class="container site-footer__grid">
-    <div class="site-footer__brand">
-      <a class="site-footer__logo" routerLink="/">
-        <span>THE AVENGERS <strong>JOYERO</strong></span>
-      </a>
-      <p class="site-footer__copyright">{{ copyright() }}</p>
-      <div class="site-footer__contact">
+  <div class="site-footer__glow" aria-hidden="true"></div>
+
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <a class="site-footer__logo" routerLink="/">
+          @if (logoUrl(); as url) {
+            <span class="site-footer__logo-mark site-footer__logo-image">
+              <img [src]="url | assetUrl" [alt]="businessName()" />
+            </span>
+          } @else {
+            <span class="site-footer__logo-mark">
+              <app-icon name="shield" size="18"></app-icon>
+            </span>
+          }
+          <span class="site-footer__logo-text">
+            <strong>{{ businessName() }}</strong>
+          </span>
+        </a>
+        <p class="site-footer__tagline">
+          Joyería de edición limitada inspirada en los héroes. Piezas numeradas, acabados
+          premium y envíos cuidados.
+        </p>
+      </div>
+
+      <nav class="site-footer__col" aria-label="Explorar">
+        <h3>Explorar</h3>
+        <a routerLink="/">Inicio</a>
+        <a routerLink="/productos">Productos</a>
+        <a routerLink="/acerca">Acerca de</a>
+        <a routerLink="/" fragment="contacto">Contacto</a>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="Colecciones">
+        <h3>Colecciones</h3>
+        @for (category of categories(); track category.id) {
+          <a routerLink="/productos" [queryParams]="{ cat: category.id }">{{ category.name }}</a>
+        }
+        <a class="site-footer__all" routerLink="/productos">Ver todo el catálogo</a>
+      </nav>
+
+      <div class="site-footer__col">
+        <h3>Contacto</h3>
         <a [href]="'mailto:' + contactEmail()">{{ contactEmail() }}</a>
         <a [href]="'tel:' + contactPhone()">{{ contactPhone() }}</a>
+
+        @if (socials().length > 0) {
+          <div class="site-footer__socials">
+            @for (social of socials(); track social.url) {
+              <a [href]="social.url" target="_blank" rel="noopener" [attr.aria-label]="social.label">
+                <app-icon [name]="$any(social.name)" size="17"></app-icon>
+              </a>
+            }
+          </div>
+        }
       </div>
     </div>
 
-    <nav class="site-footer__legal" aria-label="Enlaces legales">
-      <a routerLink="/acerca">Aviso legal</a>
-      <a routerLink="/acerca">Privacidad</a>
-    </nav>
-
-    <div class="site-footer__socials">
-      <div class="site-footer__social-row">
-        <a href="#" aria-label="Facebook" title="Facebook">
-          <app-icon name="facebook" size="18"></app-icon>
-        </a>
-        <a href="#" aria-label="Instagram" title="Instagram">
-          <app-icon name="instagram" size="18"></app-icon>
-        </a>
-        <a href="#" aria-label="YouTube" title="YouTube">
-          <app-icon name="youtube" size="18"></app-icon>
-        </a>
+    <div class="site-footer__bottom">
+      <p>{{ copyright() }}</p>
+      <div class="site-footer__legal">
+        <a routerLink="/acerca">Aviso legal</a>
+        <a routerLink="/acerca">Privacidad</a>
+        @if (adminUrl) {
+          <a
+            class="site-footer__admin"
+            [href]="adminUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Panel de administración"
+            title="Panel de administración"
+          >
+            <app-icon name="shield-check" size="14"></app-icon>
+          </a>
+        }
       </div>
     </div>
   </div>

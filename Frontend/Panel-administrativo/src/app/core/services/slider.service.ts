@@ -15,7 +15,7 @@ export class SliderService {
     return this.http.post<SliderItem>(`${environment.apiUrl}/admin/slider`, data);
   }
 
-  update(id: string, data: Partial<SliderItem>) {
+  update(id: string, data: FormData) {
     return this.http.put<SliderItem>(`${environment.apiUrl}/admin/slider/${id}`, data);
   }
 

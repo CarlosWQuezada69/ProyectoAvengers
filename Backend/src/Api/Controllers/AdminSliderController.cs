@@ -45,9 +45,20 @@ public class AdminSliderController : AdminBaseController
 
     [HttpPut("slider/{id:guid}")]
     [RequirePermission("slider.update")]
-    public async Task<ActionResult<SliderItemDto>> UpdateSlider(Guid id, [FromBody] UpdateSliderItemRequest request)
+    public async Task<ActionResult<SliderItemDto>> UpdateSlider(Guid id, IFormFile? image, [FromForm] UpdateSliderItemRequest request)
     {
-        var item = await _sliderService.UpdateAsync(id, request);
+        Stream? imageStream = null;
+        string? fileName = null;
+        string? contentType = null;
+
+        if (image != null)
+        {
+            imageStream = image.OpenReadStream();
+            fileName = image.FileName;
+            contentType = image.ContentType;
+        }
+
+        var item = await _sliderService.UpdateAsync(id, request, imageStream, fileName, contentType);
         if (item == null) return NotFound();
         return Ok(item);
     }

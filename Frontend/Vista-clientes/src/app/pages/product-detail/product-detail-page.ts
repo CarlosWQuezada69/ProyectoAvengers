@@ -7,6 +7,7 @@ import { CartService } from '../../core/services/cart.service';
 import { ProductDto, ProductListDto } from '../../core/models/product';
 import { IconComponent } from '../../shared/icon/icon';
 import { ProductImageFallbackComponent } from '../../shared/components/product-image-fallback/product-image-fallback';
+import { formatPrice } from '../../core/utils/format';
 
 @Component({
   selector: 'app-product-detail-page',
@@ -27,9 +28,9 @@ export class ProductDetailPageComponent {
   readonly selectedImageIndex = signal(0);
   readonly quantity = signal(1);
 
-  readonly price = computed(() => (this.product() ? this.format(this.product()!.price) : ''));
+  readonly price = computed(() => (this.product() ? formatPrice(this.product()!.price) : ''));
   readonly compareAt = computed(() =>
-    this.product()?.compareAtPrice ? this.format(this.product()!.compareAtPrice!) : null
+    this.product()?.compareAtPrice ? formatPrice(this.product()!.compareAtPrice!) : null
   );
   readonly hasDiscount = computed(
     () => (this.product()?.compareAtPrice ?? 0) > (this.product()?.price ?? 0)
@@ -123,9 +124,5 @@ export class ProductDetailPageComponent {
       default:
         return 'Aplican condiciones especiales';
     }
-  }
-
-  private format(value: number): string {
-    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'EUR' }).format(value);
   }
 }

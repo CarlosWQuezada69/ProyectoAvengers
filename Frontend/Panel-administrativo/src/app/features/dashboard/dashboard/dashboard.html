@@ -5,7 +5,7 @@
 
   @if (loading()) {
     <div class="kpi-grid">
-      @for (_ of [1,2,3,4]; track $index) {
+      @for (_ of [1,2,3,4,5,6,7,8]; track $index) {
         <div class="kpi-card">
           <app-skeleton height="14px" width="60%" />
           <app-skeleton height="28px" width="40%" />
@@ -27,10 +27,6 @@
         <span class="kpi-value accent-danger">{{ overview()!.lowStockCount }}</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-label">Vistas hoy</span>
-        <span class="kpi-value">{{ overview()!.todayViews | number }}</span>
-      </div>
-      <div class="kpi-card">
         <span class="kpi-label">Categorías</span>
         <span class="kpi-value">{{ overview()!.totalCategories }}</span>
       </div>
@@ -39,50 +35,46 @@
         <span class="kpi-value">{{ overview()!.totalUsers }}</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-label">Vistas del mes</span>
-        <span class="kpi-value">{{ overview()!.monthlyViews | number }}</span>
+        <span class="kpi-label">Vistas de productos hoy</span>
+        <span class="kpi-value">{{ overview()!.todayViews | number }}</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-label">Vendidos del mes</span>
-        <span class="kpi-value">{{ overview()!.monthlyPurchases | number }}</span>
+        <span class="kpi-label">Visitas hoy</span>
+        <span class="kpi-value">{{ overview()!.todayPageViews | number }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Visitas del mes</span>
+        <span class="kpi-value">{{ overview()!.monthlyPageViews | number }}</span>
       </div>
     </div>
 
     <div class="charts-grid">
       <div class="chart-card">
-        <h3>Más vistos</h3>
-        <div class="bar-chart">
-          @for (item of topViewed(); track item.productId) {
-            <div class="bar-row">
-              <span class="bar-label">{{ item.productName }}</span>
-              <div class="bar-track">
-                <div class="bar-fill" [style.width.%]="(item.count / maxCount(topViewed())) * 100"></div>
-              </div>
-              <span class="bar-value">{{ item.count }}</span>
-            </div>
-          }
-          @if (topViewed().length === 0) {
-            <p class="empty">Sin datos</p>
-          }
-        </div>
+        <h3>Visitas por página</h3>
+        <app-donut-chart [data]="donutSlices()" />
       </div>
 
       <div class="chart-card">
-        <h3>Más vendidos</h3>
-        <div class="bar-chart">
-          @for (item of topSellers(); track item.productId) {
-            <div class="bar-row">
-              <span class="bar-label">{{ item.productName }}</span>
-              <div class="bar-track">
-                <div class="bar-fill accent-gold" [style.width.%]="(item.count / maxCount(topSellers())) * 100"></div>
-              </div>
-              <span class="bar-value">{{ item.count }}</span>
+        <h3>Vistas de los últimos 7 días</h3>
+        <app-bar-chart [data]="barData()" />
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h3>Más vistos</h3>
+      <div class="bar-chart">
+        @for (item of topViewed(); track item.productId) {
+          <div class="bar-row">
+            <span class="bar-label">{{ item.productName }}</span>
+            <div class="bar-track">
+              <div class="bar-fill accent-gold" [style.width.%]="(item.count / maxCount(topViewed())) * 100"></div>
             </div>
-          }
-          @if (topSellers().length === 0) {
-            <p class="empty">Sin datos</p>
-          }
-        </div>
+            <span class="bar-value">{{ item.count }}</span>
+          </div>
+        }
+        @if (topViewed().length === 0) {
+          <p class="empty">Sin datos</p>
+        }
       </div>
     </div>
 

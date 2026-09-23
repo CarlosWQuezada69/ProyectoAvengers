@@ -1,42 +1,81 @@
 <div class="container about">
-  <h1 class="about__title">Acerca de The Avengers Joyero</h1>
+  <header class="about__hero">
+    <p class="section-head__eyebrow">Nuestra historia</p>
+    <h1 class="about__title">{{ title() }}</h1>
+  </header>
 
-  <div class="about__grid">
-    <section class="about__block">
-      <h2>Nuestra historia</h2>
-      <p>
-        The Avengers Joyero nació de la unión entre la pasión por el cómic y la joyería de autor.
-        Cada pieza es una edición limitada inspirada en los héroes más poderosos de la Tierra,
-        elaborada a mano con materiales nobles y acabados que buscan tributar a la leyenda.
-      </p>
-      <p>
-        Creemos que el poder también se lleva puesto: por eso diseñamos colecciones que
-        combinan la estética oscura y premium con destellos de oro, tal y como merece un héroe.
-      </p>
-    </section>
-
-    <section class="about__block">
-      <h2>Nuestro compromiso</h2>
-      <ul class="about__list">
-        <li>Producción de ediciones limitadas y numeradas.</li>
-        <li>Materiales seleccionados con trazabilidad.</li>
-        <li>Envíos cuidados y seguros a todo el territorio.</li>
-        <li>Atención personalizada antes y después de la compra.</li>
-      </ul>
-    </section>
-
-    <section class="about__block about__block--contact" id="contacto">
-      <h2>Contacto</h2>
-      <p>¿Dudas sobre tallas, materiales o tu pedido? Escríbenos:</p>
-      <div class="about__contact-row">
-        <app-icon name="user" size="18"></app-icon>
-        <a [href]="'mailto:' + contactEmail()">{{ contactEmail() }}</a>
+  @if (loading()) {
+    <div class="about__skeleton surface" aria-hidden="true">
+      <div class="about__skeleton-block"></div>
+      <div class="about__skeleton-lines">
+        <div class="about__skeleton-line"></div>
+        <div class="about__skeleton-line"></div>
+        <div class="about__skeleton-line short"></div>
       </div>
-      <div class="about__contact-row">
-        <app-icon name="cart" size="18"></app-icon>
-        <a [href]="'tel:' + contactPhone()">{{ contactPhone() }}</a>
+    </div>
+  } @else {
+    <div class="about__grid">
+      <section class="about__story surface">
+        <p class="about__eyebrow">Desde la Tierra, para héroes</p>
+        @for (paragraph of paragraphs(); track $index) {
+          <p class="about__paragraph">{{ paragraph }}</p>
+        }
+      </section>
+
+      <aside class="about__side">
+        @if (mission(); as mission) {
+          <section class="about__card surface">
+            <app-icon class="about__card-icon" name="sparkles" size="22"></app-icon>
+            <h2>Misión</h2>
+            <p>{{ mission }}</p>
+          </section>
+        }
+        @if (vision(); as vision) {
+          <section class="about__card surface">
+            <app-icon class="about__card-icon" name="gem" size="22"></app-icon>
+            <h2>Visión</h2>
+            <p>{{ vision }}</p>
+          </section>
+        }
+      </aside>
+    </div>
+
+    @if (about()?.gallery?.length) {
+      <section class="about__gallery" aria-label="Galería">
+        @for (image of about()!.gallery; track image.id) {
+          <figure class="about__gallery-item">
+            <img [src]="image.url | assetUrl" [alt]="image.altText ?? 'Acerca de The Avengers Joyero'" loading="lazy" />
+          </figure>
+        }
+      </section>
+    }
+
+    <section class="about__contact surface" id="contacto">
+      <div>
+        <p class="about__eyebrow">Hablemos</p>
+        <h2>¿Dudas o quieres una cotización?</h2>
+        <p class="about__contact-text">
+          Escríbenos y atenderemos tu pedido o pregunta de forma personalizada.
+        </p>
       </div>
-      <a class="btn btn-gold about__cta" routerLink="/productos">Ver colecciones</a>
+
+      <div class="about__contact-actions">
+        <a class="btn btn-ghost about__contact-link" [href]="'mailto:' + contactEmail()">
+          <app-icon name="mail" size="18"></app-icon>
+          {{ contactEmail() }}
+        </a>
+        <a class="btn btn-ghost about__contact-link" [href]="'tel:' + contactPhone()">
+          <app-icon name="phone" size="18"></app-icon>
+          {{ contactPhone() }}
+        </a>
+        @if (whatsappHref(); as wa) {
+          <a class="btn btn-gold about__contact-link" [href]="wa" target="_blank" rel="noopener">
+            <app-icon name="whatsapp" size="18"></app-icon>
+            WhatsApp
+          </a>
+        }
+        <a class="btn btn-outline" routerLink="/productos">Ver colecciones</a>
+      </div>
     </section>
-  </div>
+  }
 </div>

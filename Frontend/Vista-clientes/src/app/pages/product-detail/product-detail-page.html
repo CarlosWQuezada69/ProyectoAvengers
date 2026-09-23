@@ -26,7 +26,7 @@
             [alt]="gallery().image?.altText ?? product.name"
           />
           @if (hasDiscount()) {
-            <span class="gallery__badge">OFERTA</span>
+            <span class="gallery__badge">Oferta</span>
           }
         </div>
 
@@ -57,10 +57,10 @@
         <h1 class="detail__title">{{ product.name }}</h1>
 
         <div class="detail__price">
+          <span class="detail__price-current">{{ price() }}</span>
           @if (compareAt(); as compare) {
             <span class="detail__price-compare">{{ compare }}</span>
           }
-          <span class="detail__price-current">{{ price() }}</span>
         </div>
 
         <p class="detail__stock" [class.is-low]="lowStock()" [class.is-out]="!inStock()">
@@ -112,12 +112,27 @@
           <ul class="detail__restrictions">
             @for (restriction of product.restrictions; track restriction.id) {
               <li>
-                <app-icon name="shield" size="16"></app-icon>
+                <app-icon name="shield-check" size="16"></app-icon>
                 {{ restrictionLabel(restriction.restrictionType) }}
               </li>
             }
           </ul>
         }
+
+        <div class="detail__trust">
+          <div class="detail__trust-item">
+            <app-icon name="truck" size="20"></app-icon>
+            <span>Envío cuidadoso y asegurado</span>
+          </div>
+          <div class="detail__trust-item">
+            <app-icon name="shield-check" size="20"></app-icon>
+            <span>Edición limitada numerada</span>
+          </div>
+          <div class="detail__trust-item">
+            <app-icon name="gem" size="20"></app-icon>
+            <span>Acabados con materiales nobles</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

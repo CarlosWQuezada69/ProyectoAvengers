@@ -37,6 +37,7 @@ public class AppDbContext : DbContext
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
     public DbSet<ProductRestriction> ProductRestrictions => Set<ProductRestriction>();
     public DbSet<ProductStatsDaily> ProductStatsDailies => Set<ProductStatsDaily>();
+    public DbSet<PageViewDaily> PageViewDailies => Set<PageViewDaily>();
     public DbSet<SliderItem> SliderItems => Set<SliderItem>();
     public DbSet<SiteSetting> SiteSettings => Set<SiteSetting>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();

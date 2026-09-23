@@ -56,9 +56,19 @@
       <input type="checkbox" formControlName="isActive" />
       <span>Activo</span>
     </label>
-    @if (!editingItem) {
-      <app-uploader />
+    @if (selectedFilePreview()) {
+      <div class="slider-form__preview">
+        <img [src]="selectedFilePreview()" alt="" class="thumb" />
+      </div>
+    } @else if (editingItem && editingItem.imageUrl) {
+      <div class="slider-form__preview">
+        <img [src]="editingItem.imageUrl | assetUrl" alt="" class="thumb" />
+      </div>
     }
+    @if (editingItem) {
+      <p class="slider-form__replace-hint">Para reemplazar la imagen, sube un archivo nuevo (opcional).</p>
+    }
+    <app-uploader (filesChange)="onImageSelected($event)" />
     <div class="modal-actions">
       <app-btn variant="secondary" type="button" (click)="modalOpen = false">Cancelar</app-btn>
       <app-btn type="submit">{{ editingItem ? 'Guardar' : 'Crear' }}</app-btn>

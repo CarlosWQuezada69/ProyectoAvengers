@@ -24,8 +24,12 @@
       <h3>Legal</h3>
       <form [formGroup]="form" class="settings-form">
         <app-input formControlName="copyright_text" label="Copyright" placeholder="© 2026 Mi Empresa" />
+        <app-input formControlName="rnc" label="RNC" placeholder="1-01-00000-0" />
+        <app-input formControlName="address" label="Dirección" placeholder="Calle, ciudad, país" />
         <div class="form-actions">
           <app-btn size="sm" (click)="save('copyright_text')">Guardar</app-btn>
+          <app-btn size="sm" (click)="save('rnc')">Guardar RNC</app-btn>
+          <app-btn size="sm" (click)="save('address')">Guardar dirección</app-btn>
         </div>
       </form>
     </div>

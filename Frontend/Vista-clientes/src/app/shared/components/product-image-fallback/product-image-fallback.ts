@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
+import { AssetUrlPipe } from '../../../core/pipes/asset-url.pipe';
+
 export type ProductTheme = 'shield' | 'reactor' | 'mjolnir' | 'gems' | 'generic';
 
 const THEME_KEYWORDS: Record<ProductTheme, string[]> = {
@@ -23,10 +25,11 @@ let uid = 0;
 @Component({
   selector: 'app-product-image-fallback',
   standalone: true,
+  imports: [AssetUrlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (imageUrl(); as url) {
-      <img [src]="url" [alt]="alt()" loading="lazy" />
+      <img [src]="url | assetUrl" [alt]="alt()" loading="lazy" />
     } @else {
       <svg class="placeholder" viewBox="0 0 400 400" role="img" [attr.aria-label]="alt()">
         <defs>

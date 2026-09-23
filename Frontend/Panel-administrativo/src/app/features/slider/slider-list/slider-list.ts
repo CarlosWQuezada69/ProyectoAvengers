@@ -10,11 +10,12 @@ import { UploaderComponent } from '../../../shared/components/uploader/uploader'
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { AssetUrlPipe } from '../../../core/pipes/asset-url.pipe';
 import type { SliderItem } from '../../../core/models/index';
 
 @Component({
   selector: 'app-slider-list',
-  imports: [DatePipe, ReactiveFormsModule, ButtonComponent, InputComponent, ModalComponent, BadgeComponent, UploaderComponent, HasPermissionDirective],
+  imports: [DatePipe, ReactiveFormsModule, ButtonComponent, InputComponent, ModalComponent, BadgeComponent, UploaderComponent, HasPermissionDirective, AssetUrlPipe],
   templateUrl: './slider-list.html',
   styleUrl: './slider-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,6 +29,8 @@ export class SliderListComponent implements OnInit {
   protected loading = true;
   protected modalOpen = false;
   protected editingItem: SliderItem | null = null;
+  protected selectedFile: File | null = null;
+  protected selectedFilePreview = signal<string | null>(null);
 
   protected form = new FormGroup({
     title: new FormControl(''),
@@ -54,6 +57,8 @@ export class SliderListComponent implements OnInit {
   protected openCreateModal(): void {
     this.editingItem = null;
     this.form.reset({ isActive: true });
+    this.selectedFile = null;
+    this.selectedFilePreview.set(null);
     this.modalOpen = true;
   }
 
@@ -64,19 +69,36 @@ export class SliderListComponent implements OnInit {
       startsAt: item.startsAt?.split('T')[0] ?? '',
       endsAt: item.endsAt?.split('T')[0] ?? '',
     });
+    this.selectedFile = null;
+    this.selectedFilePreview.set(null);
     this.modalOpen = true;
+  }
+
+  protected onImageSelected(files: File[]): void {
+    this.selectedFile = files[0] ?? null;
+    this.selectedFilePreview.set(files[0] ? URL.createObjectURL(files[0]) : null);
   }
 
   protected save(): void {
     if (this.editingItem) {
-      this.sliderService.update(this.editingItem.id, this.form.value as any).subscribe({
-        next: () => { this.toast.show('Slider actualizado', 'success'); this.modalOpen = false; this.loadItems(); },
+      const fd = new FormData();
+      Object.entries(this.form.value).forEach(([k, v]) => fd.append(k, v as string));
+      if (this.selectedFile) fd.append('image', this.selectedFile, this.selectedFile.name);
+      this.sliderService.update(this.editingItem.id, fd).subscribe({
+        next: () => {
+          this.toast.show('Slider actualizado', 'success');
+          this.modalOpen = false;
+          this.selectedFile = null;
+          this.selectedFilePreview.set(null);
+          this.loadItems();
+        },
       });
     } else {
       const fd = new FormData();
       Object.entries(this.form.value).forEach(([k, v]) => fd.append(k, v as string));
+      if (this.selectedFile) fd.append('image', this.selectedFile, this.selectedFile.name);
       this.sliderService.create(fd).subscribe({
-        next: () => { this.toast.show('Slider creado', 'success'); this.modalOpen = false; this.loadItems(); },
+        next: () => { this.toast.show('Slider creado', 'success'); this.modalOpen = false; this.selectedFile = null; this.selectedFilePreview.set(null); this.loadItems(); },
       });
     }
   }

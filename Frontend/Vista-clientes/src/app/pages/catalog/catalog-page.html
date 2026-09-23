@@ -1,15 +1,16 @@
 <section class="page-hero">
   <div class="container">
     <h1>Colecciones</h1>
-    <p>Joyería de edición limitada inspirada en los héroes más poderosos.</p>
+    <p>Joyería de edición limitada inspirada en los héroes más poderosos. Piezas numeradas con acabados premium.</p>
   </div>
 </section>
 
 <section class="catalog">
   <div class="container">
     <!-- Filtros -->
-    <div class="filters">
+    <div class="catalog__toolbar">
       <form class="filters__search" (ngSubmit)="onSearch()">
+        <app-icon name="search" size="18"></app-icon>
         <input
           type="search"
           aria-label="Buscar en el catálogo"
@@ -18,54 +19,71 @@
           (input)="search.set(($any($event.target)).value)"
         />
         <button class="filters__search-btn" type="submit" aria-label="Buscar">
-          <app-icon name="search" size="18"></app-icon>
+          Buscar
         </button>
       </form>
 
-      <select
-        class="filters__select"
-        aria-label="Filtrar por categoría"
-        [value]="categoryId()"
-        (change)="onCategoryChange(($any($event.target)).value)"
-      >
-        <option value="">Todas las categorías</option>
-        @for (category of flatCategories(); track category.id) {
-          <option [value]="category.id">{{ category.name }}</option>
+      <div class="filters__group">
+        <div class="filters__field">
+          <label for="cat-select">Categoría</label>
+          <select
+            id="cat-select"
+            class="filters__select"
+            aria-label="Filtrar por categoría"
+            [value]="categoryId()"
+            (change)="onCategoryChange(($any($event.target)).value)"
+          >
+            <option value="">Todas</option>
+            @for (category of flatCategories(); track category.id) {
+              <option [value]="category.id">{{ category.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filters__field">
+          <label for="sort-select">Ordenar</label>
+          <select
+            id="sort-select"
+            class="filters__select"
+            aria-label="Ordenar productos"
+            [value]="sort()"
+            (change)="onSortChange(($any($event.target)).value)"
+          >
+            @for (option of sortOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+
+        <label class="filters__switch" [class.is-on]="onlyAvailable()">
+          <input
+            type="checkbox"
+            [checked]="onlyAvailable()"
+            (change)="onAvailabilityChange(($any($event.target)).checked)"
+          />
+          <span class="filters__switch-track" aria-hidden="true"></span>
+          Solo disponibles
+        </label>
+
+        @if (search() || categoryId() || onlyAvailable() || sort() !== 'newest') {
+          <button class="filters__reset" type="button" (click)="resetFilters()">
+            Limpiar
+          </button>
         }
-      </select>
-
-      <select
-        class="filters__select"
-        aria-label="Ordenar productos"
-        [value]="sort()"
-        (change)="onSortChange(($any($event.target)).value)"
-      >
-        @for (option of sortOptions; track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
-        }
-      </select>
-
-      <label class="filters__check">
-        <input
-          type="checkbox"
-          [checked]="onlyAvailable()"
-          (change)="onAvailabilityChange(($any($event.target)).checked)"
-        />
-        Solo disponibles
-      </label>
-
-      @if (search() || categoryId() || onlyAvailable() || sort() !== 'newest') {
-        <button class="filters__reset" type="button" (click)="resetFilters()">Limpiar filtros</button>
-      }
+      </div>
     </div>
 
-    <!-- Resultados -->
+    <!-- Meta de resultados -->
     <div class="catalog__meta">
       @if (!loading() && result()) {
         <p>
-          Mostrando {{ rangeStart() }}–{{ rangeEnd() }} de {{ totalCount() }} producto{{
-            totalCount() === 1 ? '' : 's'
-          }}
+          Mostrando <strong>{{ rangeStart() }}–{{ rangeEnd() }}</strong> de
+          <strong>{{ totalCount() }}</strong> producto{{ totalCount() === 1 ? '' : 's' }}
+        </p>
+      }
+      @if (search() && !loading()) {
+        <p class="catalog__meta-search">
+          Resultados para <strong>“{{ search() }}”</strong>
         </p>
       }
     </div>
@@ -73,10 +91,12 @@
     @if (loading()) {
       <div class="catalog__grid">
         @for (_ of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
-          <div class="catalog__skeleton" aria-hidden="true">
-            <div class="catalog__skeleton-media"></div>
-            <div class="catalog__skeleton-line"></div>
-            <div class="catalog__skeleton-line short"></div>
+          <div class="card-skeleton" aria-hidden="true">
+            <div class="card-skeleton__media"></div>
+            <div class="card-skeleton__lines">
+              <div class="card-skeleton__line"></div>
+              <div class="card-skeleton__line short"></div>
+            </div>
           </div>
         }
       </div>
@@ -90,7 +110,7 @@
       @if (totalPages() > 1) {
         <nav class="pagination" aria-label="Paginación">
           <button
-            class="pagination__btn"
+            class="pagination__btn pagination__btn--icon"
             type="button"
             aria-label="Página anterior"
             [disabled]="page() <= 1"
@@ -111,7 +131,7 @@
           }
 
           <button
-            class="pagination__btn"
+            class="pagination__btn pagination__btn--icon"
             type="button"
             aria-label="Página siguiente"
             [disabled]="page() >= totalPages()"
@@ -123,6 +143,7 @@
       }
     } @else {
       <div class="empty-state">
+        <app-icon name="search" size="44"></app-icon>
         <p>No encontramos productos con esos filtros.</p>
         <button class="btn btn-gold" type="button" (click)="resetFilters()">
           Ver todo el catálogo

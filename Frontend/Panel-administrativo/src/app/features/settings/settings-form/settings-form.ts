@@ -12,6 +12,8 @@ import type { SiteSetting } from '../../../core/models/index';
 type SettingKeys =
   | 'business_name'
   | 'copyright_text'
+  | 'rnc'
+  | 'address'
   | 'contact_email'
   | 'contact_phone'
   | 'contact_whatsapp'

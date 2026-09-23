@@ -33,11 +33,24 @@ export interface StatsOverview {
   activeProducts: number;
   totalCategories: number;
   totalUsers: number;
-  totalOrders: number;
   todayViews: number;
+  todayPageViews: number;
+  monthlyPageViews: number;
   lowStockCount: number;
   monthlyViews: number;
-  monthlyPurchases: number;
+}
+
+export interface DailyViewsStat {
+  label: string;
+  productViews: number;
+  pageViews: number;
+  total: number;
+}
+
+export interface PageViewsStat {
+  pageKey: string;
+  pageLabel: string;
+  count: number;
 }
 
 export interface TopProduct {
@@ -45,3 +58,5 @@ export interface TopProduct {
   productName: string;
   count: number;
 }
+
+export * from './about';

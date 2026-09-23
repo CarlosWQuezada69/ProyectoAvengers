@@ -41,7 +41,7 @@
             <td>
               <div class="product-cell">
                 @if (product.primaryImageUrl) {
-                  <img [src]="product.primaryImageUrl" alt="" class="product-thumb" />
+                  <img [src]="product.primaryImageUrl | assetUrl" alt="" class="product-thumb" />
                 }
                 <div>
                   <span class="product-name">{{ product.name }}</span>

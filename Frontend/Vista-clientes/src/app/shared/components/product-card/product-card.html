@@ -5,33 +5,38 @@
       [imageUrl]="product().primaryImageUrl"
       [alt]="product().name"
     />
+    <span class="product-card__sheen" aria-hidden="true"></span>
+
     @if (hasDiscount()) {
-      <span class="product-card__badge">OFERTA</span>
+      <span class="product-card__badge">-{{ discountPercent() }}%</span>
     }
     @if (outOfStock()) {
-      <span class="product-card__badge product-card__badge--soldout">AGOTADO</span>
+      <span class="product-card__badge product-card__badge--soldout">Agotado</span>
     }
   </a>
 
-  <a class="product-card__name" [routerLink]="['/productos', product().slug]">{{ product().name }}</a>
-
-  <p class="product-card__desc">
+  <div class="product-card__body">
     @if (product().categoryName) {
-      {{ product().categoryName }}
-    } @else {
-      Joyería de edición limitada inspirada en los héroes.
+      <p class="product-card__category">{{ product().categoryName }}</p>
     }
-  </p>
 
-  <div class="product-card__price">
-    @if (displayCompareAt(); as compare) {
-      <span class="product-card__price--compare">{{ compare }}</span>
-    }
-    <span class="product-card__price--current">{{ displayPrice() }}</span>
+    <a class="product-card__name" [routerLink]="['/productos', product().slug]">{{ product().name }}</a>
+
+    <div class="product-card__price">
+      <span class="product-card__price--current">{{ displayPrice() }}</span>
+      @if (displayCompareAt(); as compare) {
+        <span class="product-card__price--compare">{{ compare }}</span>
+      }
+    </div>
+
+    <button
+      class="btn btn-gold product-card__cta"
+      type="button"
+      [disabled]="outOfStock()"
+      (click)="onAdd()"
+    >
+      <app-icon name="cart" size="16"></app-icon>
+      Añadir al carrito
+    </button>
   </div>
-
-  <button class="btn btn-gold product-card__cta" type="button" (click)="onAdd()" [disabled]="outOfStock()">
-    <app-icon name="cart" size="16"></app-icon>
-    Añadir al carrito
-  </button>
 </article>

@@ -65,7 +65,7 @@
             <div class="image-grid">
               @for (img of images; track img.id) {
                 <div class="image-card" [class.primary]="img.isPrimary">
-                  <img [src]="img.url" [alt]="img.altText || ''" />
+                  <img [src]="img.url | assetUrl" [alt]="img.altText || ''" />
                   <div class="image-overlay">
                     @if (!img.isPrimary) {
                       <button type="button" class="img-action" (click)="setPrimaryImage(img.id)" title="Marcar principal">★</button>

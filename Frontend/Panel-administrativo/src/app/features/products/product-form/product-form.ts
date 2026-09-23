@@ -11,12 +11,13 @@ import { ModalComponent } from '../../../shared/components/modal/modal';
 import { UploaderComponent } from '../../../shared/components/uploader/uploader';
 import { ToastService } from '../../../shared/services/toast.service';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { AssetUrlPipe } from '../../../core/pipes/asset-url.pipe';
 import type { Product, ProductImage, ProductRestriction, RestrictionType } from '../../../core/models/product';
 import type { Category } from '../../../core/models/category';
 
 @Component({
   selector: 'app-product-form',
-  imports: [ReactiveFormsModule, RouterLink, ButtonComponent, InputComponent, SelectComponent, BadgeComponent, ModalComponent, UploaderComponent, HasPermissionDirective],
+  imports: [ReactiveFormsModule, RouterLink, ButtonComponent, InputComponent, SelectComponent, BadgeComponent, ModalComponent, UploaderComponent, HasPermissionDirective, AssetUrlPipe],
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

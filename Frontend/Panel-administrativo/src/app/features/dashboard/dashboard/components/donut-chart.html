@@ -1,0 +1,49 @@
+@if (segments().length === 0) {
+  <div class="donut-chart__empty">
+    <p>Sin datos</p>
+  </div>
+} @else {
+  <div class="donut-chart">
+    <svg
+      class="donut-chart__svg"
+      [attr.viewBox]="'0 0 ' + size() + ' ' + size()"
+      [attr.width]="size()"
+      [attr.height]="size()"
+      role="img"
+      aria-label="Distribución de visitas por página"
+    >
+      <g [attr.transform]="'rotate(-90 ' + size() / 2 + ' ' + size() / 2 + ')'">
+        @for (seg of segments(); track $index) {
+          <circle
+            cx="50%"
+            cy="50%"
+            [attr.r]="seg.radius"
+            fill="none"
+            [attr.stroke]="seg.color"
+            [attr.stroke-width]="thickness()"
+            [attr.stroke-dasharray]="seg.length + ' ' + (circumference() - seg.length)"
+            [attr.stroke-dashoffset]="seg.offset"
+          />
+        }
+      </g>
+      <text
+        class="donut-chart__total"
+        [attr.x]="size() / 2"
+        [attr.y]="size() / 2"
+        text-anchor="middle"
+        dominant-baseline="central"
+      >
+        {{ total() }}
+      </text>
+    </svg>
+    <ul class="donut-chart__legend">
+      @for (slice of data(); track slice.label; let i = $index) {
+        <li>
+          <span class="donut-chart__dot" [style.background]="palette[i % palette.length]"></span>
+          <span class="donut-chart__label">{{ slice.label }}</span>
+          <span class="donut-chart__value">{{ slice.value }} ({{ percent(slice.value) | number: '1.0-0' }}%)</span>
+        </li>
+      }
+    </ul>
+  </div>
+}

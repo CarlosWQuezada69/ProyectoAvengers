@@ -46,5 +46,7 @@ public class SliderItem
         IsActive = isActive;
     }
 
+    public void UpdateImage(string imageUrl) => ImageUrl = imageUrl;
+
     public void UpdateOrder(int displayOrder) => DisplayOrder = displayOrder;
 }

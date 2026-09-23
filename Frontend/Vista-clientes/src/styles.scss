@@ -1,43 +1,63 @@
 /* =========================================================
    THE AVENGERS JOYERO — Design tokens y base global
-   Tema oscuro/premium con acentos dorados
+   Dark premium editorial con acentos dorados
    ========================================================= */
 
 :root {
-  /* Paleta */
-  --color-bg: #0d0d0f;
-  --color-bg-elevated: #161618;
-  --color-bg-card: #1a1a1c;
+  /* Paleta base */
+  --color-bg: #0a0a0c;
+  --color-bg-soft: #0f0f12;
+  --color-surface: rgba(255, 255, 255, 0.025);
+  --color-surface-hover: rgba(255, 255, 255, 0.05);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.14);
+
+  /* Dorado premium (degradado metálico) */
   --color-gold: #f0c419;
-  --color-gold-bright: #f4d03f;
-  --color-gold-deep: #e8b923;
+  --color-gold-bright: #f8e27a;
+  --color-gold-deep: #c9972f;
   --color-gold-soft: #f5d77a;
-  --color-text: #ffffff;
-  --color-text-muted: #a9a9ac;
+  --color-gold-rgb: 240, 196, 25;
+
+  /* Texto */
+  --color-text: #f4f4f5;
+  --color-text-muted: #9d9da3;
+  --color-text-faint: #6b6b72;
   --color-text-on-gold: #1a1a1a;
-  --color-border: #2a2a2d;
-  --color-dot-inactive: #4a4a4a;
+
+  /* Estados */
+  --color-success: #4ade80;
+  --color-warning: var(--color-gold);
+  --color-danger: #f4564e;
 
   /* Tipografía */
   --font-display: 'Bebas Neue', 'Anton', 'Arial Narrow', sans-serif;
   --font-body: 'Poppins', 'Inter', 'Segoe UI', sans-serif;
 
   /* Sombras y radios */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --shadow-gold: 0 4px 12px rgba(240, 196, 25, 0.3);
-  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+  --shadow-gold: 0 8px 28px rgba(var(--color-gold-rgb), 0.22);
+  --shadow-gold-soft: 0 4px 18px rgba(var(--color-gold-rgb), 0.14);
+  --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.5);
+  --shadow-pop: 0 24px 60px rgba(0, 0, 0, 0.6);
 
   /* Layout */
-  --container-max: 1200px;
-  --header-height: 96px;
-  --nav-height: 50px;
+  --container-max: 1240px;
+  --header-top-h: 88px;
+  --nav-h: 56px;
+  --header-h: calc(var(--header-top-h) + var(--nav-h));
 
   /* Transiciones */
-  --ease: 0.2s ease-in-out;
+  --ease: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: 0.35s cubic-bezier(0.22, 1.4, 0.36, 1);
 
-  /* Degradado nav en cinta dorada */
-  --grad-gold: linear-gradient(90deg, var(--color-gold-deep), var(--color-gold-soft));
+  /* Degradados */
+  --grad-gold: linear-gradient(115deg, var(--color-gold-bright) 0%, var(--color-gold) 45%, var(--color-gold-deep) 100%);
+  --grad-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  --radial-glow: radial-gradient(1000px 520px at 78% -12%, rgba(var(--color-gold-rgb), 0.08), transparent 62%);
 }
 
 *,
@@ -48,18 +68,20 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   background:
-    radial-gradient(1200px 600px at 85% -10%, rgba(240, 196, 25, 0.06), transparent 60%),
+    var(--radial-glow),
     var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: 15px;
-  line-height: 1.55;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 ::selection {
@@ -73,9 +95,10 @@ h3,
 h4 {
   font-family: var(--font-display);
   font-weight: 400;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   margin: 0;
   text-transform: uppercase;
+  line-height: 1.05;
 }
 
 a {
@@ -98,17 +121,32 @@ select {
   font-family: inherit;
 }
 
+input,
+select,
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Enfoque accesible */
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 /* Scrollbar oscura */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
 }
 ::-webkit-scrollbar-track {
   background: var(--color-bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #2e2e31;
+  background: #2a2a2f;
   border-radius: 8px;
+  border: 2px solid var(--color-bg);
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-gold-deep);
@@ -119,9 +157,10 @@ select {
    ========================================================= */
 
 .container {
+  width: 100%;
   max-width: var(--container-max);
   margin-inline: auto;
-  padding-inline: 24px;
+  padding-inline: 28px;
 }
 
 .sr-only {
@@ -136,21 +175,99 @@ select {
   border: 0;
 }
 
-.section-title {
-  font-family: var(--font-display);
-  font-size: clamp(26px, 4.5vw, 34px);
-  letter-spacing: 2px;
-  text-align: center;
-  text-transform: uppercase;
+/* Superficie glass */
+.surface {
+  background: var(--grad-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
-.section-title::after {
+/* Título de sección con rótulo */
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.section-head__eyebrow {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+.section-head h2 {
+  font-size: clamp(34px, 5vw, 52px);
+  letter-spacing: 3px;
+  background: linear-gradient(180deg, #ffffff 20%, var(--color-gold-bright) 110%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.section-head__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  white-space: nowrap;
+  transition: gap var(--ease), color var(--ease);
+}
+
+.section-head__link:hover {
+  gap: 12px;
+  color: var(--color-gold-bright);
+}
+
+@media (max-width: 640px) {
+  .section-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+/* Encabezado de página */
+.page-hero {
+  position: relative;
+  padding: 72px 0 48px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.page-hero::before {
   content: '';
-  display: block;
-  width: 56px;
-  height: 3px;
+  position: absolute;
+  inset: -20% -10%;
+  z-index: -1;
+  background:
+    radial-gradient(640px 320px at 50% 0%, rgba(var(--color-gold-rgb), 0.14), transparent 70%),
+    linear-gradient(180deg, rgba(var(--color-gold-rgb), 0.05), transparent 60%);
+  pointer-events: none;
+}
+
+.page-hero h1 {
+  font-size: clamp(44px, 8vw, 72px);
+  letter-spacing: 4px;
+  background: linear-gradient(180deg, #ffffff 15%, var(--color-gold-bright) 115%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.page-hero p {
+  color: var(--color-text-muted);
+  max-width: 560px;
   margin: 14px auto 0;
-  background: var(--grad-gold);
+  font-size: 15px;
 }
 
 /* =========================================================
@@ -158,106 +275,128 @@ select {
    ========================================================= */
 
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   border: none;
-  border-radius: var(--radius-sm);
-  padding: 12px 20px;
+  border-radius: var(--radius-pill);
+  padding: 14px 26px;
   font-weight: 700;
   font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all var(--ease);
+  letter-spacing: 1.5px;
+  transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease),
+    background var(--ease), filter var(--ease), color var(--ease);
+  overflow: hidden;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .btn-gold {
   background: var(--grad-gold);
   color: var(--color-text-on-gold);
+  box-shadow: var(--shadow-gold-soft);
 }
 
-.btn-gold:hover {
-  filter: brightness(0.9);
+.btn-gold::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 55%);
+  pointer-events: none;
+}
+
+.btn-gold:hover:not(:disabled) {
+  transform: translateY(-2px);
   box-shadow: var(--shadow-gold);
-  transform: translateY(-1px);
-}
-
-.btn-gold:disabled {
-  filter: grayscale(0.6) brightness(0.7);
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
+  filter: brightness(1.04);
 }
 
 .btn-outline {
   background: transparent;
   color: var(--color-gold);
-  border: 1px solid var(--color-gold);
+  border: 1px solid rgba(var(--color-gold-rgb), 0.55);
 }
 
-.btn-outline:hover {
-  background: rgba(240, 196, 25, 0.1);
+.btn-outline:hover:not(:disabled) {
+  background: rgba(var(--color-gold-rgb), 0.08);
   box-shadow: var(--shadow-gold);
+  transform: translateY(-2px);
 }
 
 .btn-ghost {
-  background: transparent;
+  background: var(--color-surface);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
+  backdrop-filter: blur(8px);
 }
 
-.btn-ghost:hover {
-  border-color: var(--color-gold);
-  color: var(--color-gold);
+.btn-ghost:hover:not(:disabled) {
+  border-color: rgba(var(--color-gold-rgb), 0.5);
+  color: var(--color-gold-bright);
+  background: var(--color-surface-hover);
 }
 
-/* =========================================================
-   Patrón de hexágonos (efecto tecnológico sutil)
-   ========================================================= */
-
-.hex-pattern {
-  position: relative;
-  overflow: hidden;
-}
-
-.hex-pattern::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='56' height='100' viewBox='0 0 56 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M28 0L56 16.25v32.5L28 65 0 48.75v-32.5zM28 35.9L46.6 24.8 28 14 9.4 24.8zM56 51.5L38 62.4v21.7l18 10.4v-21.6zM56 83.7l-2.6 1.5-15.4-8.9v-13l18-10.4zM0 51.5v21.7l18 10.4V61.7l-2.6-1.5z' fill='%23f0c419' fill-opacity='0.05'/%3E%3C/svg%3E");
-  background-size: 56px 100px;
+.btn-sm {
+  padding: 9px 18px;
+  font-size: 12px;
 }
 
 /* =========================================================
-   Página de error / estados vacíos
+   Estados vacíos / paginación
    ========================================================= */
 
 .empty-state {
   padding: 80px 24px;
   text-align: center;
   color: var(--color-text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
 }
 
-.page-hero {
-  padding: 48px 0 32px;
-  text-align: center;
+.empty-state p {
+  margin: 0;
 }
 
-.page-hero h1 {
-  font-size: clamp(32px, 6vw, 48px);
-  letter-spacing: 3px;
+/* Animaciones globales */
+@keyframes shimmer {
+  to {
+    background-position-x: -200%;
+  }
 }
 
-.page-hero p {
-  color: var(--color-text-muted);
-  max-width: 640px;
-  margin: 12px auto 0;
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 @media (max-width: 768px) {
   .container {
-    padding-inline: 16px;
+    padding-inline: 18px;
   }
 }

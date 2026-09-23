@@ -1,41 +1,40 @@
-<section class="hero hex-pattern" aria-label="Destacados">
-  <div class="hero__beams" aria-hidden="true"></div>
-
-  <div class="container hero__slides">
+<section class="hero" aria-label="Destacados">
+  <div class="hero__slides">
     @for (slide of slides(); track slide.id) {
       <div
         class="hero__slide"
         [class.is-active]="slide.id === currentSlide().id"
         [class.is-hidden]="slide.id !== currentSlide().id"
       >
-        <div class="hero__copy">
-          <p class="hero__kicker">{{ slide.kicker }}</p>
-          <h1 class="hero__title">
-            <span>{{ slide.titleLine1 }}</span>
-            <span class="hero__title-accent">{{ slide.titleLine2 }}</span>
-          </h1>
-          <button class="btn btn-gold hero__cta" type="button" (click)="goToSlide(slide)">
-            Explorar colección
-          </button>
+        <div class="hero__bg" aria-hidden="true">
+          <app-product-image-fallback
+            [product]="slide.productRef"
+            [imageUrl]="slide.imageUrl"
+          />
         </div>
-        <div class="hero__media">
-          <a class="hero__image" [attr.href]="slide.linkUrl || undefined" tabindex="-1">
-            <app-product-image-fallback
-              [product]="slide.productRef"
-              [imageUrl]="slide.imageUrl"
-              [alt]="slide.titleLine1 + ' ' + slide.titleLine2"
-            />
-          </a>
+        <div class="hero__shade" aria-hidden="true"></div>
+
+        <div class="container hero__content">
+          <div class="hero__copy">
+            <p class="hero__kicker">
+              <span class="hero__kicker-line" aria-hidden="true"></span>
+              {{ slide.kicker }}
+            </p>
+            <h1 class="hero__title">
+              <span>{{ slide.titleLine1 }}</span>
+              <span class="hero__title-accent">{{ slide.titleLine2 }}</span>
+            </h1>
+            <p class="hero__desc">
+              Joyería de edición limitada inspirada en los héroes. Piezas numeradas y acabados
+              premium para llevar el poder puesto.
+            </p>
+          </div>
         </div>
       </div>
     }
   </div>
 
-  <div class="container hero__controls">
-    <button class="hero__arrow" type="button" aria-label="Anterior" (click)="prev()">
-      <app-icon name="chevron-left" size="20"></app-icon>
-    </button>
-
+  <div class="container hero__bar">
     <div class="hero__dots" role="tablist" aria-label="Seleccionar destacado">
       @for (slide of slides(); track slide.id) {
         <button
@@ -43,29 +42,48 @@
           [class.is-active]="slide.id === currentSlide().id"
           type="button"
           [attr.aria-label]="'Ir a ' + slide.titleLine1"
-          aria-selected="slide.id === currentSlide().id"
           (click)="goTo(slide)"
         ></button>
       }
     </div>
 
-    <button class="hero__arrow" type="button" aria-label="Siguiente" (click)="next()">
-      <app-icon name="chevron-right" size="20"></app-icon>
-    </button>
+    <div class="hero__counter" aria-hidden="true">
+      {{ current() + 1 | number: '2.0-0' }} / {{ slides().length | number: '2.0' }}
+    </div>
+
+    <div class="hero__arrows">
+      <button class="hero__arrow" type="button" aria-label="Anterior" (click)="prev()">
+        <app-icon name="chevron-left" size="20"></app-icon>
+      </button>
+      <button class="hero__arrow" type="button" aria-label="Siguiente" (click)="next()">
+        <app-icon name="chevron-right" size="20"></app-icon>
+      </button>
+    </div>
   </div>
 </section>
 
 <section class="collections" aria-labelledby="colecciones-title">
   <div class="container">
-    <h2 class="section-title" id="colecciones-title">Colecciones destacadas</h2>
+    <div class="section-head">
+      <div>
+        <p class="section-head__eyebrow">Lo más destacado</p>
+        <h2 id="colecciones-title">Colecciones seleccionadas</h2>
+      </div>
+      <a class="section-head__link" routerLink="/productos">
+        Ver todo
+        <app-icon name="arrow-right" size="15"></app-icon>
+      </a>
+    </div>
 
     @if (loading()) {
       <div class="collections__grid">
         @for (_ of [1, 2, 3, 4]; track $index) {
-          <div class="collections__skeleton" aria-hidden="true">
-            <div class="collections__skeleton-media"></div>
-            <div class="collections__skeleton-line"></div>
-            <div class="collections__skeleton-line short"></div>
+          <div class="card-skeleton" aria-hidden="true">
+            <div class="card-skeleton__media"></div>
+            <div class="card-skeleton__lines">
+              <div class="card-skeleton__line"></div>
+              <div class="card-skeleton__line short"></div>
+            </div>
           </div>
         }
       </div>

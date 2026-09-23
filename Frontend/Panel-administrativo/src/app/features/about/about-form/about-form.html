@@ -1,0 +1,76 @@
+<div class="about-page">
+  <header class="section-header">
+    <h2>Acerca de</h2>
+  </header>
+
+  <div [hidden]="loading">
+    <form [formGroup]="form" class="settings-section">
+      <h3>Información de la empresa</h3>
+
+      <app-input formControlName="title" label="Título" placeholder="Acerca de The Avengers Joyero" />
+
+      <div class="form-group">
+        <label class="input-label">Historia</label>
+        <textarea
+          class="textarea"
+          formControlName="history"
+          rows="6"
+          placeholder="Historia de la empresa. Separa los párrafos con una línea en blanco."
+        ></textarea>
+      </div>
+
+      <div class="form-grid form-grid-2">
+        <div class="form-group">
+          <label class="input-label">Misión</label>
+          <textarea class="textarea" formControlName="mission" rows="4" placeholder="Misión de la empresa (opcional)"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="input-label">Visión</label>
+          <textarea class="textarea" formControlName="vision" rows="4" placeholder="Visión de la empresa (opcional)"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <app-btn type="submit" [loading]="saving">Guardar</app-btn>
+      </div>
+    </form>
+
+    <div class="settings-section">
+      <h3>Galería</h3>
+      <div class="gallery-toolbar">
+        <div class="form-group">
+          <label class="input-label" for="gallery-section">Sección</label>
+          <select
+            id="gallery-section"
+            class="select"
+            [value]="gallerySection"
+            (change)="setGallerySection($any($event.target).value)"
+          >
+            <option value="default">General</option>
+            <option value="founder">Fundador</option>
+            <option value="employees">Equipo</option>
+            <option value="location">Ubicación</option>
+          </select>
+        </div>
+        <app-uploader (filesChange)="onUpload($event)" />
+      </div>
+
+      @if (gallery().length) {
+        <div class="image-grid">
+          @for (img of gallery(); track img.id; let i = $index) {
+            <div class="image-card">
+              <img [src]="toAbsolute(img.url)" [alt]="img.altText || 'Imagen de la galería'" />
+              <div class="image-overlay">
+                <button type="button" class="img-action" (click)="move(i, -1)" title="Mover arriba">↑</button>
+                <button type="button" class="img-action" (click)="move(i, 1)" title="Mover abajo">↓</button>
+                <button type="button" class="img-action danger" (click)="deleteImage(img.id)" title="Eliminar">✕</button>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="hint">Sin imágenes en la galería.</p>
+      }
+    </div>
+  </div>
+</div>

@@ -46,6 +46,12 @@ export const routes: Routes = [
         data: { permission: 'settings.view' },
       },
       {
+        path: 'about',
+        loadChildren: () => import('./features/about/about.routes').then(m => m.aboutRoutes),
+        canActivate: [permissionGuard],
+        data: { permission: 'about.view' },
+      },
+      {
         path: 'users',
         loadChildren: () => import('./features/users/users.routes').then(m => m.userRoutes),
         canActivate: [permissionGuard],

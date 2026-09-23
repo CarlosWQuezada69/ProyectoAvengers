@@ -1,0 +1,35 @@
+@if (!hasData()) {
+  <div class="bar-chart__empty">
+    <p>Sin datos</p>
+  </div>
+} @else {
+  <div class="bar-chart">
+    <div class="bar-chart__plot">
+      @for (day of data(); track day.label) {
+        <div class="bar-chart__group">
+          <div class="bar-chart__cols">
+            <div class="bar-chart__col">
+              <div
+                class="bar-chart__bar bar-chart__bar--gold"
+                [style.height.%]="(day.pageViews / max()) * 100"
+                [attr.title]="'Visitas a la página: ' + day.pageViews"
+              ></div>
+            </div>
+            <div class="bar-chart__col">
+              <div
+                class="bar-chart__bar bar-chart__bar--steel"
+                [style.height.%]="(day.productViews / max()) * 100"
+                [attr.title]="'Vistas de producto: ' + day.productViews"
+              ></div>
+            </div>
+          </div>
+          <span class="bar-chart__label">{{ day.label }}</span>
+        </div>
+      }
+    </div>
+    <div class="bar-chart__legend">
+      <span><i class="bar-chart__dot bar-chart__dot--gold"></i> Visitas a páginas</span>
+      <span><i class="bar-chart__dot bar-chart__dot--steel"></i> Vistas de producto</span>
+    </div>
+  </div>
+}

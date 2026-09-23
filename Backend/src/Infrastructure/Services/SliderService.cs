@@ -54,10 +54,23 @@ public class SliderService : ISliderService
         return MapToDto(item);
     }
 
-    public async Task<SliderItemDto?> UpdateAsync(Guid id, UpdateSliderItemRequest request)
+    public async Task<SliderItemDto?> UpdateAsync(Guid id, UpdateSliderItemRequest request,
+        Stream? imageStream = null, string? imageFileName = null, string? imageContentType = null)
     {
         var item = await _context.SliderItems.AsTracking().FirstOrDefaultAsync(s => s.Id == id);
         if (item == null) return null;
+
+        if (imageStream != null && imageFileName != null && imageContentType != null)
+        {
+            if (!ImageFileValidator.IsValid(imageContentType, imageStream.Length, out var error))
+                throw new InvalidOperationException(error);
+
+            if (!string.IsNullOrEmpty(item.ImageUrl))
+                await _fileStorage.DeleteAsync(item.ImageUrl);
+
+            var imageUrl = await _fileStorage.SaveAsync(imageStream, imageFileName, "slider");
+            item.UpdateImage(imageUrl);
+        }
 
         item.UpdateDetails(request.Title, request.Subtitle, request.LinkUrl,
             request.DisplayOrder, request.StartsAt, request.EndsAt, request.IsActive);

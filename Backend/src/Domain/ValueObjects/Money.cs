@@ -11,12 +11,12 @@ public readonly record struct Money
             throw new ArgumentException("El monto no puede ser negativo.", nameof(amount));
 
         Amount = amount;
-        Currency = string.IsNullOrWhiteSpace(currency) ? "MXN" : currency.ToUpperInvariant();
+        Currency = string.IsNullOrWhiteSpace(currency) ? "DOP" : currency.ToUpperInvariant();
     }
 
-    public static Money FromDecimal(decimal amount, string currency = "MXN") => new(amount, currency);
+    public static Money FromDecimal(decimal amount, string currency = "DOP") => new(amount, currency);
 
-    public static Money Zero(string currency = "MXN") => new(0, currency);
+    public static Money Zero(string currency = "DOP") => new(0, currency);
 
     public Money Add(Money other)
     {

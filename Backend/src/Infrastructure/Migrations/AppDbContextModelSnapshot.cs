@@ -262,6 +262,38 @@ namespace ProyectoAvengers.Infrastructure.Migrations
                     b.ToTable("email_change_requests", (string)null);
                 });
 
+            modelBuilder.Entity("ProyectoAvengers.Domain.Entities.PageViewDaily", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date")
+                        .HasColumnName("date");
+
+                    b.Property<string>("PageKey")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("page_key");
+
+                    b.Property<int>("Views")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("views");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PageKey", "Date")
+                        .IsUnique();
+
+                    b.ToTable("page_view_daily", (string)null);
+                });
+
             modelBuilder.Entity("ProyectoAvengers.Domain.Entities.PasswordResetToken", b =>
                 {
                     b.Property<Guid>("Id")

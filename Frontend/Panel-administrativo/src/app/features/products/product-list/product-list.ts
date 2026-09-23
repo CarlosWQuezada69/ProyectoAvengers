@@ -8,11 +8,12 @@ import { BadgeComponent } from '../../../shared/components/badge/badge';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { AssetUrlPipe } from '../../../core/pipes/asset-url.pipe';
 import type { Product } from '../../../core/models/product';
 
 @Component({
   selector: 'app-product-list',
-  imports: [DatePipe, RouterLink, FormsModule, ButtonComponent, BadgeComponent, HasPermissionDirective],
+  imports: [DatePipe, RouterLink, FormsModule, ButtonComponent, BadgeComponent, HasPermissionDirective, AssetUrlPipe],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

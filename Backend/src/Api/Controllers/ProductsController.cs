@@ -231,7 +231,7 @@ public class ProductsController : ControllerBase
             {
                 @type = "Offer",
                 price = product.Price,
-                priceCurrency = "MXN",
+                priceCurrency = "DOP",
                 availability = product.Stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
                 url = $"/productos/{product.Slug}"
             }

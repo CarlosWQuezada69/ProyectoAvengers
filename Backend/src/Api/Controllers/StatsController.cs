@@ -29,13 +29,15 @@ public class StatsController : AdminBaseController
         [FromQuery] int limit = 10)
         => Ok(await _statsService.GetTopViewedAsync(from, to, limit));
 
-    [HttpGet("stats/products/top-sellers")]
+    [HttpGet("stats/views/last-days")]
     [RequirePermission("stats.view")]
-    public async Task<ActionResult<List<TopProductStat>>> GetTopSellers(
-        [FromQuery] DateTime? from,
-        [FromQuery] DateTime? to,
-        [FromQuery] int limit = 10)
-        => Ok(await _statsService.GetTopSellersAsync(from, to, limit));
+    public async Task<ActionResult<List<DailyViewsStat>>> GetDailyViews([FromQuery] int days = 7)
+        => Ok(await _statsService.GetDailyViewsAsync(days));
+
+    [HttpGet("stats/views/by-page")]
+    [RequirePermission("stats.view")]
+    public async Task<ActionResult<List<PageViewsStat>>> GetPageViews()
+        => Ok(await _statsService.GetPageViewsAsync());
 
     [HttpGet("stats/products/low-stock")]
     [RequirePermission("stats.view")]

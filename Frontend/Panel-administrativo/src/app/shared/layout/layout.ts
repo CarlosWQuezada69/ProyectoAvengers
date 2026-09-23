@@ -62,6 +62,7 @@ export class LayoutComponent {
     { label: 'Categorías', icon: 'categories', route: '/categories', permission: 'categories.view' },
     { label: 'Slider', icon: 'slider', route: '/slider', permission: 'slider.view' },
     { label: 'Configuración', icon: 'settings', route: '/settings', permission: 'settings.view' },
+    { label: 'Acerca de', icon: 'about', route: '/about', permission: 'about.view' },
     { label: 'Usuarios', icon: 'users', route: '/users', permission: 'users.view' },
     { label: 'Roles', icon: 'roles', route: '/roles', permission: 'roles.view' },
     { label: 'Auditoría', icon: 'audit', route: '/audit', permission: 'audit.view' },

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 export type IconName =
   | 'shield'
+  | 'shield-check'
   | 'search'
   | 'user'
   | 'cart'
@@ -14,10 +15,20 @@ export type IconName =
   | 'instagram'
   | 'youtube'
   | 'whatsapp'
+  | 'chevron-down'
   | 'chevron-left'
   | 'chevron-right'
   | 'arrow-left'
-  | 'star';
+  | 'arrow-right'
+  | 'star'
+  | 'mail'
+  | 'phone'
+  | 'check'
+  | 'sparkles'
+  | 'gem'
+  | 'truck'
+  | 'eye'
+  | 'printer';
 
 const FILLED: ReadonlySet<IconName> = new Set(['facebook', 'instagram', 'youtube', 'whatsapp']);
 
@@ -41,6 +52,10 @@ const FILLED: ReadonlySet<IconName> = new Set(['facebook', 'instagram', 'youtube
         <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
         <path d="M12 8v4" />
         <path d="M10 10h4" />
+      }
+      @case ('shield-check') {
+        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+        <path d="m9 12 2 2 4-4" />
       }
       @case ('search') {
         <circle cx="11" cy="11" r="8" />
@@ -77,6 +92,9 @@ const FILLED: ReadonlySet<IconName> = new Set(['facebook', 'instagram', 'youtube
         <line x1="10" x2="10" y1="11" y2="17" />
         <line x1="14" x2="14" y1="11" y2="17" />
       }
+      @case ('chevron-down') {
+        <path d="m6 9 6 6 6-6" />
+      }
       @case ('chevron-left') {
         <path d="m15 18-6-6 6-6" />
       }
@@ -87,8 +105,47 @@ const FILLED: ReadonlySet<IconName> = new Set(['facebook', 'instagram', 'youtube
         <path d="M19 12H5" />
         <path d="m12 19-7-7 7-7" />
       }
+      @case ('arrow-right') {
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+      }
       @case ('star') {
         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+      }
+      @case ('mail') {
+        <rect x="2" y="4" width="20" height="16" rx="2" />
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+      }
+      @case ('phone') {
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
+      }
+      @case ('check') {
+        <path d="M20 6 9 17l-5-5" />
+      }
+      @case ('sparkles') {
+        <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z" />
+      }
+      @case ('gem') {
+        <path d="M6 3h12l4 6-10 12L2 9z" />
+        <path d="M2 9h20" />
+        <path d="M9 3l1.5 6L12 21" />
+        <path d="M15 3l-1.5 6L12 21" />
+      }
+      @case ('truck') {
+        <path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11" />
+        <path d="M14 9h4.4a2 2 0 0 1 1.8 1.1l1.6 3.2c.1.2.2.45.2.7V17c0 .55-.45 1-1 1h-2" />
+        <path d="M6 18h8" />
+        <circle cx="7" cy="18" r="2" />
+        <circle cx="17" cy="18" r="2" />
+      }
+      @case ('eye') {
+        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+        <circle cx="12" cy="12" r="3" />
+      }
+      @case ('printer') {
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+        <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" />
+        <rect x="6" y="14" width="12" height="8" rx="1" />
       }
       @case ('facebook') {
         <path
