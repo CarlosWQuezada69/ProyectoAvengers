@@ -32,6 +32,30 @@
 
 **Verificación**: builds OK (backend, panel y tienda); migración aplicada y tabla `page_view_daily` verificada; stats verificadas end-to-end; push a GitHub `3838d0d`.
 
+### 2026-09-23 — Slider con imágenes, formato RD, seeder demo y animaciones fluidas
+> Commits: `d0b4d6c`, `3fae817`, `03ba40f`
+
+**Tienda (Vista-clientes)**
+- **Hero del slider corregido**: la imagen del slide no se veía porque `z-index: -1` la pintaba detrás del fondo del hero. Ahora se apilan imagen (z-index 0) → velo (1) → texto (2), con velo oscuro uniforme sobre toda la imagen (antes quedaba a la mitad) y texto siempre legible.
+- Intervalo del carrusel a **8 s** por slide (antes 6 s).
+- Slider con **4 slides con imagen**: la cargada por el usuario + 3 fondos de muestra generados con ImageMagick (oro, rosado, platino) asociados por API a las slides del seed.
+- Slug en el formulario de producto: label "URL del producto (slug)", placeholder y hint explicativo (componente `app-input` con nuevo `hint`).
+
+**Panel administrativo**
+- Formato de fecha RD: locale `es-DO` registrado (`main.ts` + `LOCALE_ID`) y etiquetas del gráfico de stats en cultura `es-DO` (`StatsService` → "jue 17/09"…).
+- Fix TS7053: el FormGroup de Settings incluye ahora `rnc` y `address`.
+
+**Backend / datos**
+- `DateTime?` nullable en slider (sin fechas obligatorias); se verifica por API que subir imagen (200) y borrar (204) funcionan y eliminan el archivo.
+- **Seeder de datos demo solo en Development** e idempotente: catálogo (3 categorías + 5 productos en DOP), settings con 10 claves por defecto (incluye RNC/dirección) y 3 slides sin imagen; limpieza de 7 imágenes huérfanas en `uploads/slider`.
+
+**Animaciones fluidas (tienda + panel)**
+- Directiva `[reveal]` (IntersectionObserver) compartida con variantes `up/left/right/fade/scale` y `revealDelay`; aplicada a home, catálogo, detalle de producto, about, 404 y footer (tienda) y a dashboard, productos, slider, usuarios, categorías y settings (panel).
+- Utilidades CSS globales `.anim-*` y `.stagger` (aparición en cascada) con `prefers-reduced-motion` respetado.
+- Panel: se retiran las View Transitions API (ocasionaban un **flasheo blanco** al navegar en dark mode con `backdrop-filter`); se mantiene el fade de ruta (`pageFadeIn`) + reveals.
+
+**Verificación**: builds OK (backend con 28/28 tests, panel y tienda); slider con 4 ítems verificado por API; navegación del panel probada con Chromium sin recargas ni parpadeo; push `03ba40f`.
+
 ## Frontend (Angular) — Prioridades
 
 ### Alta
