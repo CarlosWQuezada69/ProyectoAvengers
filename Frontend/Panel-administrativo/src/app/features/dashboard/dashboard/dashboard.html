@@ -1,10 +1,10 @@
 <div class="dashboard">
-  <header class="section-header">
+  <header class="section-header" reveal variant="fade">
     <h2>Dashboard</h2>
   </header>
 
   @if (loading()) {
-    <div class="kpi-grid">
+    <div class="kpi-grid stagger" reveal variant="fade">
       @for (_ of [1,2,3,4,5,6,7,8]; track $index) {
         <div class="kpi-card">
           <app-skeleton height="14px" width="60%" />
@@ -13,7 +13,7 @@
       }
     </div>
   } @else if (overview()) {
-    <div class="kpi-grid">
+    <div class="kpi-grid stagger" reveal variant="fade">
       <div class="kpi-card">
         <span class="kpi-label">Productos totales</span>
         <span class="kpi-value">{{ overview()!.totalProducts }}</span>
@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <div class="charts-grid">
+    <div class="charts-grid" reveal>
       <div class="chart-card">
         <h3>Visitas por página</h3>
         <app-donut-chart [data]="donutSlices()" />
@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <div class="section-card">
+    <div class="section-card" reveal>
       <h3>Más vistos</h3>
       <div class="bar-chart">
         @for (item of topViewed(); track item.productId) {
@@ -78,7 +78,7 @@
       </div>
     </div>
 
-    <div class="section-card">
+    <div class="section-card" reveal>
       <h3>Stock bajo</h3>
       <table class="table">
         <thead>

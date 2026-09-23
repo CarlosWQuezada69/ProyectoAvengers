@@ -64,7 +64,7 @@
 
 <section class="collections" aria-labelledby="colecciones-title">
   <div class="container">
-    <div class="section-head">
+    <div class="section-head" reveal>
       <div>
         <p class="section-head__eyebrow">Lo más destacado</p>
         <h2 id="colecciones-title">Colecciones seleccionadas</h2>
@@ -76,7 +76,7 @@
     </div>
 
     @if (loading()) {
-      <div class="collections__grid">
+      <div class="collections__grid stagger" reveal variant="fade">
         @for (_ of [1, 2, 3, 4]; track $index) {
           <div class="card-skeleton" aria-hidden="true">
             <div class="card-skeleton__media"></div>
@@ -88,7 +88,7 @@
         }
       </div>
     } @else {
-      <div class="collections__grid">
+      <div class="collections__grid stagger" reveal variant="fade">
         @for (product of featured(); track product.id) {
           <app-product-card
             [product]="product"

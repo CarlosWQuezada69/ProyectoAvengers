@@ -400,3 +400,82 @@ a {
     padding-inline: 18px;
   }
 }
+
+/* =========================================================
+   MOTION — Animaciones fluidas globales (tienda)
+   ========================================================= */
+
+/* Utilidades de aparición al hacer scroll */
+.anim-reveal,
+.anim-reveal-left,
+.anim-reveal-right,
+.anim-fade,
+.anim-scale {
+  opacity: 0;
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.anim-reveal { transform: translateY(28px); }
+.anim-reveal-left { transform: translateX(-36px); }
+.anim-reveal-right { transform: translateX(36px); }
+.anim-scale { transform: scale(0.95); }
+
+.anim-reveal.is-in-view,
+.anim-reveal-left.is-in-view,
+.anim-reveal-right.is-in-view,
+.anim-fade.is-in-view,
+.anim-scale.is-in-view {
+  opacity: 1;
+  transform: none;
+}
+
+/* Stagger para grupos (tarjetas, filas) */
+.stagger > * {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stagger.is-in-view > * {
+  opacity: 1;
+  transform: none;
+}
+
+.stagger.is-in-view > *:nth-child(2) { transition-delay: 80ms; }
+.stagger.is-in-view > *:nth-child(3) { transition-delay: 160ms; }
+.stagger.is-in-view > *:nth-child(4) { transition-delay: 240ms; }
+.stagger.is-in-view > *:nth-child(5) { transition-delay: 320ms; }
+.stagger.is-in-view > *:nth-child(6) { transition-delay: 400ms; }
+.stagger.is-in-view > *:nth-child(7) { transition-delay: 480ms; }
+.stagger.is-in-view > *:nth-child(8) { transition-delay: 560ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .stagger > *,
+  .anim-reveal,
+  .anim-reveal-left,
+  .anim-reveal-right,
+  .anim-fade,
+  .anim-scale {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

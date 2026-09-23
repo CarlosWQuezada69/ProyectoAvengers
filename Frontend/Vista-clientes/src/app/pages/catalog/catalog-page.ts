@@ -28,11 +28,12 @@ function flatten(categories: CategoryDto[], result: CategoryDto[] = []): Categor
   }
   return result;
 }
+import { RevealDirective } from '../../shared/directives/reveal.directive';
 
 @Component({
   selector: 'app-catalog-page',
   standalone: true,
-  imports: [IconComponent, ProductCardComponent],
+  imports: [IconComponent, ProductCardComponent, RevealDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './catalog-page.html',
   styleUrls: ['./catalog-page.scss']

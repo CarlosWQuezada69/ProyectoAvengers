@@ -18,10 +18,11 @@ type SettingKeys =
   | 'contact_phone'
   | 'contact_whatsapp'
   | 'social_links';
+import { RevealDirective } from '../../../shared/directives/reveal.directive';
 
 @Component({
   selector: 'app-settings-form',
-  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, UploaderComponent],
+  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, UploaderComponent, RevealDirective],
   templateUrl: './settings-form.html',
   styleUrl: './settings-form.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

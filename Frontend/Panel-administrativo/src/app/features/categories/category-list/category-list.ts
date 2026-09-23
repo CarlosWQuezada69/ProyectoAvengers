@@ -9,10 +9,11 @@ import { HasPermissionDirective } from '../../../shared/directives/has-permissio
 import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import type { Category } from '../../../core/models/category';
+import { RevealDirective } from '../../../shared/directives/reveal.directive';
 
 @Component({
   selector: 'app-category-list',
-  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, ModalComponent, BadgeComponent, HasPermissionDirective],
+  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, ModalComponent, BadgeComponent, HasPermissionDirective, RevealDirective],
   templateUrl: './category-list.html',
   styleUrl: './category-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

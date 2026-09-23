@@ -9,7 +9,7 @@
   </div>
 } @else if (product(); as product) {
   <div class="container detail">
-    <nav class="breadcrumb" aria-label="Migajas">
+    <nav class="breadcrumb" reveal variant="fade" aria-label="Migajas">
       <a routerLink="/">Inicio</a>
       <span aria-hidden="true">/</span>
       <a routerLink="/productos">Productos</a>
@@ -18,7 +18,7 @@
     </nav>
 
     <div class="detail__grid">
-      <div class="gallery">
+      <div class="gallery" reveal variant="left">
         <div class="gallery__main">
           <app-product-image-fallback
             [product]="product"
@@ -47,7 +47,7 @@
         }
       </div>
 
-      <div class="detail__info">
+      <div class="detail__info" reveal variant="right" [revealDelay]="80">
         @if (product.categoryName) {
           <a class="detail__category" routerLink="/productos" [queryParams]="{ cat: product.categoryId ?? '' }">
             {{ product.categoryName }}
@@ -137,7 +137,7 @@
     </div>
   </div>
 } @else {
-  <div class="empty-state">
+  <div class="empty-state" reveal variant="fade">
     <p>Este producto no está disponible.</p>
     <a class="btn btn-gold" routerLink="/productos">Volver al catálogo</a>
   </div>

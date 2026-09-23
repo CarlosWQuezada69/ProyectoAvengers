@@ -1,4 +1,4 @@
-<section class="page-hero">
+<section class="page-hero" reveal>
   <div class="container">
     <h1>Colecciones</h1>
     <p>Joyería de edición limitada inspirada en los héroes más poderosos. Piezas numeradas con acabados premium.</p>
@@ -8,7 +8,7 @@
 <section class="catalog">
   <div class="container">
     <!-- Filtros -->
-    <div class="catalog__toolbar">
+    <div class="catalog__toolbar" reveal>
       <form class="filters__search" (ngSubmit)="onSearch()">
         <app-icon name="search" size="18"></app-icon>
         <input
@@ -74,7 +74,7 @@
     </div>
 
     <!-- Meta de resultados -->
-    <div class="catalog__meta">
+    <div class="catalog__meta" reveal variant="fade">
       @if (!loading() && result()) {
         <p>
           Mostrando <strong>{{ rangeStart() }}–{{ rangeEnd() }}</strong> de
@@ -89,7 +89,7 @@
     </div>
 
     @if (loading()) {
-      <div class="catalog__grid">
+      <div class="catalog__grid stagger" reveal variant="fade">
         @for (_ of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
           <div class="card-skeleton" aria-hidden="true">
             <div class="card-skeleton__media"></div>
@@ -101,14 +101,14 @@
         }
       </div>
     } @else if (result() && result()!.data.length > 0) {
-      <div class="catalog__grid">
+      <div class="catalog__grid stagger" reveal variant="fade">
         @for (product of result()!.data; track product.id) {
           <app-product-card [product]="product" (addRequested)="addToCart($event)" />
         }
       </div>
 
       @if (totalPages() > 1) {
-        <nav class="pagination" aria-label="Paginación">
+        <nav class="pagination" reveal variant="fade" aria-label="Paginación">
           <button
             class="pagination__btn pagination__btn--icon"
             type="button"
@@ -142,7 +142,7 @@
         </nav>
       }
     } @else {
-      <div class="empty-state">
+      <div class="empty-state" reveal variant="fade">
         <app-icon name="search" size="44"></app-icon>
         <p>No encontramos productos con esos filtros.</p>
         <button class="btn btn-gold" type="button" (click)="resetFilters()">

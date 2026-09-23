@@ -14,11 +14,12 @@ const FALLBACK_TITLE = 'Acerca de The Avengers Joyero';
 const FALLBACK_HISTORY = `The Avengers Joyero nació de la unión entre la pasión por el cómic y la joyería de autor.
 Cada pieza es una edición limitada inspirada en los héroes más poderosos de la Tierra, elaborada a mano con materiales nobles y acabados que buscan tributar a la leyenda.
 Creemos que el poder también se lleva puesto: por eso diseñamos colecciones que combinan la estética oscura y premium con destellos de oro, tal y como merece un héroe.`;
+import { RevealDirective } from '../../shared/directives/reveal.directive';
 
 @Component({
   selector: 'app-about-page',
   standalone: true,
-  imports: [IconComponent, RouterLink, AssetUrlPipe],
+  imports: [IconComponent, RouterLink, AssetUrlPipe, RevealDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './about-page.html',
   styleUrls: ['./about-page.scss']

@@ -2,7 +2,7 @@
   <div class="site-footer__glow" aria-hidden="true"></div>
 
   <div class="container">
-    <div class="site-footer__grid">
+    <div class="site-footer__grid stagger" reveal variant="fade">
       <div class="site-footer__brand">
         <a class="site-footer__logo" routerLink="/">
           @if (logoUrl(); as url) {
@@ -57,7 +57,7 @@
       </div>
     </div>
 
-    <div class="site-footer__bottom">
+    <div class="site-footer__bottom" reveal variant="fade">
       <p>{{ copyright() }}</p>
       <div class="site-footer__legal">
         <a routerLink="/acerca">Aviso legal</a>

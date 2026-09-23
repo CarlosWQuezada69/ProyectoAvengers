@@ -8,11 +8,12 @@ import { ProductDto, ProductListDto } from '../../core/models/product';
 import { IconComponent } from '../../shared/icon/icon';
 import { ProductImageFallbackComponent } from '../../shared/components/product-image-fallback/product-image-fallback';
 import { formatPrice } from '../../core/utils/format';
+import { RevealDirective } from '../../shared/directives/reveal.directive';
 
 @Component({
   selector: 'app-product-detail-page',
   standalone: true,
-  imports: [IconComponent, RouterLink, ProductImageFallbackComponent],
+  imports: [IconComponent, RouterLink, ProductImageFallbackComponent, RevealDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './product-detail-page.html',
   styleUrls: ['./product-detail-page.scss']

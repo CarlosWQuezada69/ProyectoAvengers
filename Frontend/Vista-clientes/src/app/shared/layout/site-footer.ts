@@ -8,11 +8,12 @@ import { CategoryDto } from '../../core/models/category';
 import { AssetUrlPipe } from '../../core/pipes/asset-url.pipe';
 import { parseSocialLinks, SocialLink } from '../../core/utils/social';
 import { IconComponent } from '../icon/icon';
+import { RevealDirective } from '../../shared/directives/reveal.directive';
 
 @Component({
   selector: 'app-site-footer',
   standalone: true,
-  imports: [IconComponent, RouterLink, AssetUrlPipe],
+  imports: [IconComponent, RouterLink, AssetUrlPipe, RevealDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './site-footer.html',
   styleUrls: ['./site-footer.scss']

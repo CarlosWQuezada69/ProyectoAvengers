@@ -11,10 +11,11 @@ import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.se
 import { ToastService } from '../../../shared/services/toast.service';
 import { AssetUrlPipe } from '../../../core/pipes/asset-url.pipe';
 import type { SliderItem } from '../../../core/models/index';
+import { RevealDirective } from '../../../shared/directives/reveal.directive';
 
 @Component({
   selector: 'app-slider-list',
-  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, ModalComponent, BadgeComponent, UploaderComponent, HasPermissionDirective, AssetUrlPipe],
+  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, ModalComponent, BadgeComponent, UploaderComponent, HasPermissionDirective, AssetUrlPipe, RevealDirective],
   templateUrl: './slider-list.html',
   styleUrl: './slider-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

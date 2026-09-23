@@ -1,5 +1,5 @@
 <div class="container about">
-  <header class="about__hero">
+  <header class="about__hero" reveal>
     <p class="section-head__eyebrow">Nuestra historia</p>
     <h1 class="about__title">{{ title() }}</h1>
   </header>
@@ -15,14 +15,14 @@
     </div>
   } @else {
     <div class="about__grid">
-      <section class="about__story surface">
+      <section class="about__story surface" reveal variant="left">
         <p class="about__eyebrow">Desde la Tierra, para héroes</p>
         @for (paragraph of paragraphs(); track $index) {
           <p class="about__paragraph">{{ paragraph }}</p>
         }
       </section>
 
-      <aside class="about__side">
+      <aside class="about__side" reveal variant="right" [revealDelay]="80">
         @if (mission(); as mission) {
           <section class="about__card surface">
             <app-icon class="about__card-icon" name="sparkles" size="22"></app-icon>
@@ -41,7 +41,7 @@
     </div>
 
     @if (about()?.gallery?.length) {
-      <section class="about__gallery" aria-label="Galería">
+      <section class="about__gallery stagger" reveal variant="fade" aria-label="Galería">
         @for (image of about()!.gallery; track image.id) {
           <figure class="about__gallery-item">
             <img [src]="image.url | assetUrl" [alt]="image.altText ?? 'Acerca de The Avengers Joyero'" loading="lazy" />
@@ -50,7 +50,7 @@
       </section>
     }
 
-    <section class="about__contact surface" id="contacto">
+    <section class="about__contact surface" reveal id="contacto">
       <div>
         <p class="about__eyebrow">Hablemos</p>
         <h2>¿Dudas o quieres una cotización?</h2>

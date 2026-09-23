@@ -10,10 +10,11 @@ import { ConfirmDialogService } from '../../../shared/services/confirm-dialog.se
 import { ToastService } from '../../../shared/services/toast.service';
 import { AssetUrlPipe } from '../../../core/pipes/asset-url.pipe';
 import type { Product } from '../../../core/models/product';
+import { RevealDirective } from '../../../shared/directives/reveal.directive';
 
 @Component({
   selector: 'app-product-list',
-  imports: [DatePipe, RouterLink, FormsModule, ButtonComponent, BadgeComponent, HasPermissionDirective, AssetUrlPipe],
+  imports: [DatePipe, RouterLink, FormsModule, ButtonComponent, BadgeComponent, HasPermissionDirective, AssetUrlPipe, RevealDirective],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

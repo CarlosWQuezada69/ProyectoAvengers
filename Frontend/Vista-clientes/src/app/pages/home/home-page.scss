@@ -37,8 +37,8 @@
 .hero__bg {
   position: absolute;
   inset: 0;
-  z-index: -1;
-  opacity: 0.9;
+  z-index: 0;
+  opacity: 1;
 }
 
 .hero__bg app-product-image-fallback {
@@ -53,14 +53,16 @@
 .hero__shade {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 1;
   background:
-    linear-gradient(90deg, rgba(10, 10, 12, 0.92) 0%, rgba(10, 10, 12, 0.55) 55%, rgba(10, 10, 12, 0.15) 100%),
-    linear-gradient(0deg, rgba(10, 10, 12, 0.6), transparent 40%),
-    radial-gradient(700px 320px at 12% 18%, rgba(var(--color-gold-rgb), 0.1), transparent 65%);
+    linear-gradient(90deg, rgba(10, 10, 12, 0.7) 0%, rgba(10, 10, 12, 0.42) 34%, rgba(10, 10, 12, 0.28) 62%, rgba(10, 10, 12, 0.2) 100%),
+    linear-gradient(0deg, rgba(10, 10, 12, 0.4), transparent 45%),
+    radial-gradient(700px 320px at 12% 18%, rgba(var(--color-gold-rgb), 0.07), transparent 65%);
 }
 
 .hero__content {
+  position: relative;
+  z-index: 2;
   width: 100%;
   padding-block: 64px;
 }

@@ -6,10 +6,11 @@ import { BadgeComponent } from '../../../shared/components/badge/badge';
 import { DonutChartComponent, type DonutSlice } from './components/donut-chart';
 import { BarChartComponent, type DailyBar } from './components/bar-chart';
 import type { DailyViewsStat, PageViewsStat, StatsOverview, TopProduct } from '../../../core/models/index';
+import { RevealDirective } from '../../../shared/directives/reveal.directive';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [DecimalPipe, SkeletonComponent, BadgeComponent, DonutChartComponent, BarChartComponent],
+  imports: [DecimalPipe, SkeletonComponent, BadgeComponent, DonutChartComponent, BarChartComponent, RevealDirective],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

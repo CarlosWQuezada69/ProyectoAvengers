@@ -1,12 +1,12 @@
 <div class="categories-page">
-  <header class="section-header">
+  <header class="section-header" reveal variant="fade">
     <h2>Categorías</h2>
     <div *hasPermission="'categories.create'">
       <app-btn (click)="openCreateModal()">Nueva categoría</app-btn>
     </div>
   </header>
 
-  <div class="table-card">
+  <div class="table-card" reveal variant="fade">
       <table class="table">
         <thead>
           <tr>

@@ -11,6 +11,7 @@ import { SliderItemDto } from '../../core/models/slider';
 import { IconComponent } from '../../shared/icon/icon';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card';
 import { ProductImageFallbackComponent } from '../../shared/components/product-image-fallback/product-image-fallback';
+import { RevealDirective } from '../../shared/directives/reveal.directive';
 
 interface HeroSlide {
   id: string;
@@ -151,7 +152,7 @@ function toSlide(item: SliderItemDto, index: number): HeroSlide {
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [IconComponent, ProductCardComponent, ProductImageFallbackComponent, RouterLink, DecimalPipe],
+  imports: [IconComponent, ProductCardComponent, ProductImageFallbackComponent, RouterLink, DecimalPipe, RevealDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home-page.html',
   styleUrls: ['./home-page.scss']
@@ -169,7 +170,7 @@ export class HomePageComponent {
   readonly currentSlide = computed(() => this.slides()[this.current()] ?? this.slides()[0]);
 
   constructor() {
-    interval(6000)
+    interval(8000)
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.next());
 
