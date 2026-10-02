@@ -23,13 +23,17 @@ import { BrandingService } from '../../../core/services/branding.service';
     :host {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     .brand-logo {
-      width: 32px;
-      height: 32px;
+      height: 44px;
+      width: auto;
+      max-width: 44px;
       object-fit: contain;
       flex-shrink: 0;
+    }
+    img.brand-logo {
+      filter: drop-shadow(0 4px 14px rgba(var(--accent-rgb), 0.3));
     }
     .brand-name {
       font-size: 16px;
