@@ -34,9 +34,11 @@
       type="button"
       [disabled]="outOfStock()"
       (click)="onAdd()"
+      aria-label="Añadir al carrito"
     >
       <app-icon name="cart" size="16"></app-icon>
-      Añadir al carrito
+      <span class="product-card__cta-label">Añadir al carrito</span>
+      <span class="product-card__cta-label--short" aria-hidden="true">Añadir</span>
     </button>
   </div>
 </article>

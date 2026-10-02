@@ -299,7 +299,11 @@
 
 @media (max-width: 640px) {
   .collections__grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .card-skeleton__lines {
+    padding: 10px;
   }
 }

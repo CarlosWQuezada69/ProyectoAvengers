@@ -87,7 +87,7 @@ let uid = 0;
     img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: var(--pf-object-fit, cover);
     }
     .placeholder {
       display: block;
