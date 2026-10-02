@@ -293,8 +293,10 @@
   }
 
   .quote-print__logo {
-    max-height: 64px;
-    max-width: 120px;
+    width: auto;
+    height: 88px;
+    max-height: 88px;
+    max-width: 140px;
     object-fit: contain;
   }
 

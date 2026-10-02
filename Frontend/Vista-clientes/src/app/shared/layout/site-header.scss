@@ -38,18 +38,21 @@
 }
 
 .site-header__logo {
+  --logo-mark-size: 54px;
+  --logo-image-height: 62px;
+
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .site-header__logo-mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: var(--logo-mark-size);
+  height: var(--logo-mark-size);
+  border-radius: 16px;
   background: var(--grad-gold);
   color: var(--color-text-on-gold);
   box-shadow: var(--shadow-gold-soft), inset 0 1px 0 rgba(255, 255, 255, 0.4);
@@ -71,10 +74,11 @@
   font-family: var(--font-display);
   font-size: clamp(18px, 2.4vw, 26px);
   letter-spacing: 2.5px;
-  background: linear-gradient(180deg, #ffffff, var(--color-gold-bright));
+  background: var(--grad-gold-text);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(var(--color-gold-rgb), 0.22));
 }
 
 .site-header__logo-text small {
@@ -86,17 +90,26 @@
   margin-top: 2px;
 }
 
+/* El logo real va sin caja para que ocupe todo su alto */
 .site-header__logo-image {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
+  width: auto;
+  height: var(--logo-image-height);
+  border-radius: 0;
+  background: transparent;
+  border: none;
   box-shadow: none;
 }
 
 .site-header__logo-image img {
-  width: 100%;
+  width: auto;
   height: 100%;
   object-fit: contain;
-  padding: 4px;
+  padding: 0;
+  filter: drop-shadow(0 6px 18px rgba(var(--color-gold-rgb), 0.25));
+}
+
+.site-header__logo:hover .site-header__logo-image {
+  transform: scale(1.04);
 }
 
 /* Zona derecha */
@@ -492,8 +505,8 @@
     padding-block: 12px;
   }
 
-  .site-header__logo-mark {
-    width: 40px;
-    height: 40px;
+  .site-header__logo {
+    --logo-mark-size: 46px;
+    --logo-image-height: 52px;
   }
 }

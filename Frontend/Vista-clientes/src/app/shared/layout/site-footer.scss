@@ -32,34 +32,51 @@
 }
 
 .site-footer__logo {
+  --logo-mark-size: 48px;
+  --logo-image-height: 56px;
+
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .site-footer__logo-mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
+  width: var(--logo-mark-size);
+  height: var(--logo-mark-size);
+  border-radius: 14px;
   background: var(--grad-gold);
   color: var(--color-text-on-gold);
   box-shadow: var(--shadow-gold-soft);
+  transition: transform var(--ease-spring);
 }
 
+.site-footer__logo:hover .site-footer__logo-mark {
+  transform: rotate(-6deg) scale(1.05);
+}
+
+/* El logo real va sin caja para que ocupe todo su alto */
 .site-footer__logo-image {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
+  width: auto;
+  height: var(--logo-image-height);
+  border-radius: 0;
+  background: transparent;
+  border: none;
   box-shadow: none;
 }
 
 .site-footer__logo-image img {
-  width: 100%;
+  width: auto;
   height: 100%;
   object-fit: contain;
-  padding: 4px;
+  padding: 0;
+  filter: drop-shadow(0 6px 18px rgba(var(--color-gold-rgb), 0.25));
+}
+
+.site-footer__logo:hover .site-footer__logo-image {
+  transform: scale(1.04);
 }
 
 .site-footer__logo-text {
@@ -74,6 +91,11 @@
   font-size: 20px;
   letter-spacing: 2px;
   font-weight: 400;
+  background: var(--grad-gold-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(var(--color-gold-rgb), 0.2));
 }
 
 .site-footer__logo-text small {

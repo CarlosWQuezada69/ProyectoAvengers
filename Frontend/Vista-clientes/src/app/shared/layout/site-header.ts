@@ -40,7 +40,7 @@ export class SiteHeaderComponent {
 
   readonly logoUrl = computed(() => this.catalog.settings()?.logo_url?.trim() || null);
   readonly businessName = computed(
-    () => this.catalog.settings()?.business_name?.trim() || 'The Avengers Joyero'
+    () => this.catalog.settings()?.business_name?.trim() || 'THE AVENGERS JOYERIA'
   );
 
   readonly menuOpen = signal(false);

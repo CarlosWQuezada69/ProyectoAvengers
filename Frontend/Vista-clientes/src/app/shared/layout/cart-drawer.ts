@@ -29,7 +29,7 @@ export class CartDrawerComponent {
   protected readonly formatPrice = formatPrice;
 
   readonly businessName = computed(
-    () => this.catalog.settings()?.business_name?.trim() || 'The Avengers Joyero'
+    () => this.catalog.settings()?.business_name?.trim() || 'THE AVENGERS JOYERIA'
   );
   readonly businessLogo = computed(() => this.catalog.settings()?.logo_url?.trim() || null);
   readonly rnc = computed(() => this.catalog.settings()?.rnc?.trim() ?? '');

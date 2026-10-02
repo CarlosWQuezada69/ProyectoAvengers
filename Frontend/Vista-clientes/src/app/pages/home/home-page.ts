@@ -20,49 +20,35 @@ interface HeroSlide {
   titleLine2: string;
   imageUrl: string | null;
   productRef: { name: string };
-  theme: 'shield' | 'reactor' | 'mjolnir' | 'gems';
   linkUrl: string | null;
 }
 
 const FALLBACK_SLIDES: HeroSlide[] = [
   {
     id: 'fallback-1',
-    kicker: 'Edición limitada:',
-    titleLine1: 'AVENGERS',
-    titleLine2: 'ASSEMBLE!',
+    kicker: 'Oro 18 quilates:',
+    titleLine1: 'Anillos de Oro',
+    titleLine2: '18 Quilates',
     imageUrl: null,
-    productRef: { name: 'Colgante Capitán América' },
-    theme: 'shield',
+    productRef: { name: 'Anillo de Oro 18 Quilates' },
     linkUrl: '/productos'
   },
   {
     id: 'fallback-2',
-    kicker: 'Tecnología y lujo:',
-    titleLine1: 'ARC REACTOR',
-    titleLine2: 'DE HIERRO',
+    kicker: 'Plata 925 esterlina:',
+    titleLine1: 'Cadenas y Colgantes',
+    titleLine2: 'de Plata',
     imageUrl: null,
-    productRef: { name: 'Anillo Arc Reactor' },
-    theme: 'reactor',
+    productRef: { name: 'Cadena de Plata 925' },
     linkUrl: '/productos'
   },
   {
     id: 'fallback-3',
-    kicker: 'El poder de asgard:',
-    titleLine1: 'FUERZA',
-    titleLine2: 'DE THOR',
+    kicker: 'Certificado de calidad:',
+    titleLine1: 'Diamantes',
+    titleLine2: 'Eternos',
     imageUrl: null,
-    productRef: { name: 'Brazalete Martillo Thor' },
-    theme: 'mjolnir',
-    linkUrl: '/productos'
-  },
-  {
-    id: 'fallback-4',
-    kicker: 'Seis gemas, un destino:',
-    titleLine1: 'PODER',
-    titleLine2: 'INFINITO',
-    imageUrl: null,
-    productRef: { name: 'Colgante Gemas del Infinito' },
-    theme: 'gems',
+    productRef: { name: 'Anillo de Diamante' },
     linkUrl: '/productos'
   }
 ];
@@ -126,25 +112,18 @@ const FALLBACK_PRODUCTS: ProductListDto[] = [
   }
 ];
 
-function toSlide(item: SliderItemDto, index: number): HeroSlide {
+function toSlide(item: SliderItemDto): HeroSlide {
   const words = item.title.trim().split(/\s+/);
   const line1 = words.slice(0, Math.ceil(words.length / 2)).join(' ');
   const line2 = words.slice(Math.ceil(words.length / 2)).join(' ');
-  const lower = (item.title + ' ' + (item.subtitle ?? '')).toLowerCase();
-
-  let theme: HeroSlide['theme'] = 'shield';
-  if (/reactor|iron/gi.test(lower)) theme = 'reactor';
-  else if (/thor|martillo|mjolnir/gi.test(lower)) theme = 'mjolnir';
-  else if (/infinito|gema/gi.test(lower)) theme = 'gems';
 
   return {
     id: item.id,
     kicker: item.subtitle?.trim() || 'Edición limitada:',
-    titleLine1: line1 || 'AVENGERS',
-    titleLine2: line2 || 'ASSEMBLE!',
+    titleLine1: line1 || 'Joyería',
+    titleLine2: line2 || 'de Autor',
     imageUrl: item.imageUrl,
     productRef: { name: item.title },
-    theme,
     linkUrl: item.linkUrl
   };
 }

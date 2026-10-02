@@ -25,11 +25,15 @@ export class SiteFooterComponent {
   readonly categories = signal<CategoryDto[]>([]);
 
   readonly logoUrl = computed(() => this.catalog.settings()?.logo_url?.trim() || null);
-  readonly businessName = computed(() => this.catalog.settings()?.business_name ?? 'The Avengers Joyero');
+  readonly businessName = computed(
+    () => this.catalog.settings()?.business_name?.trim() || 'THE AVENGERS JOYERIA'
+  );
   readonly contactEmail = computed(() => this.catalog.settings()?.contact_email ?? 'hola@avengersjoyero.com');
   readonly contactPhone = computed(() => this.catalog.settings()?.contact_phone ?? '+1 809 000 0000');
   readonly copyright = computed(
-    () => this.catalog.settings()?.copyright_text ?? '© 2024 The Avengers Joyero'
+    () =>
+      this.catalog.settings()?.copyright_text?.trim() ||
+      '© 2026 THE AVENGERS JOYERIA. Todos los derechos reservados.'
   );
   readonly socials = computed<SocialLink[]>(() =>
     parseSocialLinks(this.catalog.settings()?.social_links ?? null)

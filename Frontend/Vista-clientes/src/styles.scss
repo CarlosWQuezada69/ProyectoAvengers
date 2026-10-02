@@ -56,6 +56,11 @@
 
   /* Degradados */
   --grad-gold: linear-gradient(115deg, var(--color-gold-bright) 0%, var(--color-gold) 45%, var(--color-gold-deep) 100%);
+  --grad-gold-text: linear-gradient(180deg,
+      var(--color-gold-bright) 0%,
+      var(--color-gold) 42%,
+      var(--color-gold-deep) 74%,
+      var(--color-gold-soft) 100%);
   --grad-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
   --radial-glow: radial-gradient(1000px 520px at 78% -12%, rgba(var(--color-gold-rgb), 0.08), transparent 62%);
 }
