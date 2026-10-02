@@ -19,6 +19,10 @@ packages/
 .env
 .env.local
 
+# Secretos de .NET (Jwt:Secret va en user-secrets o variable de entorno)
+appsettings.Local.json
+appsettings.*.Local.json
+
 # Logs
 *.log
 

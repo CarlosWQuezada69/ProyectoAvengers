@@ -49,7 +49,7 @@ public class ProductsController : ControllerBase
             query = query.Where(p =>
                 p.Name.ToLower().Contains(searchTerm) ||
                 p.Sku.ToLower().Contains(searchTerm) ||
-                p.Description!.ToLower().Contains(searchTerm));
+                (p.Description ?? "").ToLower().Contains(searchTerm));
         }
 
         if (categoryId.HasValue)
